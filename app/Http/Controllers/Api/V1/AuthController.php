@@ -25,11 +25,6 @@ class AuthController extends Controller
             
             $user = Auth::user();
 
-            if($user->role === "forgotten") {
-                $user->role = $user->active ? 'user' : 'inactive';
-                $user->save();
-            }
-
             $scopes = $user->getRoleScopes();
             $token = $user->createToken('token-name', $scopes)->accessToken;
 
