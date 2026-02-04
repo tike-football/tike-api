@@ -43,4 +43,16 @@ return [
 
     'connection' => env('PASSPORT_CONNECTION'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Password Grant Defaults
+    |--------------------------------------------------------------------------
+    |
+    | These values are used by custom auth flows that request tokens from
+    | the Passport OAuth server.
+    |
+    */
+
+    'internal_url' => rtrim(env('PASSPORT_INTERNAL_URL', 'http://nginx'), '/'),
+
 ];

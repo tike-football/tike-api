@@ -23,6 +23,7 @@ class User extends Authenticatable implements OAuthenticatable
         'name',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -46,5 +47,10 @@ class User extends Authenticatable implements OAuthenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function getRoleScopes(): array
+    {
+        return config('roles.' . $this->role . '.scopes') ?? [];
     }
 }
