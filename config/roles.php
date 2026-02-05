@@ -9,4 +9,9 @@ return [
             'test:test'
         ],
     ],
+    'unverified_user' => [
+        'scopes' => [
+            'user:verify'
+        ],
+    ],
 ];
