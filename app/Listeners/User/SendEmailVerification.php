@@ -3,6 +3,7 @@
 namespace App\Listeners\User;
 
 use App\Events\User\UserStored;
+use App\Notifications\User\EmailVerificationNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
@@ -38,7 +39,8 @@ class SendEmailVerification implements ShouldQueue
                 'queue' => $this->queue,
             ]);
 
-            // TODO: Implement email verification sending logic here
+            // Send email verification notification
+            $event->user->notify(new EmailVerificationNotification());
 
             Log::info('SendEmailVerification listener completed successfully', [
                 'user_id' => $event->user->id,

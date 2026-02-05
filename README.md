@@ -169,6 +169,104 @@ Content-Type: application/json
 
 **Note:** Email must be verified to obtain a token.
 
+#### Verify Email
+```http
+POST /api/v1/auth/verify-email
+Authorization: Bearer {verification_token}
+```
+
+**Response:** `200 OK`
+
+**Note:** The verification token must have the `user:verify` scope. After verification, the token is revoked.
+
+---
+
+## Email Verification System
+
+### Overview
+
+The application implements a queue-based email verification system using Laravel Notifications.
+
+### Flow
+
+1. **User Registration** → Triggers `UserStored` event
+2. **Event Listener** → `SendEmailVerification` (queued on `emails` queue)
+3. **Notification** → `EmailVerificationNotification` sends email with verification link
+4. **Verification Link** → Contains a Passport token with `user:verify` scope
+5. **User Clicks Link** → Calls `/api/v1/auth/verify-email` endpoint
+6. **Email Verified** → `email_verified_at` field is set, token is revoked
+
+### Configuration
+
+#### Email Verification URL
+
+Set in `.env`:
+
+```env
+EMAIL_VERIFICATION_URL="https://your-frontend-domain.com/verify-email/"
+```
+
+The system will append the verification token to this URL.
+
+#### Mail Service Configuration
+
+The system uses Laravel's mail abstraction, so you can easily switch between services:
+
+**SMTP:**
+```env
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=your-password
+MAIL_ENCRYPTION=tls
+```
+
+**SendGrid:**
+```env
+MAIL_MAILER=sendgrid
+SENDGRID_API_KEY=your-sendgrid-api-key
+```
+
+**Mailgun:**
+```env
+MAIL_MAILER=mailgun
+MAILGUN_DOMAIN=your-domain.com
+MAILGUN_SECRET=your-mailgun-key
+```
+
+**AWS SES:**
+```env
+MAIL_MAILER=ses
+AWS_ACCESS_KEY_ID=your-key
+AWS_SECRET_ACCESS_KEY=your-secret
+AWS_DEFAULT_REGION=us-east-1
+```
+
+### Localization
+
+Email content is configured for multiple languages. Currently supported:
+
+- **Spanish (default):** `lang/es/notifications.php`
+
+To add more languages, create a new file:
+
+```bash
+cp lang/es/notifications.php lang/en/notifications.php
+```
+
+Then translate the content. Users will receive emails in their preferred language (future implementation).
+
+### Testing Emails Locally
+
+Use `MAIL_MAILER=log` in development to log emails instead of sending them:
+
+```env
+MAIL_MAILER=log
+```
+
+Emails will be logged to `storage/logs/laravel.log`.
+
 ---
 
 ## Testing

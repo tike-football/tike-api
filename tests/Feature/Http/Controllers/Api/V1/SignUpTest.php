@@ -5,6 +5,7 @@ namespace Tests\Feature\Http\Controllers\Api\V1;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class SignUpTest extends TestCase
@@ -13,6 +14,8 @@ class SignUpTest extends TestCase
 
     public function test_user_can_register_with_valid_data(): void
     {
+        Notification::fake();
+
         $userData = [
             'name' => 'John',
             'last_name' => 'Doe',
