@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Events\User\UserStored;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\SignUpRequest;
 use App\Models\User;
@@ -70,6 +71,9 @@ class AuthController extends Controller
                 'password' => Hash::make($request->password),
                 'role' => 'user', // Default role
             ]);
+
+            // Dispatch UserStored event
+            event(new UserStored($user));
 
             return response()->json([
                 'message' => 'User registered successfully.',
