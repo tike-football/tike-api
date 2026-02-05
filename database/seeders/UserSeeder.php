@@ -13,7 +13,10 @@ class UserSeeder extends Seeder
         User::updateOrCreate(
             ['email' => 'test@tike.com'],
             [
-                'name' => 'admin',
+                'name' => 'Admin',
+                'last_name' => 'User',
+                'country_code' => '+1',
+                'phone_number' => '1234567890',
                 'role' => 'admin',
                 'password' => Hash::make('qwerty123'),
             ]
