@@ -15,6 +15,7 @@ class UserSeeder extends Seeder
             [
                 'name' => 'Admin',
                 'last_name' => 'User',
+                'email_verified_at' => now(),
                 'country_code' => '+1',
                 'phone_number' => '1234567890',
                 'role' => 'admin',

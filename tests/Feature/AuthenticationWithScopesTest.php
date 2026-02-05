@@ -27,6 +27,7 @@ class AuthenticationWithScopesTest extends TestCase
         $user = User::factory()->create([
             'email' => 'test@example.com',
             'password' => bcrypt('password123'),
+            'email_verified_at' => now(),
         ]);
 
         $response = $this->postJson('/api/v1/auth/get-token', [

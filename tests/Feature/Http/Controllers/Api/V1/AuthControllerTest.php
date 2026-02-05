@@ -4,6 +4,8 @@ namespace Tests\Feature\Http\Controllers\Api\V1;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
+use Laravel\Passport\Client;
 use Laravel\Passport\Passport;
 use Tests\TestCase;
 
@@ -27,6 +29,7 @@ class AuthControllerTest extends TestCase
         $user = User::factory()->create([
             'email' => 'test@example.com',
             'password' => bcrypt('password123'),
+            'email_verified_at' => now(),
         ]);
 
         $response = $this->postJson('/api/v1/auth/get-token', [
@@ -36,6 +39,52 @@ class AuthControllerTest extends TestCase
 
         $response->assertStatus(403)
             ->assertJson(['message' => 'Your email or password are incorrect.']);
+    }
+
+    public function test_verified_user_can_get_token(): void
+    {
+        // Create personal access client
+        $client = Client::create([
+            'name' => 'Personal Access Client',
+            'secret' => Str::random(40),
+            'provider' => null,
+            'redirect_uris' => [],
+            'grant_types' => ['personal_access'],
+            'revoked' => false,
+        ]);
+
+        $user = User::factory()->create([
+            'email' => 'verified@example.com',
+            'password' => bcrypt('password123'),
+            'email_verified_at' => now(),
+            'role' => 'user',
+        ]);
+
+        $response = $this->postJson('/api/v1/auth/get-token', [
+            'email' => 'verified@example.com',
+            'password' => 'password123',
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonStructure(['access_token']);
+    }
+
+    public function test_unverified_user_cannot_get_token(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'unverified@example.com',
+            'password' => bcrypt('password123'),
+            'email_verified_at' => null,
+            'role' => 'user',
+        ]);
+
+        $response = $this->postJson('/api/v1/auth/get-token', [
+            'email' => 'unverified@example.com',
+            'password' => 'password123',
+        ]);
+
+        $response->assertStatus(403)
+            ->assertJson(['message' => 'Your email address is not verified.']);
     }
 
     public function test_authenticated_user_can_access_scoped_endpoint(): void

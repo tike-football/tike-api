@@ -28,6 +28,13 @@ class AuthController extends Controller
             
             $user = Auth::user();
 
+            // Check if the user's email is verified
+            if (is_null($user->email_verified_at)) {
+                return response()->json([
+                    'message' => 'Your email address is not verified.',
+                ], 403);
+            }
+
             $scopes = $user->getRoleScopes();
             $token = $user->createToken('token-name', $scopes)->accessToken;
 
