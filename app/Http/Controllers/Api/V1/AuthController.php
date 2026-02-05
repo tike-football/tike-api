@@ -14,6 +14,12 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    /**
+     * Return an access_token
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function getToken(Request $request): JsonResponse
     {
         try {
@@ -95,6 +101,57 @@ class AuthController extends Controller
             return response()->json([
                 'message' => 'Registration failed.',
                 'error' => 'An error occurred while creating the user. Please try again.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Verify user's email address.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function verifyEmail(Request $request): JsonResponse
+    {
+        try {
+            $user = $request->user();
+
+            // Check if email is already verified
+            if (!is_null($user->email_verified_at)) {
+                return response()->json([
+                    'message' => 'Email address is already verified.',
+                ], 400);
+            }
+
+            // Mark email as verified
+            $user->email_verified_at = now();
+            $user->save();
+
+            // Revoke the current token to prevent reuse
+            $token = $user->token();
+            if ($token) {
+                $token->revoke();
+            }
+
+            return response()->json([
+                'message' => 'Email verified successfully.',
+                'user' => [
+                    'id' => $user->id,
+                    'email' => $user->email,
+                    'email_verified_at' => $user->email_verified_at->toDateTimeString(),
+                ]
+            ], 200);
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error(__METHOD__ . ' error: ' . $e->getMessage(), [
+                'user_id' => $request->user()->id ?? null,
+                'exception_message' => $e->getMessage(),
+                'exception_trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'message' => 'An error occurred while verifying the email.',
+                'error' => 'Email verification failed. Please try again.'
             ], 500);
         }
     }

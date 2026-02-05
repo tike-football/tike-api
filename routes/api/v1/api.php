@@ -19,4 +19,6 @@ Route::middleware(['auth:api', 'scope:test:test'])->get('scopes/test', function 
 Route::prefix('auth')->group(function (): void {
     Route::post('get-token', [AuthController::class, 'getToken']);
     Route::post('sign-up', [AuthController::class, 'signUp']);
+    Route::post('verify-email', [AuthController::class, 'verifyEmail'])
+        ->middleware(['auth:api', 'scope:user:verify']);
 });

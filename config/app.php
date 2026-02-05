@@ -123,4 +123,21 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Util URLs
+    |--------------------------------------------------------------------------
+    |
+    | These configuration options determine the URLs used by the application
+    | for various utility functions, such as email verification and password
+    | resets. You can customize these URLs to match your application's needs.
+    |
+    */
+
+    'urls' => [
+        'email_verification' => env('EMAIL_VERIFICATION_URL', 'http://localhost:8080/verify-email/'),
+    ],
+
+
+
 ];

@@ -5,6 +5,8 @@ return [
         'scopes' => ['test:test'],
     ],
     'user' => [
-        'scopes' => ['test:test'],
+        'scopes' => [
+            'test:test'
+        ],
     ],
 ];
