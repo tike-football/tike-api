@@ -265,17 +265,43 @@ AWS_DEFAULT_REGION=us-east-1
 
 ### Localization
 
-Email content is configured for multiple languages. Currently supported:
+Email content is automatically sent in the user's preferred language based on their `language` setting.
+
+Currently supported languages:
 
 - **Spanish (default):** `lang/es/notifications.php`
+- **English:** `lang/en/notifications.php`
 
-To add more languages, create a new file:
+#### How It Works
+
+1. During registration, users can optionally specify their `language` preference (`es` or `en`)
+2. This preference is saved in the `settings` table
+3. When sending notifications, the system automatically sets the locale based on the user's language setting
+4. If no language is set, it defaults to Spanish (`es`)
+
+#### Adding New Languages
+
+To add support for additional languages:
+
+1. Create a new language file:
 
 ```bash
-cp lang/es/notifications.php lang/en/notifications.php
+cp lang/es/notifications.php lang/fr/notifications.php
 ```
 
-Then translate the content. Users will receive emails in their preferred language (future implementation).
+2. Translate the content in the new file
+
+3. Add the language to `config/settings.php`:
+
+```php
+'language' => [
+    'default' => 'es',
+    'options' => ['es', 'en', 'fr'],  // Add new language here
+    // ...
+],
+```
+
+4. Users will now be able to select the new language during registration
 
 ### Testing Emails Locally
 

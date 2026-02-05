@@ -7,6 +7,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Lang;
 
@@ -37,6 +38,10 @@ class EmailVerificationNotification extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
+        // Set locale based on user's language preference
+        $locale = $notifiable->getSetting('language', config('settings.language.default', 'es'));
+        App::setLocale($locale);
+
         $verificationUrl = $this->generateVerificationUrl($notifiable);
 
         return (new MailMessage)
