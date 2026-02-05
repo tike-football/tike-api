@@ -1,59 +1,319 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Tike API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Laravel 12 REST API with OAuth2 authentication (Passport) and queue-based email verification.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Requirements
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- PHP 8.2+
+- MySQL 8.0+
+- Composer
+- Docker (recommended)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## Installation
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### 1. Environment Configuration
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Copy the environment template:
 
-## Laravel Sponsors
+```bash
+cp .env.example .env
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Configure your database and queue settings in `.env`:
 
-### Premium Partners
+```env
+DB_CONNECTION=mysql
+DB_HOST=mysql
+DB_PORT=3306
+DB_DATABASE=tike
+DB_USERNAME=tike
+DB_PASSWORD=tike
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+QUEUE_CONNECTION=database
+```
 
-## Contributing
+### 2. Install Dependencies
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+composer install
+```
 
-## Code of Conduct
+### 3. Generate Application Key
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+php artisan key:generate
+```
 
-## Security Vulnerabilities
+### 4. Run Database Migrations
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+php artisan migrate
+```
+
+### 5. Generate OAuth Keys
+
+```bash
+php artisan passport:keys
+```
+
+### 6. Seed Database (Optional)
+
+```bash
+php artisan db:seed
+```
+
+---
+
+## Queue Workers
+
+The application uses queues for background processing (e.g., email verification).
+
+### Production Mode
+
+Run the queue worker as a persistent process:
+
+```bash
+php artisan queue:work --queue=emails --tries=3 --timeout=60
+```
+
+**Important:** In production, use a process manager like Supervisor to automatically restart the worker.
+
+### Development Mode
+
+Use `queue:listen` for automatic code reload:
+
+```bash
+php artisan queue:listen --queue=emails --verbose --tries=3 --timeout=60
+```
+
+---
+
+## Logging
+
+### Default Log Location
+
+Logs are stored in: `storage/logs/laravel.log`
+
+### View Logs in Real-Time
+
+```bash
+tail -f storage/logs/laravel.log
+```
+
+### Custom Log Configuration
+
+Edit `config/logging.php` to customize log channels and paths.
+
+**Change log path via environment:**
+
+```env
+LOG_CHANNEL=daily
+LOG_LEVEL=info
+```
+
+**Custom path in `config/logging.php`:**
+
+```php
+'daily' => [
+    'driver' => 'daily',
+    'path' => env('LOG_PATH', storage_path('logs/laravel.log')),
+    'level' => env('LOG_LEVEL', 'debug'),
+    'days' => 14,
+],
+```
+
+Then set in `.env`:
+
+```env
+LOG_PATH=/var/log/tike-api/app.log
+```
+
+---
+
+## API Documentation
+
+### Authentication Endpoints
+
+#### Register New User
+```http
+POST /api/v1/auth/sign-up
+Content-Type: application/json
+
+{
+  "name": "John",
+  "last_name": "Doe",
+  "email": "john@example.com",
+  "password": "SecurePass123",
+  "password_confirmation": "SecurePass123"
+}
+```
+
+**Response:** `201 Created`
+
+#### Get Access Token
+```http
+POST /api/v1/auth/token
+Content-Type: application/json
+
+{
+  "email": "john@example.com",
+  "password": "SecurePass123"
+}
+```
+
+**Response:** `200 OK` with JWT token
+
+**Note:** Email must be verified to obtain a token.
+
+---
+
+## Testing
+
+Run all tests:
+
+```bash
+php artisan test
+```
+
+Run specific test suite:
+
+```bash
+php artisan test --testsuite=Feature
+php artisan test --testsuite=Unit
+```
+
+Run tests with coverage:
+
+```bash
+php artisan test --coverage
+```
+
+---
+
+## Common Commands
+
+### Cache Management
+
+```bash
+php artisan cache:clear
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear
+```
+
+### Database Operations
+
+```bash
+# Run migrations
+php artisan migrate
+
+# Rollback last migration
+php artisan migrate:rollback
+
+# Fresh database with seeders
+php artisan migrate:fresh --seed
+```
+
+### Queue Management
+
+```bash
+# Clear all failed jobs
+php artisan queue:flush
+
+# Retry failed jobs
+php artisan queue:retry all
+
+# List failed jobs
+php artisan queue:failed
+```
+
+---
+
+## Production Deployment
+
+### Optimization
+
+Run these commands after deployment:
+
+```bash
+composer install --optimize-autoloader --no-dev
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+```
+
+### Queue Worker (Supervisor)
+
+Create a Supervisor configuration file `/etc/supervisor/conf.d/tike-api-worker.conf`:
+
+```ini
+[program:tike-api-worker]
+process_name=%(program_name)s_%(process_num)02d
+command=php /path/to/tike-api/artisan queue:work --queue=emails --sleep=3 --tries=3 --max-time=3600
+autostart=true
+autorestart=true
+stopasgroup=true
+killasgroup=true
+user=www-data
+numprocs=2
+redirect_stderr=true
+stdout_logfile=/path/to/tike-api/storage/logs/worker.log
+stopwaitsecs=3600
+```
+
+Reload Supervisor:
+
+```bash
+sudo supervisorctl reread
+sudo supervisorctl update
+sudo supervisorctl start tike-api-worker:*
+```
+
+---
+
+## Troubleshooting
+
+### Clear All Caches
+
+```bash
+php artisan optimize:clear
+```
+
+### Permission Issues
+
+```bash
+chmod -R 775 storage bootstrap/cache
+chown -R www-data:www-data storage bootstrap/cache
+```
+
+### Queue Not Processing
+
+Check if the worker is running:
+
+```bash
+ps aux | grep queue:work
+```
+
+Restart the queue worker:
+
+```bash
+php artisan queue:restart
+```
+
+---
+
+## Additional Resources
+
+- [Laravel Documentation](https://laravel.com/docs)
+- [Laravel Passport](https://laravel.com/docs/passport)
+- [Laravel Queues](https://laravel.com/docs/queues)
+
+---
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is proprietary software. All rights reserved.
