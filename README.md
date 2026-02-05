@@ -148,11 +148,31 @@ Content-Type: application/json
   "last_name": "Doe",
   "email": "john@example.com",
   "password": "SecurePass123",
-  "password_confirmation": "SecurePass123"
+  "password_confirmation": "SecurePass123",
+  "language": "en"  // Optional: 'es' or 'en' (default: 'es')
 }
 ```
 
 **Response:** `201 Created`
+
+```json
+{
+  "message": "User registered successfully.",
+  "user": {
+    "id": 1,
+    "name": "John",
+    "last_name": "Doe",
+    "email": "john@example.com",
+    "role": "user",
+    "language": "en"
+  }
+}
+```
+
+**Notes:**
+- `language` is optional and must be exactly 2 characters
+- Supported languages: `es` (Spanish), `en` (English)
+- If not provided or invalid, defaults to `es`
 
 #### Get Access Token
 ```http

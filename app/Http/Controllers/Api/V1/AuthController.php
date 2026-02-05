@@ -78,6 +78,19 @@ class AuthController extends Controller
                 'role' => 'user', // Default role
             ]);
 
+            // Set user language setting
+            $language = $request->input('language');
+            
+            // If language is provided and valid, use it; otherwise use default
+            $availableLanguages = config('settings.language.options', ['es', 'en']);
+            $defaultLanguage = config('settings.language.default', 'es');
+            
+            if ($language && in_array($language, $availableLanguages)) {
+                $user->setSetting('language', $language);
+            } else {
+                $user->setSetting('language', $defaultLanguage);
+            }
+
             // Dispatch UserStored event
             event(new UserStored($user));
 
@@ -89,6 +102,7 @@ class AuthController extends Controller
                     'last_name' => $user->last_name,
                     'email' => $user->email,
                     'role' => $user->role,
+                    'language' => $user->getSetting('language'),
                 ]
             ], 201);
 
