@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Events\User\PasswordUpdated;
 use App\Events\User\UserStored;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\SignUpRequest;
@@ -185,6 +186,9 @@ class AuthController extends Controller
             // Update the password
             $user->password = Hash::make($request->input('new_password'));
             $user->save();
+
+            // Dispatch PasswordUpdated event
+            event(new PasswordUpdated($user));
 
             return response()->json([
                 'message' => 'Password updated successfully.',

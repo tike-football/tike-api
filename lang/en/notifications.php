@@ -25,4 +25,14 @@ return [
         'salutation' => 'Regards,<br>The Tike Team',
     ],
 
+    'password_updated' => [
+        'subject' => 'Your Password Has Been Updated',
+        'greeting' => 'Hello :name!',
+        'line1' => 'We are writing to inform you that your password has been successfully updated.',
+        'line2' => 'If you made this change, you can safely ignore this message.',
+        'line3' => 'If you did not request this change, we recommend contacting our support team immediately.',
+        'line4' => 'For your security, make sure to use a strong and unique password.',
+        'salutation' => 'Regards,<br>The Tike Team',
+    ],
+
 ];

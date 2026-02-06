@@ -2,9 +2,6 @@
 
 namespace App\Providers;
 
-use App\Events\User\UserStored;
-use App\Listeners\User\SendEmailVerification;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Passport\Passport;
 
