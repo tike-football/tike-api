@@ -136,6 +136,7 @@ return [
 
     'urls' => [
         'email_verification' => env('EMAIL_VERIFICATION_URL', 'http://localhost:8080/verify-email/'),
+        'reset_password' => env('RESET_PASSWORD_URL', 'http://localhost:8080/reset-password/'),
     ],
 
 

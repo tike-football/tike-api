@@ -25,4 +25,26 @@ return [
         'salutation' => 'Regards,<br>The Tike Team',
     ],
 
+    'password_updated' => [
+        'subject' => 'Your Password Has Been Updated',
+        'greeting' => 'Hello :name!',
+        'line1' => 'We are writing to inform you that your password has been successfully updated.',
+        'line2' => 'If you made this change, you can safely ignore this message.',
+        'line3' => 'If you did not request this change, we recommend contacting our support team immediately.',
+        'line4' => 'For your security, make sure to use a strong and unique password.',
+        'salutation' => 'Regards,<br>The Tike Team',
+    ],
+
+    'password_forgot' => [
+        'subject' => 'Reset Your Password',
+        'greeting' => 'Hello :name!',
+        'line1' => 'We received a request to reset the password for your account.',
+        'line2' => 'To reset your password, click the button below or copy the provided URL.',
+        'action' => 'Reset Password',
+        'line3' => 'This reset link will expire after use.',
+        'line4' => 'If you did not request a password reset, you can safely ignore this email.',
+        'url_label' => 'Or copy and paste this URL into your browser:',
+        'salutation' => 'Regards,<br>The Tike Team',
+    ],
+
 ];

@@ -25,4 +25,26 @@ return [
         'salutation' => 'Saludos,<br>El equipo de Tike',
     ],
 
+    'password_updated' => [
+        'subject' => 'Tu contraseña ha sido actualizada',
+        'greeting' => '¡Hola :name!',
+        'line1' => 'Te informamos que tu contraseña ha sido actualizada exitosamente.',
+        'line2' => 'Si realizaste este cambio, puedes ignorar este mensaje.',
+        'line3' => 'Si no solicitaste este cambio, te recomendamos contactar a nuestro equipo de soporte inmediatamente.',
+        'line4' => 'Por tu seguridad, asegúrate de usar una contraseña fuerte y única.',
+        'salutation' => 'Saludos,<br>El equipo de Tike',
+    ],
+
+    'password_forgot' => [
+        'subject' => 'Restablece tu contraseña',
+        'greeting' => '¡Hola :name!',
+        'line1' => 'Recibimos una solicitud para restablecer la contraseña de tu cuenta.',
+        'line2' => 'Para restablecer tu contraseña, haz clic en el botón de abajo o copia la URL proporcionada.',
+        'action' => 'Restablecer Contraseña',
+        'line3' => 'Este enlace de restablecimiento expirará después de su uso.',
+        'line4' => 'Si no solicitaste restablecer tu contraseña, puedes ignorar este correo de forma segura.',
+        'url_label' => 'O copia y pega esta URL en tu navegador:',
+        'salutation' => 'Saludos,<br>El equipo de Tike',
+    ],
+
 ];
