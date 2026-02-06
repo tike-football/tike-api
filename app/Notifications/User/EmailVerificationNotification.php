@@ -9,17 +9,20 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Lang;
 
 class EmailVerificationNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
+    protected string $userLocale;
+
     /**
      * Create a new notification instance.
      */
-    public function __construct()
+    public function __construct(string $locale = 'es')
     {
+        $this->userLocale = $locale;
+        $this->locale($locale);
         $this->onQueue('emails');
     }
 
@@ -38,23 +41,28 @@ class EmailVerificationNotification extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
-        // Set locale based on user's language preference
-        $locale = $notifiable->getSetting('language', config('settings.language.default', 'es'));
-        App::setLocale($locale);
+        // Temporarily set the locale for this notification
+        $previousLocale = App::getLocale();
+        App::setLocale($this->userLocale);
 
         $verificationUrl = $this->generateVerificationUrl($notifiable);
 
-        return (new MailMessage)
-            ->subject(Lang::get('notifications.email_verification.subject'))
-            ->greeting(Lang::get('notifications.email_verification.greeting', ['name' => $notifiable->name]))
-            ->line(Lang::get('notifications.email_verification.line1'))
-            ->line(Lang::get('notifications.email_verification.line2'))
-            ->action(Lang::get('notifications.email_verification.action'), $verificationUrl)
-            ->line(Lang::get('notifications.email_verification.line3'))
-            ->line(Lang::get('notifications.email_verification.line4'))
-            ->line(Lang::get('notifications.email_verification.url_label'))
+        $mailMessage = (new MailMessage)
+            ->subject(__('notifications.email_verification.subject'))
+            ->greeting(__('notifications.email_verification.greeting', ['name' => $notifiable->name]))
+            ->line(__('notifications.email_verification.line1'))
+            ->line(__('notifications.email_verification.line2'))
+            ->action(__('notifications.email_verification.action'), $verificationUrl)
+            ->line(__('notifications.email_verification.line3'))
+            ->line(__('notifications.email_verification.line4'))
+            ->line(__('notifications.email_verification.url_label'))
             ->line($verificationUrl)
-            ->salutation(Lang::get('notifications.email_verification.salutation'));
+            ->salutation(__('notifications.email_verification.salutation'));
+
+        // Restore previous locale
+        App::setLocale($previousLocale);
+
+        return $mailMessage;
     }
 
     /**
