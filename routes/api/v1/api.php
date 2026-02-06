@@ -26,5 +26,7 @@ Route::prefix('auth')->group(function (): void {
         Route::patch('/', [AuthController::class, 'updatePassword'])
             ->middleware(['auth:api', 'scope:user:update-password']);
         Route::post('forgot', [AuthController::class, 'forgotPassword']);
+        Route::post('reset', [AuthController::class, 'resetPassword'])
+            ->middleware(['auth:api', 'scope:user:recover-password']);
     });
 });

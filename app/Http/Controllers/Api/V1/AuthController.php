@@ -7,6 +7,7 @@ use App\Events\User\PasswordUpdated;
 use App\Events\User\UserStored;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\ForgotPasswordRequest;
+use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Http\Requests\Auth\SignUpRequest;
 use App\Http\Requests\Auth\UpdatePasswordRequest;
 use App\Models\User;
@@ -206,6 +207,51 @@ class AuthController extends Controller
             return response()->json([
                 'message' => 'An error occurred while updating the password.',
                 'error' => 'Password update failed. Please try again.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Reset user password using reset token
+     *
+     * @param ResetPasswordRequest $request
+     * @return JsonResponse
+     */
+    public function resetPassword(ResetPasswordRequest $request): JsonResponse
+    {
+        try {
+            $user = $request->user();
+
+            // Update the user's password
+            $user->password = Hash::make($request->new_password);
+
+            // Verify email if not already verified
+            if (is_null($user->email_verified_at)) {
+                $user->email_verified_at = now();
+            }
+
+            $user->save();
+
+            // Revoke all tokens for security
+            $user->tokens()->delete();
+
+            // Dispatch PasswordUpdated event
+            event(new PasswordUpdated($user));
+
+            return response()->json([
+                'message' => 'Password has been reset successfully. Please login with your new password.',
+            ], 200);
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error(__METHOD__ . ' error: ' . $e->getMessage(), [
+                'user_id' => $request->user()->id ?? null,
+                'exception_message' => $e->getMessage(),
+                'exception_trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'message' => 'An error occurred while resetting the password.',
+                'error' => 'Password reset failed. Please try again.'
             ], 500);
         }
     }
