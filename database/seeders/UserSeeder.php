@@ -10,7 +10,7 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        User::updateOrCreate(
+        $admin = User::updateOrCreate(
             ['email' => 'test@tike.com'],
             [
                 'name' => 'Admin',
@@ -22,5 +22,8 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('qwerty123'),
             ]
         );
+
+        // Set admin language to Spanish
+        $admin->setSetting('language', 'es');
     }
 }

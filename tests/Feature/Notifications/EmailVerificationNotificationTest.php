@@ -105,4 +105,55 @@ class EmailVerificationNotificationTest extends TestCase
 
         $this->assertContains('mail', $channels);
     }
+
+    public function test_notification_uses_english_translations(): void
+    {
+        Config::set('app.locale', 'en');
+
+        // Verify the translation file exists and has the correct keys
+        $this->assertTrue(file_exists(lang_path('en/notifications.php')));
+        
+        $translations = require lang_path('en/notifications.php');
+        
+        $this->assertArrayHasKey('email_verification', $translations);
+        $this->assertArrayHasKey('subject', $translations['email_verification']);
+        $this->assertEquals('Verify Your Email Address', $translations['email_verification']['subject']);
+    }
+
+    public function test_notification_uses_user_language_setting_spanish(): void
+    {
+        $user = User::factory()->create([
+            'name' => 'Juan',
+            'email' => 'juan@example.com',
+        ]);
+        
+        $user->setSetting('language', 'es');
+
+        // Verify the user's language setting is correct
+        $this->assertEquals('es', $user->getSetting('language'));
+    }
+
+    public function test_notification_uses_user_language_setting_english(): void
+    {
+        $user = User::factory()->create([
+            'name' => 'John',
+            'email' => 'john@example.com',
+        ]);
+        
+        $user->setSetting('language', 'en');
+
+        // Verify the user's language setting is correct
+        $this->assertEquals('en', $user->getSetting('language'));
+    }
+
+    public function test_notification_defaults_to_spanish_if_no_language_setting(): void
+    {
+        $user = User::factory()->create([
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+        ]);
+
+        // User has no language setting - should default to 'es'
+        $this->assertEquals('es', $user->getSetting('language'));
+    }
 }

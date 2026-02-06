@@ -29,6 +29,7 @@ class SignUpRequest extends FormRequest
             'last_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()],
+            'language' => ['nullable', 'string', 'size:2'],
         ];
     }
 
@@ -58,6 +59,9 @@ class SignUpRequest extends FormRequest
             'password.string' => 'The password must be a string.',
             'password.confirmed' => 'The password confirmation does not match.',
             'password.min' => 'The password must be at least 8 characters.',
+            
+            'language.string' => 'The language must be a string.',
+            'language.size' => 'The language code must be exactly 2 characters.',
         ];
     }
 

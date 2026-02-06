@@ -10,7 +10,7 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 
-class EmailVerificationNotification extends Notification implements ShouldQueue
+class PasswordForgotNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -45,19 +45,19 @@ class EmailVerificationNotification extends Notification implements ShouldQueue
         $previousLocale = App::getLocale();
         App::setLocale($this->userLocale);
 
-        $verificationUrl = $this->generateVerificationUrl($notifiable);
+        $resetUrl = $this->generateResetUrl($notifiable);
 
         $mailMessage = (new MailMessage)
-            ->subject(__('notifications.email_verification.subject'))
-            ->greeting(__('notifications.email_verification.greeting', ['name' => $notifiable->name]))
-            ->line(__('notifications.email_verification.line1'))
-            ->line(__('notifications.email_verification.line2'))
-            ->action(__('notifications.email_verification.action'), $verificationUrl)
-            ->line(__('notifications.email_verification.line3'))
-            ->line(__('notifications.email_verification.line4'))
-            ->line(__('notifications.email_verification.url_label'))
-            ->line($verificationUrl)
-            ->salutation(__('notifications.email_verification.salutation'));
+            ->subject(__('notifications.password_forgot.subject'))
+            ->greeting(__('notifications.password_forgot.greeting', ['name' => $notifiable->name]))
+            ->line(__('notifications.password_forgot.line1'))
+            ->line(__('notifications.password_forgot.line2'))
+            ->action(__('notifications.password_forgot.action'), $resetUrl)
+            ->line(__('notifications.password_forgot.line3'))
+            ->line(__('notifications.password_forgot.line4'))
+            ->line(__('notifications.password_forgot.url_label'))
+            ->line($resetUrl)
+            ->salutation(__('notifications.password_forgot.salutation'));
 
         // Restore previous locale
         App::setLocale($previousLocale);
@@ -66,20 +66,20 @@ class EmailVerificationNotification extends Notification implements ShouldQueue
     }
 
     /**
-     * Generate the email verification URL with token.
+     * Generate the password reset URL with token.
      */
-    protected function generateVerificationUrl(User $user): string
+    protected function generateResetUrl(User $user): string
     {
-        // Get the scopes for unverified user
+        // Get the scopes for password reset
         $scopes = Config::get('roles.unverified_user.scopes', ['user:verify']);
 
-        // Create a verification token with the appropriate scopes
-        $token = $user->createToken('email-verification-token', $scopes);
+        // Create a reset token with the appropriate scopes
+        $token = $user->createToken('password-reset-token', $scopes);
 
         // Get the base URL from configuration
-        $baseUrl = Config::get('app.urls.email_verification');
+        $baseUrl = Config::get('app.urls.reset_password');
 
-        // Generate the full verification URL with the token
+        // Generate the full reset URL with the token
         return $baseUrl . $token->accessToken;
     }
 
@@ -91,7 +91,7 @@ class EmailVerificationNotification extends Notification implements ShouldQueue
     public function toArray(object $notifiable): array
     {
         return [
-            'message' => 'Email verification notification sent.',
+            'message' => 'Password reset notification sent.',
             'user_id' => $notifiable->id,
         ];
     }

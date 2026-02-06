@@ -2,22 +2,29 @@
 
 namespace App\Listeners\User;
 
-use App\Events\User\UserStored;
-use App\Notifications\User\EmailVerificationNotification;
+use App\Events\User\PasswordForgotRequested;
+use App\Notifications\User\PasswordForgotNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 
-class SendEmailVerification implements ShouldQueue
+class SendPasswordForgotLink implements ShouldQueue
 {
     use InteractsWithQueue;
 
     /**
      * The name of the queue the job should be sent to.
      *
-     * @var string
+     * @var string|null
      */
     public $queue = 'emails';
+
+    /**
+     * Determine if the listener should be queued after the response is sent to the browser.
+     *
+     * @var bool
+     */
+    public $afterResponse = false;
 
     /**
      * Create the event listener.
@@ -30,10 +37,10 @@ class SendEmailVerification implements ShouldQueue
     /**
      * Handle the event.
      */
-    public function handle(UserStored $event): void
+    public function handle(PasswordForgotRequested $event): void
     {
         try {
-            Log::info('SendEmailVerification listener started', [
+            Log::info('SendPasswordForgotLink listener started', [
                 'user_id' => $event->user->id,
                 'user_email' => $event->user->email,
                 'queue' => $this->queue,
@@ -42,17 +49,17 @@ class SendEmailVerification implements ShouldQueue
             // Get user's language preference
             $locale = $event->user->getSetting('language', config('settings.language.default', 'es'));
 
-            // Send email verification notification with user's locale
-            $event->user->notify(new EmailVerificationNotification($locale));
+            // Send password forgot notification with user's locale
+            $event->user->notify(new PasswordForgotNotification($locale));
 
-            Log::info('SendEmailVerification listener completed successfully', [
+            Log::info('SendPasswordForgotLink listener completed successfully', [
                 'user_id' => $event->user->id,
                 'user_email' => $event->user->email,
                 'locale' => $locale,
             ]);
 
         } catch (\Exception $e) {
-            Log::error('SendEmailVerification listener failed', [
+            Log::error('SendPasswordForgotLink listener failed', [
                 'user_id' => $event->user->id ?? null,
                 'user_email' => $event->user->email ?? null,
                 'error' => $e->getMessage(),

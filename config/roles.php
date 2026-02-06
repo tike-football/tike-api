@@ -2,16 +2,21 @@
 
 return [
     'admin' => [
-        'scopes' => ['test:test'],
+        'scopes' => [
+            'test:test',
+            'user:update-password'
+        ],
     ],
     'user' => [
         'scopes' => [
-            'test:test'
+            'test:test',
+            'user:update-password'
         ],
     ],
     'unverified_user' => [
         'scopes' => [
-            'user:verify'
+            'user:verify',
+            'user:recover-password'
         ],
     ],
 ];
