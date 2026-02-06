@@ -199,6 +199,37 @@ Authorization: Bearer {verification_token}
 
 **Note:** The verification token must have the `user:verify` scope. After verification, the token is revoked.
 
+#### Update Password
+```http
+PATCH /api/v1/auth/password
+Authorization: Bearer {access_token}
+Content-Type: application/json
+
+{
+  "current_password": "OldPassword123",
+  "new_password": "NewSecurePass456",
+  "new_password_confirmation": "NewSecurePass456"
+}
+```
+
+**Response:** `200 OK`
+
+```json
+{
+  "message": "Password updated successfully."
+}
+```
+
+**Requirements:**
+- User must be authenticated
+- Requires `user:update-password` scope
+- `current_password` must match the user's current password
+- `new_password` must meet minimum strength requirements:
+  - At least 8 characters
+  - Mixed case letters (uppercase and lowercase)
+  - Contains numbers
+- `new_password_confirmation` must match `new_password`
+
 ---
 
 ## Email Verification System

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Events\User\UserStored;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\SignUpRequest;
+use App\Http\Requests\Auth\UpdatePasswordRequest;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -166,6 +167,39 @@ class AuthController extends Controller
             return response()->json([
                 'message' => 'An error occurred while verifying the email.',
                 'error' => 'Email verification failed. Please try again.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Update the authenticated user's password
+     *
+     * @param UpdatePasswordRequest $request
+     * @return JsonResponse
+     */
+    public function updatePassword(UpdatePasswordRequest $request): JsonResponse
+    {
+        try {
+            $user = $request->user();
+
+            // Update the password
+            $user->password = Hash::make($request->input('new_password'));
+            $user->save();
+
+            return response()->json([
+                'message' => 'Password updated successfully.',
+            ], 200);
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error(__METHOD__ . ' error: ' . $e->getMessage(), [
+                'user_id' => $request->user()->id ?? null,
+                'exception_message' => $e->getMessage(),
+                'exception_trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'message' => 'An error occurred while updating the password.',
+                'error' => 'Password update failed. Please try again.'
             ], 500);
         }
     }
