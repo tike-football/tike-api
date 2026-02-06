@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Events\User\PasswordForgotRequested;
 use App\Events\User\PasswordUpdated;
 use App\Events\User\UserStored;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Auth\SignUpRequest;
 use App\Http\Requests\Auth\UpdatePasswordRequest;
 use App\Models\User;
@@ -204,6 +206,40 @@ class AuthController extends Controller
             return response()->json([
                 'message' => 'An error occurred while updating the password.',
                 'error' => 'Password update failed. Please try again.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Send password reset link to user's email
+     *
+     * @param ForgotPasswordRequest $request
+     * @return JsonResponse
+     */
+    public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
+    {
+        try {
+            // Find the user by email
+            $user = User::where('email', $request->email)->first();
+
+            // Dispatch PasswordForgotRequested event
+            event(new PasswordForgotRequested($user));
+
+            // Always return success message for security (don't reveal if email exists)
+            return response()->json([
+                'message' => 'If an account exists with that email, a password reset link has been sent.',
+            ], 200);
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error(__METHOD__ . ' error: ' . $e->getMessage(), [
+                'email' => $request->email ?? null,
+                'exception_message' => $e->getMessage(),
+                'exception_trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'message' => 'An error occurred while processing your request.',
+                'error' => 'Password reset request failed. Please try again.'
             ], 500);
         }
     }

@@ -35,4 +35,16 @@ return [
         'salutation' => 'Regards,<br>The Tike Team',
     ],
 
+    'password_forgot' => [
+        'subject' => 'Reset Your Password',
+        'greeting' => 'Hello :name!',
+        'line1' => 'We received a request to reset the password for your account.',
+        'line2' => 'To reset your password, click the button below or copy the provided URL.',
+        'action' => 'Reset Password',
+        'line3' => 'This reset link will expire after use.',
+        'line4' => 'If you did not request a password reset, you can safely ignore this email.',
+        'url_label' => 'Or copy and paste this URL into your browser:',
+        'salutation' => 'Regards,<br>The Tike Team',
+    ],
+
 ];

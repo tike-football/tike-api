@@ -21,6 +21,10 @@ Route::prefix('auth')->group(function (): void {
     Route::post('sign-up', [AuthController::class, 'signUp']);
     Route::post('verify-email', [AuthController::class, 'verifyEmail'])
         ->middleware(['auth:api', 'scope:user:verify']);
-    Route::patch('password', [AuthController::class, 'updatePassword'])
-        ->middleware(['auth:api', 'scope:user:update-password']);
+    
+    Route::prefix('password')->group(function (): void {
+        Route::patch('/', [AuthController::class, 'updatePassword'])
+            ->middleware(['auth:api', 'scope:user:update-password']);
+        Route::post('forgot', [AuthController::class, 'forgotPassword']);
+    });
 });

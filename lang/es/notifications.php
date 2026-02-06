@@ -35,4 +35,16 @@ return [
         'salutation' => 'Saludos,<br>El equipo de Tike',
     ],
 
+    'password_forgot' => [
+        'subject' => 'Restablece tu contraseña',
+        'greeting' => '¡Hola :name!',
+        'line1' => 'Recibimos una solicitud para restablecer la contraseña de tu cuenta.',
+        'line2' => 'Para restablecer tu contraseña, haz clic en el botón de abajo o copia la URL proporcionada.',
+        'action' => 'Restablecer Contraseña',
+        'line3' => 'Este enlace de restablecimiento expirará después de su uso.',
+        'line4' => 'Si no solicitaste restablecer tu contraseña, puedes ignorar este correo de forma segura.',
+        'url_label' => 'O copia y pega esta URL en tu navegador:',
+        'salutation' => 'Saludos,<br>El equipo de Tike',
+    ],
+
 ];
