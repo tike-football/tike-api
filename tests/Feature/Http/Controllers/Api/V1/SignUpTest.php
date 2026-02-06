@@ -38,6 +38,7 @@ class SignUpTest extends TestCase
                     'last_name',
                     'email',
                     'role',
+                    'language',
                 ],
             ]);
 
@@ -257,5 +258,92 @@ class SignUpTest extends TestCase
         $this->assertNotNull($user);
         $this->assertNotEquals('SecurePass123', $user->password);
         $this->assertTrue(Hash::check('SecurePass123', $user->password));
+    }
+
+    public function test_user_can_register_with_language(): void
+    {
+        Notification::fake();
+
+        $userData = [
+            'name' => 'John',
+            'last_name' => 'Doe',
+            'email' => 'john.doe@example.com',
+            'password' => 'SecurePass123',
+            'password_confirmation' => 'SecurePass123',
+            'language' => 'en',
+        ];
+
+        $response = $this->postJson('/api/v1/auth/sign-up', $userData);
+
+        $response->assertStatus(201)
+            ->assertJson([
+                'message' => 'User registered successfully.',
+                'user' => [
+                    'language' => 'en',
+                ],
+            ]);
+
+        $user = User::where('email', 'john.doe@example.com')->first();
+        $this->assertEquals('en', $user->getSetting('language'));
+    }
+
+    public function test_user_registers_with_default_language_if_not_provided(): void
+    {
+        Notification::fake();
+
+        $userData = [
+            'name' => 'John',
+            'last_name' => 'Doe',
+            'email' => 'john.doe@example.com',
+            'password' => 'SecurePass123',
+            'password_confirmation' => 'SecurePass123',
+        ];
+
+        $response = $this->postJson('/api/v1/auth/sign-up', $userData);
+
+        $response->assertStatus(201);
+
+        $user = User::where('email', 'john.doe@example.com')->first();
+        $this->assertEquals('es', $user->getSetting('language')); // Default is 'es'
+    }
+
+    public function test_registration_uses_default_language_if_invalid_provided(): void
+    {
+        Notification::fake();
+
+        $userData = [
+            'name' => 'John',
+            'last_name' => 'Doe',
+            'email' => 'john.doe@example.com',
+            'password' => 'SecurePass123',
+            'password_confirmation' => 'SecurePass123',
+            'language' => 'fr', // Valid format but not in options
+        ];
+
+        $response = $this->postJson('/api/v1/auth/sign-up', $userData);
+
+        $response->assertStatus(201); // Should succeed
+
+        $user = User::where('email', 'john.doe@example.com')->first();
+        $this->assertEquals('es', $user->getSetting('language')); // Uses default
+    }
+
+    public function test_registration_validates_language_length(): void
+    {
+        Notification::fake();
+
+        $userData = [
+            'name' => 'John',
+            'last_name' => 'Doe',
+            'email' => 'john.doe@example.com',
+            'password' => 'SecurePass123',
+            'password_confirmation' => 'SecurePass123',
+            'language' => 'eng', // 3 characters, should fail
+        ];
+
+        $response = $this->postJson('/api/v1/auth/sign-up', $userData);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['language']);
     }
 }

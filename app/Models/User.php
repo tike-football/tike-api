@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\Contracts\OAuthenticatable;
@@ -55,5 +56,47 @@ class User extends Authenticatable implements OAuthenticatable
     public function getRoleScopes(): array
     {
         return config('roles.' . $this->role . '.scopes') ?? [];
+    }
+
+    /**
+     * Get the settings for the user.
+     */
+    public function settings(): HasMany
+    {
+        return $this->hasMany(Setting::class);
+    }
+
+    /**
+     * Get a specific setting value for the user.
+     *
+     * @param string $key
+     * @param mixed $default
+     * @return mixed
+     */
+    public function getSetting(string $key, $default = null)
+    {
+        $setting = $this->settings()->where('key', $key)->first();
+        
+        if ($setting) {
+            return $setting->value;
+        }
+
+        // Return default from config if exists
+        return config("settings.{$key}.default", $default);
+    }
+
+    /**
+     * Set a setting value for the user.
+     *
+     * @param string $key
+     * @param mixed $value
+     * @return Setting
+     */
+    public function setSetting(string $key, $value): Setting
+    {
+        return $this->settings()->updateOrCreate(
+            ['key' => $key],
+            ['value' => $value]
+        );
     }
 }

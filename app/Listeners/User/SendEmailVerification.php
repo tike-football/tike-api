@@ -39,12 +39,16 @@ class SendEmailVerification implements ShouldQueue
                 'queue' => $this->queue,
             ]);
 
-            // Send email verification notification
-            $event->user->notify(new EmailVerificationNotification());
+            // Get user's language preference
+            $locale = $event->user->getSetting('language', config('settings.language.default', 'es'));
+
+            // Send email verification notification with user's locale
+            $event->user->notify(new EmailVerificationNotification($locale));
 
             Log::info('SendEmailVerification listener completed successfully', [
                 'user_id' => $event->user->id,
                 'user_email' => $event->user->email,
+                'locale' => $locale,
             ]);
 
         } catch (\Exception $e) {
