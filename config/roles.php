@@ -15,7 +15,8 @@ return [
     ],
     'unverified_user' => [
         'scopes' => [
-            'user:verify'
+            'user:verify',
+            'user:recover-password'
         ],
     ],
 ];
