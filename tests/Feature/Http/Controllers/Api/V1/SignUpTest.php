@@ -12,6 +12,22 @@ class SignUpTest extends TestCase
 {
     use RefreshDatabase;
 
+    /**
+     * Get base user data for registration
+     */
+    private function getBaseUserData(): array
+    {
+        return [
+            'name' => 'John',
+            'last_name' => 'Doe',
+            'email' => 'john.doe@example.com',
+            'country_code' => '+1',
+            'phone_number' => '5551234567',
+            'password' => 'SecurePass123',
+            'password_confirmation' => 'SecurePass123',
+        ];
+    }
+
     public function test_user_can_register_with_valid_data(): void
     {
         Notification::fake();
@@ -20,6 +36,8 @@ class SignUpTest extends TestCase
             'name' => 'John',
             'last_name' => 'Doe',
             'email' => 'john.doe@example.com',
+            'country_code' => '+1',
+            'phone_number' => '5551234567',
             'password' => 'SecurePass123',
             'password_confirmation' => 'SecurePass123',
         ];
@@ -37,6 +55,8 @@ class SignUpTest extends TestCase
                     'name',
                     'last_name',
                     'email',
+                    'country_code',
+                    'phone_number',
                     'role',
                     'language',
                 ],
@@ -46,18 +66,17 @@ class SignUpTest extends TestCase
             'name' => 'John',
             'last_name' => 'Doe',
             'email' => 'john.doe@example.com',
+            'country_code' => '+1',
+            'phone_number' => '5551234567',
+            'full_phone_number' => '+15551234567',
             'role' => 'user',
         ]);
     }
 
     public function test_registration_requires_name(): void
     {
-        $userData = [
-            'last_name' => 'Doe',
-            'email' => 'john.doe@example.com',
-            'password' => 'SecurePass123',
-            'password_confirmation' => 'SecurePass123',
-        ];
+        $userData = $this->getBaseUserData();
+        unset($userData['name']);
 
         $response = $this->postJson('/api/v1/auth/sign-up', $userData);
 
@@ -67,12 +86,8 @@ class SignUpTest extends TestCase
 
     public function test_registration_requires_last_name(): void
     {
-        $userData = [
-            'name' => 'John',
-            'email' => 'john.doe@example.com',
-            'password' => 'SecurePass123',
-            'password_confirmation' => 'SecurePass123',
-        ];
+        $userData = $this->getBaseUserData();
+        unset($userData['last_name']);
 
         $response = $this->postJson('/api/v1/auth/sign-up', $userData);
 
@@ -82,12 +97,8 @@ class SignUpTest extends TestCase
 
     public function test_registration_requires_email(): void
     {
-        $userData = [
-            'name' => 'John',
-            'last_name' => 'Doe',
-            'password' => 'SecurePass123',
-            'password_confirmation' => 'SecurePass123',
-        ];
+        $userData = $this->getBaseUserData();
+        unset($userData['email']);
 
         $response = $this->postJson('/api/v1/auth/sign-up', $userData);
 
@@ -97,13 +108,8 @@ class SignUpTest extends TestCase
 
     public function test_registration_requires_valid_email(): void
     {
-        $userData = [
-            'name' => 'John',
-            'last_name' => 'Doe',
-            'email' => 'invalid-email',
-            'password' => 'SecurePass123',
-            'password_confirmation' => 'SecurePass123',
-        ];
+        $userData = $this->getBaseUserData();
+        $userData['email'] = 'invalid-email';
 
         $response = $this->postJson('/api/v1/auth/sign-up', $userData);
 
@@ -117,13 +123,8 @@ class SignUpTest extends TestCase
             'email' => 'existing@example.com',
         ]);
 
-        $userData = [
-            'name' => 'John',
-            'last_name' => 'Doe',
-            'email' => 'existing@example.com',
-            'password' => 'SecurePass123',
-            'password_confirmation' => 'SecurePass123',
-        ];
+        $userData = $this->getBaseUserData();
+        $userData['email'] = 'existing@example.com';
 
         $response = $this->postJson('/api/v1/auth/sign-up', $userData);
 
@@ -139,11 +140,9 @@ class SignUpTest extends TestCase
 
     public function test_registration_requires_password(): void
     {
-        $userData = [
-            'name' => 'John',
-            'last_name' => 'Doe',
-            'email' => 'john.doe@example.com',
-        ];
+        $userData = $this->getBaseUserData();
+        unset($userData['password']);
+        unset($userData['password_confirmation']);
 
         $response = $this->postJson('/api/v1/auth/sign-up', $userData);
 
@@ -153,12 +152,8 @@ class SignUpTest extends TestCase
 
     public function test_registration_requires_password_confirmation(): void
     {
-        $userData = [
-            'name' => 'John',
-            'last_name' => 'Doe',
-            'email' => 'john.doe@example.com',
-            'password' => 'SecurePass123',
-        ];
+        $userData = $this->getBaseUserData();
+        unset($userData['password_confirmation']);
 
         $response = $this->postJson('/api/v1/auth/sign-up', $userData);
 
@@ -168,13 +163,8 @@ class SignUpTest extends TestCase
 
     public function test_registration_requires_matching_passwords(): void
     {
-        $userData = [
-            'name' => 'John',
-            'last_name' => 'Doe',
-            'email' => 'john.doe@example.com',
-            'password' => 'SecurePass123',
-            'password_confirmation' => 'DifferentPass123',
-        ];
+        $userData = $this->getBaseUserData();
+        $userData['password_confirmation'] = 'DifferentPass123';
 
         $response = $this->postJson('/api/v1/auth/sign-up', $userData);
 
@@ -191,13 +181,9 @@ class SignUpTest extends TestCase
     public function test_registration_requires_medium_strength_password(): void
     {
         // Password without uppercase
-        $userData = [
-            'name' => 'John',
-            'last_name' => 'Doe',
-            'email' => 'john.doe@example.com',
-            'password' => 'weakpass123',
-            'password_confirmation' => 'weakpass123',
-        ];
+        $userData = $this->getBaseUserData();
+        $userData['password'] = 'weakpass123';
+        $userData['password_confirmation'] = 'weakpass123';
 
         $response = $this->postJson('/api/v1/auth/sign-up', $userData);
 
@@ -205,6 +191,7 @@ class SignUpTest extends TestCase
             ->assertJsonValidationErrors(['password']);
 
         // Password without numbers
+        $userData = $this->getBaseUserData();
         $userData['password'] = 'WeakPassword';
         $userData['password_confirmation'] = 'WeakPassword';
 
@@ -214,6 +201,7 @@ class SignUpTest extends TestCase
             ->assertJsonValidationErrors(['password']);
 
         // Password too short
+        $userData = $this->getBaseUserData();
         $userData['password'] = 'Short1';
         $userData['password_confirmation'] = 'Short1';
 
@@ -225,13 +213,9 @@ class SignUpTest extends TestCase
 
     public function test_registered_user_has_default_user_role(): void
     {
-        $userData = [
-            'name' => 'John',
-            'last_name' => 'Doe',
-            'email' => 'john.doe@example.com',
-            'password' => 'SecurePass123',
-            'password_confirmation' => 'SecurePass123',
-        ];
+        Notification::fake();
+
+        $userData = $this->getBaseUserData();
 
         $this->postJson('/api/v1/auth/sign-up', $userData);
 
@@ -243,13 +227,9 @@ class SignUpTest extends TestCase
 
     public function test_password_is_hashed_in_database(): void
     {
-        $userData = [
-            'name' => 'John',
-            'last_name' => 'Doe',
-            'email' => 'john.doe@example.com',
-            'password' => 'SecurePass123',
-            'password_confirmation' => 'SecurePass123',
-        ];
+        Notification::fake();
+
+        $userData = $this->getBaseUserData();
 
         $this->postJson('/api/v1/auth/sign-up', $userData);
 
@@ -264,14 +244,8 @@ class SignUpTest extends TestCase
     {
         Notification::fake();
 
-        $userData = [
-            'name' => 'John',
-            'last_name' => 'Doe',
-            'email' => 'john.doe@example.com',
-            'password' => 'SecurePass123',
-            'password_confirmation' => 'SecurePass123',
-            'language' => 'en',
-        ];
+        $userData = $this->getBaseUserData();
+        $userData['language'] = 'en';
 
         $response = $this->postJson('/api/v1/auth/sign-up', $userData);
 
@@ -291,13 +265,7 @@ class SignUpTest extends TestCase
     {
         Notification::fake();
 
-        $userData = [
-            'name' => 'John',
-            'last_name' => 'Doe',
-            'email' => 'john.doe@example.com',
-            'password' => 'SecurePass123',
-            'password_confirmation' => 'SecurePass123',
-        ];
+        $userData = $this->getBaseUserData();
 
         $response = $this->postJson('/api/v1/auth/sign-up', $userData);
 
@@ -311,14 +279,8 @@ class SignUpTest extends TestCase
     {
         Notification::fake();
 
-        $userData = [
-            'name' => 'John',
-            'last_name' => 'Doe',
-            'email' => 'john.doe@example.com',
-            'password' => 'SecurePass123',
-            'password_confirmation' => 'SecurePass123',
-            'language' => 'fr', // Valid format but not in options
-        ];
+        $userData = $this->getBaseUserData();
+        $userData['language'] = 'fr'; // Valid format but not in options
 
         $response = $this->postJson('/api/v1/auth/sign-up', $userData);
 
@@ -332,18 +294,138 @@ class SignUpTest extends TestCase
     {
         Notification::fake();
 
-        $userData = [
-            'name' => 'John',
-            'last_name' => 'Doe',
-            'email' => 'john.doe@example.com',
-            'password' => 'SecurePass123',
-            'password_confirmation' => 'SecurePass123',
-            'language' => 'eng', // 3 characters, should fail
-        ];
+        $userData = $this->getBaseUserData();
+        $userData['language'] = 'eng'; // 3 characters, should fail
 
         $response = $this->postJson('/api/v1/auth/sign-up', $userData);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['language']);
+    }
+
+    public function test_registration_requires_country_code(): void
+    {
+        $userData = [
+            'name' => 'John',
+            'last_name' => 'Doe',
+            'email' => 'john.doe@example.com',
+            'phone_number' => '5551234567',
+            'password' => 'SecurePass123',
+            'password_confirmation' => 'SecurePass123',
+        ];
+
+        $response = $this->postJson('/api/v1/auth/sign-up', $userData);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['country_code']);
+    }
+
+    public function test_registration_requires_phone_number(): void
+    {
+        $userData = [
+            'name' => 'John',
+            'last_name' => 'Doe',
+            'email' => 'john.doe@example.com',
+            'country_code' => '+1',
+            'password' => 'SecurePass123',
+            'password_confirmation' => 'SecurePass123',
+        ];
+
+        $response = $this->postJson('/api/v1/auth/sign-up', $userData);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['phone_number']);
+    }
+
+    public function test_registration_requires_unique_phone_number(): void
+    {
+        // Create user with specific phone number
+        User::factory()->create([
+            'country_code' => '+52',
+            'phone_number' => '5551234567',
+            'full_phone_number' => '+525551234567',
+        ]);
+
+        $userData = [
+            'name' => 'John',
+            'last_name' => 'Doe',
+            'email' => 'different@example.com',
+            'country_code' => '+52',
+            'phone_number' => '5551234567',
+            'password' => 'SecurePass123',
+            'password_confirmation' => 'SecurePass123',
+        ];
+
+        $response = $this->postJson('/api/v1/auth/sign-up', $userData);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['phone_number'])
+            ->assertJson([
+                'message' => 'Validation failed.',
+                'errors' => [
+                    'phone_number' => ['This phone number is already registered.']
+                ]
+            ]);
+    }
+
+    public function test_registration_allows_same_phone_number_with_different_country_code(): void
+    {
+        Notification::fake();
+
+        // Create user with phone number in one country
+        User::factory()->create([
+            'email' => 'first@example.com',
+            'country_code' => '+1',
+            'phone_number' => '5551234567',
+            'full_phone_number' => '+15551234567',
+        ]);
+
+        // Try to register with same phone number but different country code
+        $userData = [
+            'name' => 'John',
+            'last_name' => 'Doe',
+            'email' => 'second@example.com',
+            'country_code' => '+52',
+            'phone_number' => '5551234567',
+            'password' => 'SecurePass123',
+            'password_confirmation' => 'SecurePass123',
+        ];
+
+        $response = $this->postJson('/api/v1/auth/sign-up', $userData);
+
+        $response->assertStatus(201);
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'second@example.com',
+            'country_code' => '+52',
+            'phone_number' => '5551234567',
+            'full_phone_number' => '+525551234567',
+        ]);
+    }
+
+    public function test_full_phone_number_is_generated_correctly(): void
+    {
+        Notification::fake();
+
+        $userData = [
+            'name' => 'John',
+            'last_name' => 'Doe',
+            'email' => 'john.doe@example.com',
+            'country_code' => '+34',
+            'phone_number' => '612345678',
+            'password' => 'SecurePass123',
+            'password_confirmation' => 'SecurePass123',
+        ];
+
+        $response = $this->postJson('/api/v1/auth/sign-up', $userData);
+
+        $response->assertStatus(201);
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'john.doe@example.com',
+            'country_code' => '+34',
+            'phone_number' => '612345678',
+            'full_phone_number' => '+34612345678',
+        ]);
     }
 }

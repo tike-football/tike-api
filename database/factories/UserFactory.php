@@ -23,12 +23,16 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $countryCode = fake()->randomElement(['+1', '+52', '+34', '+44', '+49', '+33']);
+        $phoneNumber = fake()->numerify('##########');
+        
         return [
             'name' => fake()->firstName(),
             'last_name' => fake()->lastName(),
             'email' => fake()->unique()->safeEmail(),
-            'country_code' => fake()->randomElement(['+1', '+52', '+34', '+44', '+49', '+33']),
-            'phone_number' => fake()->numerify('##########'),
+            'country_code' => $countryCode,
+            'phone_number' => $phoneNumber,
+            'full_phone_number' => $countryCode . $phoneNumber,
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),

@@ -22,6 +22,8 @@ class UserStoredEventTest extends TestCase
             'name' => 'John',
             'last_name' => 'Doe',
             'email' => 'john.doe@example.com',
+            'country_code' => '+1',
+            'phone_number' => '5551234567',
             'password' => 'SecurePass123',
             'password_confirmation' => 'SecurePass123',
         ];
@@ -43,6 +45,8 @@ class UserStoredEventTest extends TestCase
             'name' => 'Jane',
             'last_name' => 'Smith',
             'email' => 'jane.smith@example.com',
+            'country_code' => '+1',
+            'phone_number' => '5551234568',
             'password' => 'SecurePass123',
             'password_confirmation' => 'SecurePass123',
         ];
