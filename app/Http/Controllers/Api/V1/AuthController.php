@@ -79,6 +79,9 @@ class AuthController extends Controller
                 'name' => $request->name,
                 'last_name' => $request->last_name,
                 'email' => $request->email,
+                'country_code' => $request->country_code,
+                'phone_number' => $request->phone_number,
+                'full_phone_number' => $request->country_code . $request->phone_number,
                 'password' => Hash::make($request->password),
                 'role' => 'user', // Default role
             ]);
@@ -106,6 +109,8 @@ class AuthController extends Controller
                     'name' => $user->name,
                     'last_name' => $user->last_name,
                     'email' => $user->email,
+                    'country_code' => $user->country_code,
+                    'phone_number' => $user->phone_number,
                     'role' => $user->role,
                     'language' => $user->getSetting('language'),
                 ]
