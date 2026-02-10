@@ -232,6 +232,316 @@ Content-Type: application/json
 
 ---
 
+## API Key Authentication
+
+### Overview
+
+All API endpoints (except `/api/v1/health`) require a valid API key sent via the `X-API-Key` header. This security layer prevents unauthorized access to the API while maintaining ease of development.
+
+### Route Protection Levels
+
+The API implements three levels of security:
+
+1. **No protection**: `/api/v1/health` (for monitoring services)
+2. **API Key only**: Public endpoints that don't require user authentication
+   - `/api/v1/countries` - Get all countries
+   - `/api/v1/countries/{code}` - Get country by code
+   - `/api/v1/auth/sign-up` - Register new user
+   - `/api/v1/auth/get-token` - Login / Get OAuth token
+   - `/api/v1/auth/password/forgot` - Request password reset
+3. **API Key + OAuth**: Protected endpoints requiring both API key and user authentication
+   - `/api/v1/auth/verify-email` - Verify email address
+   - `/api/v1/auth/password` - Update password
+   - `/api/v1/auth/password/reset` - Reset password with token
+   - All other authenticated endpoints
+
+### Development API Keys
+
+The database seeder automatically creates 4 fixed API keys for development. These keys never change, making development workflow seamless:
+
+| Platform | API Key | Rate Limit |
+|----------|---------|------------|
+| **iOS** | `dev_ios_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa` | 1000/min |
+| **Android** | `dev_android_bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb` | 1000/min |
+| **Web** | `dev_web_cccccccccccccccccccccccccccccccccccccccccccccccccccccccc` | 1000/min |
+| **Testing** | `dev_test_ddddddddddddddddddddddddddddddddddddddddddddddddddddddd` | 10000/min |
+
+These keys are created by the `ApiKeySeeder` when running:
+
+```bash
+php artisan migrate:fresh --seed
+# or
+php artisan db:seed --class=ApiKeySeeder
+```
+
+### Usage Examples
+
+#### cURL
+
+**Public endpoint (API key only):**
+```bash
+curl -H "X-API-Key: dev_test_ddddddddddddddddddddddddddddddddddddddddddddddddddddddd" \
+     http://localhost:8080/api/v1/countries
+```
+
+**Sign up a new user:**
+```bash
+curl -X POST \
+     -H "X-API-Key: dev_test_ddddddddddddddddddddddddddddddddddddddddddddddddddddddd" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "name": "John",
+       "last_name": "Doe",
+       "email": "john@example.com",
+       "country_code": "+1",
+       "phone_number": "1234567890",
+       "password": "Test123",
+       "password_confirmation": "Test123"
+     }' \
+     http://localhost:8080/api/v1/auth/sign-up
+```
+
+**Protected endpoint (API key + OAuth token):**
+```bash
+curl -X POST \
+     -H "X-API-Key: dev_test_ddddddddddddddddddddddddddddddddddddddddddddddddddddddd" \
+     -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+     -H "Content-Type: application/json" \
+     -d '{"token": "verification_token"}' \
+     http://localhost:8080/api/v1/auth/verify-email
+```
+
+#### JavaScript (fetch)
+
+**Public endpoint:**
+```javascript
+fetch('http://localhost:8080/api/v1/countries', {
+  headers: {
+    'X-API-Key': 'dev_test_ddddddddddddddddddddddddddddddddddddddddddddddddddddddd'
+  }
+})
+.then(response => response.json())
+.then(data => console.log(data));
+```
+
+**Protected endpoint:**
+```javascript
+fetch('http://localhost:8080/api/v1/auth/verify-email', {
+  method: 'POST',
+  headers: {
+    'X-API-Key': 'dev_test_ddddddddddddddddddddddddddddddddddddddddddddddddddddddd',
+    'Authorization': `Bearer ${accessToken}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ token: verificationToken })
+})
+.then(response => response.json())
+.then(data => console.log(data));
+```
+
+#### Postman
+
+1. **Add API Key header to all requests:**
+   - Key: `X-API-Key`
+   - Value: `dev_test_ddddddddddddddddddddddddddddddddddddddddddddddddddddddd`
+
+2. **For authenticated endpoints, also add Authorization header:**
+   - Key: `Authorization`
+   - Value: `Bearer YOUR_ACCESS_TOKEN`
+
+3. **Tip:** Save the API key in Postman environment variables for easy reuse:
+   - Variable: `api_key`
+   - Value: `dev_test_ddddddddddddddddddddddddddddddddddddddddddddddddddddddd`
+   - Use: `{{api_key}}` in headers
+
+### Error Responses
+
+#### Missing API Key
+**Status:** `401 Unauthorized`
+```json
+{
+  "message": "API key is required.",
+  "error": "Missing X-API-Key header"
+}
+```
+
+#### Invalid API Key
+**Status:** `401 Unauthorized`
+```json
+{
+  "message": "Invalid API key.",
+  "error": "The provided API key is not valid"
+}
+```
+
+#### Inactive or Expired Key
+**Status:** `401 Unauthorized`
+```json
+{
+  "message": "API key is inactive or expired."
+}
+```
+
+### Managing API Keys
+
+#### View all API keys:
+```bash
+php artisan tinker
+>>> App\Models\ApiKey::all();
+```
+
+#### Create a new API key:
+```bash
+php artisan tinker
+>>> App\Models\ApiKey::generate('My App Name', 'ios', 1000);
+# Returns: ApiKey object with generated key
+```
+
+#### Deactivate an API key:
+```bash
+php artisan tinker
+>>> $key = App\Models\ApiKey::where('platform', 'ios')->first();
+>>> $key->update(['is_active' => false]);
+```
+
+#### Reactivate an API key:
+```bash
+php artisan tinker
+>>> $key = App\Models\ApiKey::where('platform', 'ios')->first();
+>>> $key->update(['is_active' => true]);
+```
+
+#### Check API key last usage:
+```bash
+php artisan tinker
+>>> App\Models\ApiKey::where('platform', 'testing')->first()->last_used_at;
+```
+
+#### Set expiration date:
+```bash
+php artisan tinker
+>>> $key = App\Models\ApiKey::find(1);
+>>> $key->update(['expires_at' => now()->addMonths(6)]);
+```
+
+### Database Schema
+
+The `api_keys` table structure:
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | bigint | Primary key |
+| `name` | varchar(255) | Descriptive name (e.g., "iOS Production App") |
+| `key` | varchar(64) | Unique 64-character API key |
+| `platform` | varchar(50) | Platform identifier (ios, android, web, etc.) |
+| `is_active` | boolean | Enable/disable flag (default: true) |
+| `rate_limit` | integer | Requests per minute (default: 100) |
+| `last_used_at` | timestamp | Last time the key was used (nullable) |
+| `expires_at` | timestamp | Optional expiration date (nullable) |
+| `created_at` | timestamp | Creation timestamp |
+| `updated_at` | timestamp | Last update timestamp |
+
+**Indexes:**
+- Unique index on `key`
+- Index on `platform`
+- Index on `is_active`
+
+### Production Considerations
+
+⚠️ **Security Warning:** The development API keys are for local development only. **Never use them in production.**
+
+#### For Production Deployment:
+
+1. **Generate Secure Keys:**
+   ```bash
+   php artisan tinker
+   >>> App\Models\ApiKey::generate('iOS Production', 'ios', 10000);
+   >>> App\Models\ApiKey::generate('Android Production', 'android', 10000);
+   >>> App\Models\ApiKey::generate('Web Production', 'web', 5000);
+   ```
+
+2. **Store Keys Securely:**
+   - Use environment variables or secure vault services
+   - Never commit production keys to version control
+   - Distribute keys through secure channels only
+
+3. **Rotate Keys Periodically:**
+   - Generate new keys every 3-6 months
+   - Deactivate old keys after transition period
+   - Monitor `last_used_at` to ensure old keys are no longer in use
+
+4. **Monitor Usage:**
+   - Check `last_used_at` for suspicious activity
+   - Review rate limits based on actual traffic
+   - Set up alerts for inactive keys being used
+
+5. **Set Appropriate Rate Limits:**
+   - Adjust `rate_limit` based on expected traffic per platform
+   - Lower limits for testing/staging environments
+   - Higher limits for production mobile apps
+
+6. **Configure Expiration:**
+   - Set `expires_at` for temporary API keys
+   - Useful for beta testers or limited-time access
+   - Automatically prevents access after expiration
+
+7. **Platform-Based Tracking:**
+   - Use different keys per platform (iOS, Android, Web)
+   - Enables platform-specific analytics
+   - Allows selective key revocation without affecting other platforms
+
+#### Rate Limiting (Future Enhancement)
+
+The `rate_limit` field is prepared for future implementation. To add active rate limiting:
+
+1. Modify `ValidateApiKey` middleware
+2. Track requests per key per minute
+3. Return `429 Too Many Requests` when exceeded
+4. Consider using Redis for distributed rate limiting
+
+### Testing with API Keys
+
+The test suite uses the `WithApiKey` trait to automatically include API keys in test requests:
+
+```php
+use Tests\Traits\WithApiKey;
+
+class MyTest extends TestCase
+{
+    use RefreshDatabase, WithApiKey;
+    
+    public function test_endpoint_requires_api_key(): void
+    {
+        // Automatically includes X-API-Key header
+        $response = $this->getJsonWithApiKey('/api/v1/countries');
+        $response->assertStatus(200);
+    }
+    
+    public function test_protected_endpoint(): void
+    {
+        $user = User::factory()->create();
+        Passport::actingAs($user, ['user:verify']);
+        
+        // Includes both API key and Authorization headers
+        $response = $this->postJsonWithApiKey('/api/v1/auth/verify-email', [
+            'token' => 'some-token'
+        ]);
+        
+        $response->assertStatus(200);
+    }
+}
+```
+
+Available trait methods:
+- `getJsonWithApiKey($uri, $headers = [])`
+- `postJsonWithApiKey($uri, $data = [], $headers = [])`
+- `patchJsonWithApiKey($uri, $data = [], $headers = [])`
+- `deleteJsonWithApiKey($uri, $data = [], $headers = [])`
+
+The trait automatically creates the test API key if it doesn't exist in the database.
+
+---
+
 ## Email Verification System
 
 ### Overview

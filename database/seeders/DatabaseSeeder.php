@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             CountrySeeder::class,
             PassportSeeder::class,
+            ApiKeySeeder::class,
             UserSeeder::class,
         ]);
     }

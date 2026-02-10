@@ -5,10 +5,11 @@ namespace Tests\Feature\Http\Controllers\Api\V1;
 use App\Models\Country;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use Tests\Traits\WithApiKey;
 
 class CountryControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, WithApiKey;
 
     protected function setUp(): void
     {
@@ -56,7 +57,7 @@ class CountryControllerTest extends TestCase
 
     public function test_can_get_all_countries(): void
     {
-        $response = $this->getJson('/api/v1/countries');
+        $response = $this->getJsonWithApiKey('/api/v1/countries');
 
         $response->assertStatus(200)
             ->assertJsonStructure([
@@ -81,7 +82,7 @@ class CountryControllerTest extends TestCase
 
     public function test_countries_are_returned_ordered_by_name(): void
     {
-        $response = $this->getJson('/api/v1/countries');
+        $response = $this->getJsonWithApiKey('/api/v1/countries');
 
         $response->assertStatus(200);
         
@@ -95,7 +96,7 @@ class CountryControllerTest extends TestCase
 
     public function test_can_get_country_by_alpha2_code(): void
     {
-        $response = $this->getJson('/api/v1/countries/MX');
+        $response = $this->getJsonWithApiKey('/api/v1/countries/MX');
 
         $response->assertStatus(200)
             ->assertJsonStructure([
@@ -129,7 +130,7 @@ class CountryControllerTest extends TestCase
 
     public function test_can_get_country_by_alpha3_code(): void
     {
-        $response = $this->getJson('/api/v1/countries/USA');
+        $response = $this->getJsonWithApiKey('/api/v1/countries/USA');
 
         $response->assertStatus(200)
             ->assertJson([
@@ -144,9 +145,9 @@ class CountryControllerTest extends TestCase
 
     public function test_country_code_search_is_case_insensitive(): void
     {
-        $responseLower = $this->getJson('/api/v1/countries/mx');
-        $responseUpper = $this->getJson('/api/v1/countries/MX');
-        $responseMixed = $this->getJson('/api/v1/countries/Mx');
+        $responseLower = $this->getJsonWithApiKey('/api/v1/countries/mx');
+        $responseUpper = $this->getJsonWithApiKey('/api/v1/countries/MX');
+        $responseMixed = $this->getJsonWithApiKey('/api/v1/countries/Mx');
 
         $responseLower->assertStatus(200)
             ->assertJson(['country' => ['code' => 'MX']]);
@@ -160,7 +161,7 @@ class CountryControllerTest extends TestCase
 
     public function test_returns_404_when_country_not_found(): void
     {
-        $response = $this->getJson('/api/v1/countries/XX');
+        $response = $this->getJsonWithApiKey('/api/v1/countries/XX');
 
         $response->assertStatus(404)
             ->assertJson([
@@ -170,7 +171,7 @@ class CountryControllerTest extends TestCase
 
     public function test_country_includes_flag_emoji(): void
     {
-        $response = $this->getJson('/api/v1/countries/ES');
+        $response = $this->getJsonWithApiKey('/api/v1/countries/ES');
 
         $response->assertStatus(200);
         
@@ -182,7 +183,7 @@ class CountryControllerTest extends TestCase
 
     public function test_all_countries_have_required_fields(): void
     {
-        $response = $this->getJson('/api/v1/countries');
+        $response = $this->getJsonWithApiKey('/api/v1/countries');
 
         $response->assertStatus(200);
         
@@ -205,21 +206,21 @@ class CountryControllerTest extends TestCase
 
     public function test_countries_endpoint_does_not_require_authentication(): void
     {
-        $response = $this->getJson('/api/v1/countries');
+        $response = $this->getJsonWithApiKey('/api/v1/countries');
 
         $response->assertStatus(200);
     }
 
     public function test_country_show_endpoint_does_not_require_authentication(): void
     {
-        $response = $this->getJson('/api/v1/countries/MX');
+        $response = $this->getJsonWithApiKey('/api/v1/countries/MX');
 
         $response->assertStatus(200);
     }
 
     public function test_can_filter_countries_by_region(): void
     {
-        $response = $this->getJson('/api/v1/countries');
+        $response = $this->getJsonWithApiKey('/api/v1/countries');
 
         $response->assertStatus(200);
         
@@ -234,7 +235,7 @@ class CountryControllerTest extends TestCase
 
     public function test_total_count_matches_number_of_countries(): void
     {
-        $response = $this->getJson('/api/v1/countries');
+        $response = $this->getJsonWithApiKey('/api/v1/countries');
 
         $response->assertStatus(200);
         

@@ -7,10 +7,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Passport\Passport;
 use Tests\TestCase;
+use Tests\Traits\WithApiKey;
 
 class UpdatePasswordTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, WithApiKey;
 
     public function test_user_can_update_password_with_valid_data(): void
     {
@@ -23,7 +24,7 @@ class UpdatePasswordTest extends TestCase
 
         Passport::actingAs($user, ['user:update-password']);
 
-        $response = $this->patchJson('/api/v1/auth/password', [
+        $response = $this->patchJsonWithApiKey('/api/v1/auth/password', [
             'current_password' => 'OldPassword123',
             'new_password' => 'NewSecurePass456',
             'new_password_confirmation' => 'NewSecurePass456',
@@ -42,7 +43,7 @@ class UpdatePasswordTest extends TestCase
 
     public function test_update_password_requires_authentication(): void
     {
-        $response = $this->patchJson('/api/v1/auth/password', [
+        $response = $this->patchJsonWithApiKey('/api/v1/auth/password', [
             'current_password' => 'OldPassword123',
             'new_password' => 'NewSecurePass456',
             'new_password_confirmation' => 'NewSecurePass456',
@@ -63,7 +64,7 @@ class UpdatePasswordTest extends TestCase
         // Acting with wrong scope
         Passport::actingAs($user, ['user:verify']);
 
-        $response = $this->patchJson('/api/v1/auth/password', [
+        $response = $this->patchJsonWithApiKey('/api/v1/auth/password', [
             'current_password' => 'OldPassword123',
             'new_password' => 'NewSecurePass456',
             'new_password_confirmation' => 'NewSecurePass456',
@@ -83,7 +84,7 @@ class UpdatePasswordTest extends TestCase
 
         Passport::actingAs($user, ['user:update-password']);
 
-        $response = $this->patchJson('/api/v1/auth/password', [
+        $response = $this->patchJsonWithApiKey('/api/v1/auth/password', [
             'new_password' => 'NewSecurePass456',
             'new_password_confirmation' => 'NewSecurePass456',
         ]);
@@ -103,7 +104,7 @@ class UpdatePasswordTest extends TestCase
 
         Passport::actingAs($user, ['user:update-password']);
 
-        $response = $this->patchJson('/api/v1/auth/password', [
+        $response = $this->patchJsonWithApiKey('/api/v1/auth/password', [
             'current_password' => 'WrongPassword123',
             'new_password' => 'NewSecurePass456',
             'new_password_confirmation' => 'NewSecurePass456',
@@ -124,7 +125,7 @@ class UpdatePasswordTest extends TestCase
 
         Passport::actingAs($user, ['user:update-password']);
 
-        $response = $this->patchJson('/api/v1/auth/password', [
+        $response = $this->patchJsonWithApiKey('/api/v1/auth/password', [
             'current_password' => 'OldPassword123',
             'new_password_confirmation' => 'NewSecurePass456',
         ]);
@@ -144,7 +145,7 @@ class UpdatePasswordTest extends TestCase
 
         Passport::actingAs($user, ['user:update-password']);
 
-        $response = $this->patchJson('/api/v1/auth/password', [
+        $response = $this->patchJsonWithApiKey('/api/v1/auth/password', [
             'current_password' => 'OldPassword123',
             'new_password' => 'NewSecurePass456',
         ]);
@@ -164,7 +165,7 @@ class UpdatePasswordTest extends TestCase
 
         Passport::actingAs($user, ['user:update-password']);
 
-        $response = $this->patchJson('/api/v1/auth/password', [
+        $response = $this->patchJsonWithApiKey('/api/v1/auth/password', [
             'current_password' => 'OldPassword123',
             'new_password' => 'NewSecurePass456',
             'new_password_confirmation' => 'DifferentPassword789',
@@ -185,7 +186,7 @@ class UpdatePasswordTest extends TestCase
 
         Passport::actingAs($user, ['user:update-password']);
 
-        $response = $this->patchJson('/api/v1/auth/password', [
+        $response = $this->patchJsonWithApiKey('/api/v1/auth/password', [
             'current_password' => 'OldPassword123',
             'new_password' => 'weak',
             'new_password_confirmation' => 'weak',
@@ -206,7 +207,7 @@ class UpdatePasswordTest extends TestCase
 
         Passport::actingAs($admin, ['user:update-password']);
 
-        $response = $this->patchJson('/api/v1/auth/password', [
+        $response = $this->patchJsonWithApiKey('/api/v1/auth/password', [
             'current_password' => 'OldAdminPass123',
             'new_password' => 'NewAdminPass456',
             'new_password_confirmation' => 'NewAdminPass456',
@@ -235,7 +236,7 @@ class UpdatePasswordTest extends TestCase
 
         $newPassword = 'NewSecurePass456';
 
-        $this->patchJson('/api/v1/auth/password', [
+        $this->patchJsonWithApiKey('/api/v1/auth/password', [
             'current_password' => 'OldPassword123',
             'new_password' => $newPassword,
             'new_password_confirmation' => $newPassword,

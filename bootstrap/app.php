@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'client' => \Laravel\Passport\Http\Middleware\EnsureClientIsResourceOwner::class,
             'scope' => \Laravel\Passport\Http\Middleware\CheckTokenForAnyScope::class,
             'auth' => \App\Http\Middleware\Authenticate::class,
+            'api.key' => \App\Http\Middleware\ValidateApiKey::class,
         ]);
         
         $middleware->group('api', [

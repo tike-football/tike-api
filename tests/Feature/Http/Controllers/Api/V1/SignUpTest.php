@@ -7,10 +7,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
+use Tests\Traits\WithApiKey;
 
 class SignUpTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, WithApiKey;
 
     /**
      * Get base user data for registration
@@ -42,7 +43,7 @@ class SignUpTest extends TestCase
             'password_confirmation' => 'SecurePass123',
         ];
 
-        $response = $this->postJson('/api/v1/auth/sign-up', $userData);
+        $response = $this->postJsonWithApiKey('/api/v1/auth/sign-up', $userData);
 
         $response->assertStatus(201)
             ->assertJson([
@@ -78,7 +79,7 @@ class SignUpTest extends TestCase
         $userData = $this->getBaseUserData();
         unset($userData['name']);
 
-        $response = $this->postJson('/api/v1/auth/sign-up', $userData);
+        $response = $this->postJsonWithApiKey('/api/v1/auth/sign-up', $userData);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['name']);
@@ -89,7 +90,7 @@ class SignUpTest extends TestCase
         $userData = $this->getBaseUserData();
         unset($userData['last_name']);
 
-        $response = $this->postJson('/api/v1/auth/sign-up', $userData);
+        $response = $this->postJsonWithApiKey('/api/v1/auth/sign-up', $userData);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['last_name']);
@@ -100,7 +101,7 @@ class SignUpTest extends TestCase
         $userData = $this->getBaseUserData();
         unset($userData['email']);
 
-        $response = $this->postJson('/api/v1/auth/sign-up', $userData);
+        $response = $this->postJsonWithApiKey('/api/v1/auth/sign-up', $userData);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['email']);
@@ -111,7 +112,7 @@ class SignUpTest extends TestCase
         $userData = $this->getBaseUserData();
         $userData['email'] = 'invalid-email';
 
-        $response = $this->postJson('/api/v1/auth/sign-up', $userData);
+        $response = $this->postJsonWithApiKey('/api/v1/auth/sign-up', $userData);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['email']);
@@ -126,7 +127,7 @@ class SignUpTest extends TestCase
         $userData = $this->getBaseUserData();
         $userData['email'] = 'existing@example.com';
 
-        $response = $this->postJson('/api/v1/auth/sign-up', $userData);
+        $response = $this->postJsonWithApiKey('/api/v1/auth/sign-up', $userData);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['email'])
@@ -144,7 +145,7 @@ class SignUpTest extends TestCase
         unset($userData['password']);
         unset($userData['password_confirmation']);
 
-        $response = $this->postJson('/api/v1/auth/sign-up', $userData);
+        $response = $this->postJsonWithApiKey('/api/v1/auth/sign-up', $userData);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['password']);
@@ -155,7 +156,7 @@ class SignUpTest extends TestCase
         $userData = $this->getBaseUserData();
         unset($userData['password_confirmation']);
 
-        $response = $this->postJson('/api/v1/auth/sign-up', $userData);
+        $response = $this->postJsonWithApiKey('/api/v1/auth/sign-up', $userData);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['password']);
@@ -166,7 +167,7 @@ class SignUpTest extends TestCase
         $userData = $this->getBaseUserData();
         $userData['password_confirmation'] = 'DifferentPass123';
 
-        $response = $this->postJson('/api/v1/auth/sign-up', $userData);
+        $response = $this->postJsonWithApiKey('/api/v1/auth/sign-up', $userData);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['password'])
@@ -185,7 +186,7 @@ class SignUpTest extends TestCase
         $userData['password'] = 'weakpass123';
         $userData['password_confirmation'] = 'weakpass123';
 
-        $response = $this->postJson('/api/v1/auth/sign-up', $userData);
+        $response = $this->postJsonWithApiKey('/api/v1/auth/sign-up', $userData);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['password']);
@@ -195,7 +196,7 @@ class SignUpTest extends TestCase
         $userData['password'] = 'WeakPassword';
         $userData['password_confirmation'] = 'WeakPassword';
 
-        $response = $this->postJson('/api/v1/auth/sign-up', $userData);
+        $response = $this->postJsonWithApiKey('/api/v1/auth/sign-up', $userData);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['password']);
@@ -205,7 +206,7 @@ class SignUpTest extends TestCase
         $userData['password'] = 'Short1';
         $userData['password_confirmation'] = 'Short1';
 
-        $response = $this->postJson('/api/v1/auth/sign-up', $userData);
+        $response = $this->postJsonWithApiKey('/api/v1/auth/sign-up', $userData);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['password']);
@@ -217,7 +218,7 @@ class SignUpTest extends TestCase
 
         $userData = $this->getBaseUserData();
 
-        $this->postJson('/api/v1/auth/sign-up', $userData);
+        $this->postJsonWithApiKey('/api/v1/auth/sign-up', $userData);
 
         $user = User::where('email', 'john.doe@example.com')->first();
 
@@ -231,7 +232,7 @@ class SignUpTest extends TestCase
 
         $userData = $this->getBaseUserData();
 
-        $this->postJson('/api/v1/auth/sign-up', $userData);
+        $this->postJsonWithApiKey('/api/v1/auth/sign-up', $userData);
 
         $user = User::where('email', 'john.doe@example.com')->first();
 
@@ -247,7 +248,7 @@ class SignUpTest extends TestCase
         $userData = $this->getBaseUserData();
         $userData['language'] = 'en';
 
-        $response = $this->postJson('/api/v1/auth/sign-up', $userData);
+        $response = $this->postJsonWithApiKey('/api/v1/auth/sign-up', $userData);
 
         $response->assertStatus(201)
             ->assertJson([
@@ -267,7 +268,7 @@ class SignUpTest extends TestCase
 
         $userData = $this->getBaseUserData();
 
-        $response = $this->postJson('/api/v1/auth/sign-up', $userData);
+        $response = $this->postJsonWithApiKey('/api/v1/auth/sign-up', $userData);
 
         $response->assertStatus(201);
 
@@ -282,7 +283,7 @@ class SignUpTest extends TestCase
         $userData = $this->getBaseUserData();
         $userData['language'] = 'fr'; // Valid format but not in options
 
-        $response = $this->postJson('/api/v1/auth/sign-up', $userData);
+        $response = $this->postJsonWithApiKey('/api/v1/auth/sign-up', $userData);
 
         $response->assertStatus(201); // Should succeed
 
@@ -297,7 +298,7 @@ class SignUpTest extends TestCase
         $userData = $this->getBaseUserData();
         $userData['language'] = 'eng'; // 3 characters, should fail
 
-        $response = $this->postJson('/api/v1/auth/sign-up', $userData);
+        $response = $this->postJsonWithApiKey('/api/v1/auth/sign-up', $userData);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['language']);
@@ -314,7 +315,7 @@ class SignUpTest extends TestCase
             'password_confirmation' => 'SecurePass123',
         ];
 
-        $response = $this->postJson('/api/v1/auth/sign-up', $userData);
+        $response = $this->postJsonWithApiKey('/api/v1/auth/sign-up', $userData);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['country_code']);
@@ -331,7 +332,7 @@ class SignUpTest extends TestCase
             'password_confirmation' => 'SecurePass123',
         ];
 
-        $response = $this->postJson('/api/v1/auth/sign-up', $userData);
+        $response = $this->postJsonWithApiKey('/api/v1/auth/sign-up', $userData);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['phone_number']);
@@ -356,7 +357,7 @@ class SignUpTest extends TestCase
             'password_confirmation' => 'SecurePass123',
         ];
 
-        $response = $this->postJson('/api/v1/auth/sign-up', $userData);
+        $response = $this->postJsonWithApiKey('/api/v1/auth/sign-up', $userData);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['phone_number'])
@@ -391,7 +392,7 @@ class SignUpTest extends TestCase
             'password_confirmation' => 'SecurePass123',
         ];
 
-        $response = $this->postJson('/api/v1/auth/sign-up', $userData);
+        $response = $this->postJsonWithApiKey('/api/v1/auth/sign-up', $userData);
 
         $response->assertStatus(201);
 
@@ -417,7 +418,7 @@ class SignUpTest extends TestCase
             'password_confirmation' => 'SecurePass123',
         ];
 
-        $response = $this->postJson('/api/v1/auth/sign-up', $userData);
+        $response = $this->postJsonWithApiKey('/api/v1/auth/sign-up', $userData);
 
         $response->assertStatus(201);
 

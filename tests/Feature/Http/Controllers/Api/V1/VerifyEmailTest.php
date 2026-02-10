@@ -6,10 +6,11 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Passport\Passport;
 use Tests\TestCase;
+use Tests\Traits\WithApiKey;
 
 class VerifyEmailTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, WithApiKey;
 
     public function test_user_can_verify_email_with_valid_token(): void
     {
@@ -20,7 +21,7 @@ class VerifyEmailTest extends TestCase
 
         Passport::actingAs($user, ['user:verify']);
 
-        $response = $this->postJson('/api/v1/auth/verify-email');
+        $response = $this->postJsonWithApiKey('/api/v1/auth/verify-email');
 
         $response->assertStatus(200)
             ->assertJson([
@@ -40,7 +41,7 @@ class VerifyEmailTest extends TestCase
 
     public function test_user_cannot_verify_email_without_authentication(): void
     {
-        $response = $this->postJson('/api/v1/auth/verify-email');
+        $response = $this->postJsonWithApiKey('/api/v1/auth/verify-email');
 
         $response->assertStatus(401)
             ->assertJson([
@@ -57,7 +58,7 @@ class VerifyEmailTest extends TestCase
 
         Passport::actingAs($user, ['test:test']);
 
-        $response = $this->postJson('/api/v1/auth/verify-email');
+        $response = $this->postJsonWithApiKey('/api/v1/auth/verify-email');
 
         $response->assertStatus(403);
     }
@@ -71,7 +72,7 @@ class VerifyEmailTest extends TestCase
 
         Passport::actingAs($user, ['user:verify']);
 
-        $response = $this->postJson('/api/v1/auth/verify-email');
+        $response = $this->postJsonWithApiKey('/api/v1/auth/verify-email');
 
         $response->assertStatus(400)
             ->assertJson([
@@ -88,7 +89,7 @@ class VerifyEmailTest extends TestCase
 
         Passport::actingAs($user, ['user:verify']);
 
-        $response = $this->postJson('/api/v1/auth/verify-email');
+        $response = $this->postJsonWithApiKey('/api/v1/auth/verify-email');
 
         $response->assertStatus(200);
 
@@ -100,7 +101,7 @@ class VerifyEmailTest extends TestCase
         $user2 = User::find($user->id);
         Passport::actingAs($user2, ['user:verify']);
         
-        $response = $this->postJson('/api/v1/auth/verify-email');
+        $response = $this->postJsonWithApiKey('/api/v1/auth/verify-email');
         $response->assertStatus(400)
             ->assertJson(['message' => 'Email address is already verified.']);
     }
@@ -115,7 +116,7 @@ class VerifyEmailTest extends TestCase
 
         Passport::actingAs($user, ['user:verify']);
 
-        $response = $this->postJson('/api/v1/auth/verify-email');
+        $response = $this->postJsonWithApiKey('/api/v1/auth/verify-email');
 
         $response->assertStatus(200)
             ->assertJsonStructure([

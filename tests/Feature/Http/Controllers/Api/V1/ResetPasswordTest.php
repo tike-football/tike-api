@@ -10,10 +10,11 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Queue;
 use Laravel\Passport\Passport;
 use Tests\TestCase;
+use Tests\Traits\WithApiKey;
 
 class ResetPasswordTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, WithApiKey;
 
     protected function setUp(): void
     {
@@ -24,7 +25,7 @@ class ResetPasswordTest extends TestCase
 
     public function test_reset_password_requires_authentication(): void
     {
-        $response = $this->postJson('/api/v1/auth/password/reset', [
+        $response = $this->postJsonWithApiKey('/api/v1/auth/password/reset', [
             'new_password' => 'NewPassword123',
             'new_password_confirmation' => 'NewPassword123',
         ]);
@@ -39,7 +40,7 @@ class ResetPasswordTest extends TestCase
         // Acting as user with wrong scope
         Passport::actingAs($user, ['test:test']);
 
-        $response = $this->postJson('/api/v1/auth/password/reset', [
+        $response = $this->postJsonWithApiKey('/api/v1/auth/password/reset', [
             'new_password' => 'NewPassword123',
             'new_password_confirmation' => 'NewPassword123',
         ]);
@@ -52,7 +53,7 @@ class ResetPasswordTest extends TestCase
         $user = User::factory()->create();
         Passport::actingAs($user, ['user:recover-password']);
 
-        $response = $this->postJson('/api/v1/auth/password/reset', []);
+        $response = $this->postJsonWithApiKey('/api/v1/auth/password/reset', []);
 
         $response->assertStatus(422)
             ->assertJsonStructure([
@@ -66,7 +67,7 @@ class ResetPasswordTest extends TestCase
         $user = User::factory()->create();
         Passport::actingAs($user, ['user:recover-password']);
 
-        $response = $this->postJson('/api/v1/auth/password/reset', [
+        $response = $this->postJsonWithApiKey('/api/v1/auth/password/reset', [
             'new_password' => 'NewPassword123',
         ]);
 
@@ -82,7 +83,7 @@ class ResetPasswordTest extends TestCase
         $user = User::factory()->create();
         Passport::actingAs($user, ['user:recover-password']);
 
-        $response = $this->postJson('/api/v1/auth/password/reset', [
+        $response = $this->postJsonWithApiKey('/api/v1/auth/password/reset', [
             'new_password' => 'NewPassword123',
             'new_password_confirmation' => 'DifferentPassword456',
         ]);
@@ -102,7 +103,7 @@ class ResetPasswordTest extends TestCase
         $user = User::factory()->create();
         Passport::actingAs($user, ['user:recover-password']);
 
-        $response = $this->postJson('/api/v1/auth/password/reset', [
+        $response = $this->postJsonWithApiKey('/api/v1/auth/password/reset', [
             'new_password' => 'Short1',
             'new_password_confirmation' => 'Short1',
         ]);
@@ -119,7 +120,7 @@ class ResetPasswordTest extends TestCase
         $user = User::factory()->create();
         Passport::actingAs($user, ['user:recover-password']);
 
-        $response = $this->postJson('/api/v1/auth/password/reset', [
+        $response = $this->postJsonWithApiKey('/api/v1/auth/password/reset', [
             'new_password' => 'lowercase123',
             'new_password_confirmation' => 'lowercase123',
         ]);
@@ -136,7 +137,7 @@ class ResetPasswordTest extends TestCase
         $user = User::factory()->create();
         Passport::actingAs($user, ['user:recover-password']);
 
-        $response = $this->postJson('/api/v1/auth/password/reset', [
+        $response = $this->postJsonWithApiKey('/api/v1/auth/password/reset', [
             'new_password' => 'NoNumbers',
             'new_password_confirmation' => 'NoNumbers',
         ]);
@@ -156,7 +157,7 @@ class ResetPasswordTest extends TestCase
 
         Passport::actingAs($user, ['user:recover-password']);
 
-        $response = $this->postJson('/api/v1/auth/password/reset', [
+        $response = $this->postJsonWithApiKey('/api/v1/auth/password/reset', [
             'new_password' => 'NewPassword456',
             'new_password_confirmation' => 'NewPassword456',
         ]);
@@ -176,7 +177,7 @@ class ResetPasswordTest extends TestCase
         $user = User::factory()->create();
         Passport::actingAs($user, ['user:recover-password']);
 
-        $response = $this->postJson('/api/v1/auth/password/reset', [
+        $response = $this->postJsonWithApiKey('/api/v1/auth/password/reset', [
             'new_password' => 'NewPassword456',
             'new_password_confirmation' => 'NewPassword456',
         ]);
@@ -199,7 +200,7 @@ class ResetPasswordTest extends TestCase
         // In a real scenario, tokens would exist from previous logins
         $initialTokenCount = $user->tokens()->count();
 
-        $response = $this->postJson('/api/v1/auth/password/reset', [
+        $response = $this->postJsonWithApiKey('/api/v1/auth/password/reset', [
             'new_password' => 'NewPassword456',
             'new_password_confirmation' => 'NewPassword456',
         ]);
@@ -222,7 +223,7 @@ class ResetPasswordTest extends TestCase
 
         Passport::actingAs($user, ['user:recover-password']);
 
-        $response = $this->postJson('/api/v1/auth/password/reset', [
+        $response = $this->postJsonWithApiKey('/api/v1/auth/password/reset', [
             'new_password' => 'NewPassword456',
             'new_password_confirmation' => 'NewPassword456',
         ]);
@@ -243,7 +244,7 @@ class ResetPasswordTest extends TestCase
 
         Passport::actingAs($user, ['user:recover-password']);
 
-        $response = $this->postJson('/api/v1/auth/password/reset', [
+        $response = $this->postJsonWithApiKey('/api/v1/auth/password/reset', [
             'new_password' => 'NewPassword456',
             'new_password_confirmation' => 'NewPassword456',
         ]);
@@ -263,7 +264,7 @@ class ResetPasswordTest extends TestCase
         $user = User::factory()->create();
         Passport::actingAs($user, ['user:recover-password']);
 
-        $response = $this->postJson('/api/v1/auth/password/reset', [
+        $response = $this->postJsonWithApiKey('/api/v1/auth/password/reset', [
             'new_password' => 'weak',
         ]);
 
@@ -281,7 +282,7 @@ class ResetPasswordTest extends TestCase
 
         $newPassword = 'NewPassword456';
 
-        $response = $this->postJson('/api/v1/auth/password/reset', [
+        $response = $this->postJsonWithApiKey('/api/v1/auth/password/reset', [
             'new_password' => $newPassword,
             'new_password_confirmation' => $newPassword,
         ]);

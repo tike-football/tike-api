@@ -8,10 +8,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
+use Tests\Traits\WithApiKey;
 
 class ForgotPasswordTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, WithApiKey;
 
     protected function setUp(): void
     {
@@ -22,7 +23,7 @@ class ForgotPasswordTest extends TestCase
 
     public function test_forgot_password_requires_email(): void
     {
-        $response = $this->postJson('/api/v1/auth/password/forgot', []);
+        $response = $this->postJsonWithApiKey('/api/v1/auth/password/forgot', []);
 
         $response->assertStatus(422)
             ->assertJsonStructure([
@@ -33,7 +34,7 @@ class ForgotPasswordTest extends TestCase
 
     public function test_forgot_password_requires_valid_email_format(): void
     {
-        $response = $this->postJson('/api/v1/auth/password/forgot', [
+        $response = $this->postJsonWithApiKey('/api/v1/auth/password/forgot', [
             'email' => 'invalid-email',
         ]);
 
@@ -46,7 +47,7 @@ class ForgotPasswordTest extends TestCase
 
     public function test_forgot_password_requires_existing_email(): void
     {
-        $response = $this->postJson('/api/v1/auth/password/forgot', [
+        $response = $this->postJsonWithApiKey('/api/v1/auth/password/forgot', [
             'email' => 'nonexistent@example.com',
         ]);
 
@@ -63,7 +64,7 @@ class ForgotPasswordTest extends TestCase
             'email' => 'test@example.com',
         ]);
 
-        $response = $this->postJson('/api/v1/auth/password/forgot', [
+        $response = $this->postJsonWithApiKey('/api/v1/auth/password/forgot', [
             'email' => 'test@example.com',
         ]);
 
@@ -84,7 +85,7 @@ class ForgotPasswordTest extends TestCase
             'email' => 'existing@example.com',
         ]);
 
-        $responseExisting = $this->postJson('/api/v1/auth/password/forgot', [
+        $responseExisting = $this->postJsonWithApiKey('/api/v1/auth/password/forgot', [
             'email' => 'existing@example.com',
         ]);
 
@@ -103,7 +104,7 @@ class ForgotPasswordTest extends TestCase
         ]);
 
         // Make request without authentication
-        $response = $this->postJson('/api/v1/auth/password/forgot', [
+        $response = $this->postJsonWithApiKey('/api/v1/auth/password/forgot', [
             'email' => 'test@example.com',
         ]);
 
@@ -117,7 +118,7 @@ class ForgotPasswordTest extends TestCase
             'email_verified_at' => null,
         ]);
 
-        $response = $this->postJson('/api/v1/auth/password/forgot', [
+        $response = $this->postJsonWithApiKey('/api/v1/auth/password/forgot', [
             'email' => 'unverified@example.com',
         ]);
 
@@ -130,7 +131,7 @@ class ForgotPasswordTest extends TestCase
 
     public function test_forgot_password_returns_json_on_validation_error(): void
     {
-        $response = $this->postJson('/api/v1/auth/password/forgot', [
+        $response = $this->postJsonWithApiKey('/api/v1/auth/password/forgot', [
             'email' => '',
         ]);
 
@@ -143,7 +144,7 @@ class ForgotPasswordTest extends TestCase
 
     public function test_forgot_password_email_field_has_max_length_validation(): void
     {
-        $response = $this->postJson('/api/v1/auth/password/forgot', [
+        $response = $this->postJsonWithApiKey('/api/v1/auth/password/forgot', [
             'email' => str_repeat('a', 250) . '@example.com', // Over 255 characters
         ]);
 
