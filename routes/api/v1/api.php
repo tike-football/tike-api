@@ -1,32 +1,49 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\CountryController;
 use Illuminate\Support\Facades\Route;
 
+// Health check - No API key required (for monitoring)
 Route::get('health', function () {
     return response()->json([
         'status' => 'ok',
     ]);
 });
 
-Route::middleware(['auth:api', 'scope:test:test'])->get('scopes/test', function () {
+// Test endpoint with scopes - Requires both API key and authentication
+Route::middleware(['api.key', 'auth:api', 'scope:test:test'])->get('scopes/test', function () {
     return response()->json([
         'scope' => 'test:test',
         'valid' => true,
     ]);
 });
 
-Route::prefix('auth')->group(function (): void {
-    Route::post('get-token', [AuthController::class, 'getToken']);
-    Route::post('sign-up', [AuthController::class, 'signUp']);
+// Public endpoints - Require API key but no authentication
+Route::middleware(['api.key'])->group(function (): void {
+    // Countries endpoints
+    Route::prefix('countries')->group(function (): void {
+        Route::get('/', [CountryController::class, 'index']);
+        Route::get('/{code}', [CountryController::class, 'show']);
+    });
+
+    // Auth endpoints (public but need API key)
+    Route::prefix('auth')->group(function (): void {
+        Route::post('get-token', [AuthController::class, 'getToken']);
+        Route::post('sign-up', [AuthController::class, 'signUp']);
+        Route::post('password/forgot', [AuthController::class, 'forgotPassword']);
+    });
+});
+
+// Protected endpoints - Require both API key and authentication
+Route::middleware(['api.key', 'auth:api'])->prefix('auth')->group(function (): void {
     Route::post('verify-email', [AuthController::class, 'verifyEmail'])
-        ->middleware(['auth:api', 'scope:user:verify']);
+        ->middleware(['scope:user:verify']);
     
     Route::prefix('password')->group(function (): void {
         Route::patch('/', [AuthController::class, 'updatePassword'])
-            ->middleware(['auth:api', 'scope:user:update-password']);
-        Route::post('forgot', [AuthController::class, 'forgotPassword']);
+            ->middleware(['scope:user:update-password']);
         Route::post('reset', [AuthController::class, 'resetPassword'])
-            ->middleware(['auth:api', 'scope:user:recover-password']);
+            ->middleware(['scope:user:recover-password']);
     });
 });

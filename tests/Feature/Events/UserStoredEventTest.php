@@ -9,10 +9,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
+use Tests\Traits\WithApiKey;
 
 class UserStoredEventTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, WithApiKey;
 
     public function test_user_stored_event_is_dispatched_on_registration(): void
     {
@@ -28,7 +29,7 @@ class UserStoredEventTest extends TestCase
             'password_confirmation' => 'SecurePass123',
         ];
 
-        $response = $this->postJson('/api/v1/auth/sign-up', $userData);
+        $response = $this->postJsonWithApiKey('/api/v1/auth/sign-up', $userData);
 
         $response->assertStatus(201);
 
@@ -51,7 +52,7 @@ class UserStoredEventTest extends TestCase
             'password_confirmation' => 'SecurePass123',
         ];
 
-        $this->postJson('/api/v1/auth/sign-up', $userData);
+        $this->postJsonWithApiKey('/api/v1/auth/sign-up', $userData);
 
         Event::assertDispatched(UserStored::class);
         Event::assertListening(

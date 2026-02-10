@@ -8,14 +8,15 @@ use Illuminate\Support\Str;
 use Laravel\Passport\Client;
 use Laravel\Passport\Passport;
 use Tests\TestCase;
+use Tests\Traits\WithApiKey;
 
 class AuthControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, WithApiKey;
 
     public function test_get_token_requires_email_and_password(): void
     {
-        $response = $this->postJson('/api/v1/auth/get-token', []);
+        $response = $this->postJsonWithApiKey('/api/v1/auth/get-token', []);
 
         $response->assertStatus(422)
             ->assertJsonStructure([
@@ -32,7 +33,7 @@ class AuthControllerTest extends TestCase
             'email_verified_at' => now(),
         ]);
 
-        $response = $this->postJson('/api/v1/auth/get-token', [
+        $response = $this->postJsonWithApiKey('/api/v1/auth/get-token', [
             'email' => 'test@example.com',
             'password' => 'wrong_password',
         ]);
@@ -60,7 +61,7 @@ class AuthControllerTest extends TestCase
             'role' => 'user',
         ]);
 
-        $response = $this->postJson('/api/v1/auth/get-token', [
+        $response = $this->postJsonWithApiKey('/api/v1/auth/get-token', [
             'email' => 'verified@example.com',
             'password' => 'password123',
         ]);
@@ -78,7 +79,7 @@ class AuthControllerTest extends TestCase
             'role' => 'user',
         ]);
 
-        $response = $this->postJson('/api/v1/auth/get-token', [
+        $response = $this->postJsonWithApiKey('/api/v1/auth/get-token', [
             'email' => 'unverified@example.com',
             'password' => 'password123',
         ]);
@@ -93,7 +94,7 @@ class AuthControllerTest extends TestCase
 
         Passport::actingAs($user, ['test:test']);
 
-        $response = $this->getJson('/api/v1/scopes/test');
+        $response = $this->getJsonWithApiKey('/api/v1/scopes/test');
 
         $response->assertStatus(200)
             ->assertJson([
@@ -104,7 +105,7 @@ class AuthControllerTest extends TestCase
 
     public function test_unauthenticated_user_cannot_access_scoped_endpoint(): void
     {
-        $response = $this->getJson('/api/v1/scopes/test');
+        $response = $this->getJsonWithApiKey('/api/v1/scopes/test');
 
         $response->assertStatus(401)
             ->assertJson(['message' => 'Unauthenticated.']);
@@ -116,7 +117,7 @@ class AuthControllerTest extends TestCase
 
         Passport::actingAs($user, ['different:scope']);
 
-        $response = $this->getJson('/api/v1/scopes/test');
+        $response = $this->getJsonWithApiKey('/api/v1/scopes/test');
 
         $response->assertStatus(403);
     }
