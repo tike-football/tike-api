@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\CountryController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('health', function () {
@@ -14,6 +15,11 @@ Route::middleware(['auth:api', 'scope:test:test'])->get('scopes/test', function 
         'scope' => 'test:test',
         'valid' => true,
     ]);
+});
+
+Route::prefix('countries')->group(function (): void {
+    Route::get('/', [CountryController::class, 'index']);
+    Route::get('/{code}', [CountryController::class, 'show']);
 });
 
 Route::prefix('auth')->group(function (): void {
