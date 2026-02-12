@@ -19,12 +19,18 @@ RUN apk add --no-cache \
     mysql-client \
     supervisor \
     nginx \
+    libcap \
     redis \
+    $PHPIZE_DEPS \
     && docker-php-ext-install \
         pdo_mysql \
         zip \
         opcache \
-        bcmath
+        bcmath \
+    && pecl install redis \
+    && docker-php-ext-enable redis \
+    && setcap 'cap_net_bind_service=+ep' /usr/sbin/nginx \
+    && apk del $PHPIZE_DEPS
 
 # Instalar Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
@@ -55,7 +61,18 @@ RUN composer dump-autoload --optimize --no-dev
 
 # Configurar permisos
 RUN chown -R tike:tike /var/www/html && \
-    chmod -R 755 /var/www/html/storage /var/www/html/bootstrap/cache
+    chmod -R 755 /var/www/html/storage /var/www/html/bootstrap/cache && \
+    mkdir -p /var/lib/nginx/tmp/client_body \
+             /var/lib/nginx/tmp/proxy \
+             /var/lib/nginx/tmp/fastcgi \
+             /var/lib/nginx/tmp/uwsgi \
+             /var/lib/nginx/tmp/scgi \
+             /var/lib/nginx/logs \
+             /var/log/nginx && \
+    chown -R tike:tike /var/lib/nginx /var/log/nginx && \
+    chmod -R 755 /var/lib/nginx /var/log/nginx && \
+    if [ -f /var/www/html/storage/oauth-private.key ]; then chmod 600 /var/www/html/storage/oauth-private.key; fi && \
+    if [ -f /var/www/html/storage/oauth-public.key ]; then chmod 660 /var/www/html/storage/oauth-public.key; fi
 
 # Configurar PHP-FPM
 RUN echo "pm = dynamic" >> /usr/local/etc/php-fpm.d/www.conf && \
