@@ -1,0 +1,54 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Docker
+Dockerfile
+Dockerfile.production
+docker-compose*.yml
+.dockerignore
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+*~
+
+# Tests
+tests/
+phpunit.xml
+.phpunit.result.cache
+
+# Documentation
+README.md
+CHANGELOG.md
+docs/
+
+# Node (si tienes)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Storage (se regenera en runtime)
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+bootstrap/cache/*
+
+# Vendor (se instala en el build)
+vendor/
+
+# Mac
+.DS_Store
+
+# Backup files
+*.bak
+*.backup
