@@ -10,14 +10,18 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
+        $countryCode = '+1';
+        $phoneNumber = '1234567890';
+
         $admin = User::updateOrCreate(
             ['email' => 'test@tike.com'],
             [
                 'name' => 'Admin',
                 'last_name' => 'User',
                 'email_verified_at' => now(),
-                'country_code' => '+1',
-                'phone_number' => '1234567890',
+                'country_code' => $countryCode,
+                'phone_number' => $phoneNumber,
+                'full_phone_number' => $countryCode . $phoneNumber,
                 'role' => 'admin',
                 'password' => Hash::make('qwerty123'),
             ]
