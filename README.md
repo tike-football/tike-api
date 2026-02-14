@@ -583,10 +583,14 @@ MAIL_PASSWORD=your-password
 MAIL_ENCRYPTION=tls
 ```
 
-**SendGrid:**
+**SendGrid (via SMTP):**
 ```env
-MAIL_MAILER=sendgrid
-SENDGRID_API_KEY=your-sendgrid-api-key
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.sendgrid.net
+MAIL_PORT=587
+MAIL_USERNAME=apikey
+MAIL_PASSWORD=your-sendgrid-api-key
+MAIL_ENCRYPTION=tls
 ```
 
 **Mailgun:**
