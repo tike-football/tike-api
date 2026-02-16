@@ -3,19 +3,30 @@ set -eu
 
 cd /var/www/html
 
+mkdir -p \
+  storage/framework/cache \
+  storage/framework/sessions \
+  storage/framework/views \
+  storage/logs \
+  bootstrap/cache
+
 php artisan config:clear || true
 php artisan cache:clear || true
 php artisan route:clear || true
 php artisan view:clear || true
 
-# Ensure Passport keys are always available after deploy.
+# Ensure runtime writable paths are owned by the same user as php-fpm workers.
+chown -R www-data:www-data storage bootstrap/cache
+chmod -R ug+rwX storage bootstrap/cache
+
+# Keep Passport keys stable across deploys.
 if [ -n "${PASSPORT_PRIVATE_KEY:-}" ] && [ -n "${PASSPORT_PUBLIC_KEY:-}" ]; then
   printf "%b" "$PASSPORT_PRIVATE_KEY" > storage/oauth-private.key
   printf "%b" "$PASSPORT_PUBLIC_KEY" > storage/oauth-public.key
 fi
 
 if [ ! -s storage/oauth-private.key ] || [ ! -s storage/oauth-public.key ]; then
-  php artisan passport:keys --force
+  php artisan passport:keys --force || true
 fi
 
 chown www-data:www-data storage/oauth-private.key storage/oauth-public.key

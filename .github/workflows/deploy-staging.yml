@@ -83,6 +83,12 @@ jobs:
 
       - name: Render new task definition
         run: |
+          PASSPORT_SECRET_ARN=$(aws secretsmanager describe-secret \
+            --secret-id tike-staging/passport \
+            --query 'ARN' \
+            --output text)
+          echo "PASSPORT_SECRET_ARN=${PASSPORT_SECRET_ARN}" >> $GITHUB_ENV
+
           aws ecs describe-task-definition \
             --task-definition ${ECS_TASK_FAMILY} \
             --query taskDefinition > task-definition.json
@@ -116,6 +122,19 @@ jobs:
                     | .environment = (
                         ((.environment // []) | map({(.name): .value}) | add // {}) as $old
                         | ($old + $stenv | to_entries | map({name: .key, value: .value}))
+                      )
+                    | .secrets = (
+                        ((.secrets // []) | map(select(.name != "PASSPORT_PRIVATE_KEY" and .name != "PASSPORT_PUBLIC_KEY")))
+                        + [
+                            {
+                              "name": "PASSPORT_PRIVATE_KEY",
+                              "valueFrom": (env.PASSPORT_SECRET_ARN + ":PASSPORT_PRIVATE_KEY::")
+                            },
+                            {
+                              "name": "PASSPORT_PUBLIC_KEY",
+                              "valueFrom": (env.PASSPORT_SECRET_ARN + ":PASSPORT_PUBLIC_KEY::")
+                            }
+                          ]
                       )
                   else .
                   end
