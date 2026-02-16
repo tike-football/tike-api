@@ -5,6 +5,7 @@ ENV APP_ENV=${APP_ENV}
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
 RUN apk add --no-cache \
+    $PHPIZE_DEPS \
     nginx \
     supervisor \
     redis \

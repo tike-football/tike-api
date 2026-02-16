@@ -1,4 +1,4 @@
-name: Deploy Staging ECS
+name: deploy_st
 
 on:
   push:
@@ -19,7 +19,7 @@ env:
   CONTAINER_NAME: tike-api
 
 jobs:
-  deploy:
+  deploy_st:
     runs-on: ubuntu-latest
 
     steps:
