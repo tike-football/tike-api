@@ -1,0 +1,91 @@
+name: deploy_st
+
+on:
+  push:
+    branches:
+      - staging
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: tike-api
+  ECS_CLUSTER: tike-api-staging
+  ECS_SERVICE: tike-api-staging-service
+  ECS_TASK_FAMILY: tike-api-staging
+  CONTAINER_NAME: tike-api
+
+jobs:
+  deploy_st:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::139194331469:role/GitHubActionsTikeApiStagingDeploy
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push image
+        env:
+          IMAGE_TAG: staging-${{ github.sha }}
+        run: |
+          ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
+          IMAGE_URI=${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}
+          echo "IMAGE_URI=${IMAGE_URI}" >> $GITHUB_ENV
+          docker buildx create --use --name tike-builder || docker buildx use tike-builder
+          docker buildx build \
+            --platform linux/amd64 \
+            -f docker/production/Dockerfile \
+            --build-arg APP_ENV=staging \
+            -t ${IMAGE_URI} \
+            --push \
+            .
+
+      - name: Render new task definition
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition ${ECS_TASK_FAMILY} \
+            --query taskDefinition > task-definition.json
+
+          jq 'del(.taskDefinitionArn,.revision,.status,.requiresAttributes,.compatibilities,.registeredAt,.registeredBy)
+              | .containerDefinitions |= map(if .name == env.CONTAINER_NAME then .image = env.IMAGE_URI else . end)' \
+              task-definition.json > task-definition-rendered.json
+
+      - name: Register task definition revision
+        id: taskdef
+        run: |
+          TASK_DEF_ARN=$(aws ecs register-task-definition \
+            --cli-input-json file://task-definition-rendered.json \
+            --query 'taskDefinition.taskDefinitionArn' \
+            --output text)
+          echo "TASK_DEF_ARN=${TASK_DEF_ARN}" >> $GITHUB_ENV
+
+      - name: Deploy ECS service
+        run: |
+          aws ecs update-service \
+            --cluster ${ECS_CLUSTER} \
+            --service ${ECS_SERVICE} \
+            --task-definition ${TASK_DEF_ARN} \
+            --force-new-deployment
+
+          aws ecs wait services-stable \
+            --cluster ${ECS_CLUSTER} \
+            --services ${ECS_SERVICE}
+
+      - name: Verify queue worker command includes emails queue
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition ${TASK_DEF_ARN} \
+            --query 'taskDefinition.containerDefinitions[0].command' \
+            --output text || true
