@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Route;
 // Health check - No API key required (for monitoring)
 Route::get('health', function () {
     return response()->json([
-        'status' => 'okk',
+        'status' => 'ok',
     ]);
 });
 
