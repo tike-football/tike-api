@@ -17,6 +17,7 @@ env:
   ECS_SERVICE: tike-api-staging-service
   ECS_TASK_FAMILY: tike-api-staging
   CONTAINER_NAME: tike-api
+  ST_ENV_FILE: appconfig/ST.env
 
 jobs:
   tests:
@@ -86,8 +87,39 @@ jobs:
             --task-definition ${ECS_TASK_FAMILY} \
             --query taskDefinition > task-definition.json
 
-          jq 'del(.taskDefinitionArn,.revision,.status,.requiresAttributes,.compatibilities,.registeredAt,.registeredBy)
-              | .containerDefinitions |= map(if .name == env.CONTAINER_NAME then .image = env.IMAGE_URI else . end)' \
+          awk -F= '
+            /^[[:space:]]*#/ {next}
+            /^[[:space:]]*$/ {next}
+            {
+              key=$1
+              sub(/^[[:space:]]+/, "", key)
+              sub(/[[:space:]]+$/, "", key)
+              if (key == "") next
+
+              val=substr($0, index($0, "=")+1)
+              sub(/^[[:space:]]+/, "", val)
+              sub(/[[:space:]]+$/, "", val)
+              gsub(/^"/, "", val)
+              gsub(/"$/, "", val)
+
+              if (val == "__FROM_SECRET_MANAGER__") next
+              gsub(/"/, "\\\"", val)
+              printf "\"%s\":\"%s\",\n", key, val
+            }
+          ' "${ST_ENV_FILE}" | sed '$ s/,$//' | awk 'BEGIN{print "{"} {print} END{print "}"}' > st-env.json
+
+          jq --slurpfile st st-env.json 'del(.taskDefinitionArn,.revision,.status,.requiresAttributes,.compatibilities,.registeredAt,.registeredBy)
+              | ($st[0]) as $stenv
+              | .containerDefinitions |= map(
+                  if .name == env.CONTAINER_NAME then
+                    .image = env.IMAGE_URI
+                    | .environment = (
+                        ((.environment // []) | map({(.name): .value}) | add // {}) as $old
+                        | ($old + $stenv | to_entries | map({name: .key, value: .value}))
+                      )
+                  else .
+                  end
+                )' \
               task-definition.json > task-definition-rendered.json
 
       - name: Register task definition revision
