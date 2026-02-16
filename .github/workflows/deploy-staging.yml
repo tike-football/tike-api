@@ -18,6 +18,7 @@ env:
   ECS_TASK_FAMILY: tike-api-staging
   CONTAINER_NAME: tike-api
   ST_ENV_FILE: appconfig/ST.env
+  PASSPORT_SECRET_ARN: arn:aws:secretsmanager:us-east-1:139194331469:secret:tike-staging/passport-CxhtpI
 
 jobs:
   tests:
@@ -83,12 +84,6 @@ jobs:
 
       - name: Render new task definition
         run: |
-          PASSPORT_SECRET_ARN=$(aws secretsmanager describe-secret \
-            --secret-id tike-staging/passport \
-            --query 'ARN' \
-            --output text)
-          echo "PASSPORT_SECRET_ARN=${PASSPORT_SECRET_ARN}" >> $GITHUB_ENV
-
           aws ecs describe-task-definition \
             --task-definition ${ECS_TASK_FAMILY} \
             --query taskDefinition > task-definition.json
