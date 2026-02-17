@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Event;
 use Laravel\Passport\Passport;
 
 class AppServiceProvider extends ServiceProvider
@@ -21,5 +23,11 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Passport::enablePasswordGrant();
+
+        // Remove Laravel's default Registered -> SendEmailVerificationNotification
+        // after all providers have completed booting.
+        $this->app->booted(function (): void {
+            Event::forget(Registered::class);
+        });
     }
 }
