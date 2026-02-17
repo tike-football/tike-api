@@ -157,6 +157,13 @@ jobs:
             --cluster ${ECS_CLUSTER} \
             --services ${ECS_SERVICE}
 
+      - name: Staging sanity checks
+        env:
+          EXPECTED_TASK_DEF_ARN: ${{ env.TASK_DEF_ARN }}
+          WEB_SERVICE_NAME: tike-web-staging-service
+        run: |
+          ./scripts/staging_sanity_check.sh
+
       - name: Verify queue worker command includes emails queue
         run: |
           aws ecs describe-task-definition \
