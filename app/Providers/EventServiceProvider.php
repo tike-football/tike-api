@@ -28,4 +28,12 @@ class EventServiceProvider extends ServiceProvider
             SendPasswordUpdatedNotification::class,
         ],
     ];
+
+    /**
+     * Disable listener auto-discovery to avoid duplicate registrations.
+     */
+    public function shouldDiscoverEvents(): bool
+    {
+        return false;
+    }
 }
