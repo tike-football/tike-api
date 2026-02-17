@@ -20,13 +20,17 @@ chown -R www-data:www-data storage bootstrap/cache
 chmod -R ug+rwX storage bootstrap/cache
 
 # Keep Passport keys stable across deploys.
-if [ -n "${PASSPORT_PRIVATE_KEY:-}" ] && [ -n "${PASSPORT_PUBLIC_KEY:-}" ]; then
-  printf "%b" "$PASSPORT_PRIVATE_KEY" > storage/oauth-private.key
-  printf "%b" "$PASSPORT_PUBLIC_KEY" > storage/oauth-public.key
+if [ -z "${PASSPORT_PRIVATE_KEY:-}" ] || [ -z "${PASSPORT_PUBLIC_KEY:-}" ]; then
+  echo "ERROR: Missing PASSPORT_PRIVATE_KEY or PASSPORT_PUBLIC_KEY from environment."
+  exit 1
 fi
 
+printf "%b" "$PASSPORT_PRIVATE_KEY" > storage/oauth-private.key
+printf "%b" "$PASSPORT_PUBLIC_KEY" > storage/oauth-public.key
+
 if [ ! -s storage/oauth-private.key ] || [ ! -s storage/oauth-public.key ]; then
-  php artisan passport:keys --force || true
+  echo "ERROR: Passport key files were not written correctly."
+  exit 1
 fi
 
 chown www-data:www-data storage/oauth-private.key storage/oauth-public.key
