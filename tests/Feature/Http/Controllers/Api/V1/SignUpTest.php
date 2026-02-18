@@ -59,6 +59,7 @@ class SignUpTest extends TestCase
                     'country_code',
                     'phone_number',
                     'role',
+                    'avatar_path',
                     'language',
                 ],
             ]);
@@ -71,6 +72,7 @@ class SignUpTest extends TestCase
             'phone_number' => '5551234567',
             'full_phone_number' => '+15551234567',
             'role' => 'user',
+            'avatar_path' => 'system/default01.png',
         ]);
     }
 
@@ -224,6 +226,20 @@ class SignUpTest extends TestCase
 
         $this->assertNotNull($user);
         $this->assertEquals('user', $user->role);
+    }
+
+    public function test_registered_user_has_default_avatar_path(): void
+    {
+        Notification::fake();
+
+        $userData = $this->getBaseUserData();
+
+        $this->postJsonWithApiKey('/api/v1/auth/sign-up', $userData);
+
+        $user = User::where('email', 'john.doe@example.com')->first();
+
+        $this->assertNotNull($user);
+        $this->assertEquals('system/default01.png', $user->avatar_path);
     }
 
     public function test_password_is_hashed_in_database(): void

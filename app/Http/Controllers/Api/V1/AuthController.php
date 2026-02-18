@@ -84,6 +84,7 @@ class AuthController extends Controller
                 'full_phone_number' => $request->country_code . $request->phone_number,
                 'password' => Hash::make($request->password),
                 'role' => 'user', // Default role
+                'avatar_path' => 'system/default01.png',
             ]);
 
             // Set user language setting
@@ -112,6 +113,7 @@ class AuthController extends Controller
                     'country_code' => $user->country_code,
                     'phone_number' => $user->phone_number,
                     'role' => $user->role,
+                    'avatar_path' => $user->avatar_path,
                     'language' => $user->getSetting('language'),
                 ]
             ], 201);
