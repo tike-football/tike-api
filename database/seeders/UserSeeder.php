@@ -23,6 +23,7 @@ class UserSeeder extends Seeder
                 'phone_number' => $phoneNumber,
                 'full_phone_number' => $countryCode . $phoneNumber,
                 'role' => 'admin',
+                'avatar_path' => 'system/default01.png',
                 'password' => Hash::make('qwerty123'),
             ]
         );

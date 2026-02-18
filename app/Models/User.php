@@ -29,6 +29,7 @@ class User extends Authenticatable implements OAuthenticatable
         'full_phone_number',
         'password',
         'role',
+        'avatar_path',
     ];
 
     /**
