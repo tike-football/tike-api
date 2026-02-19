@@ -25,7 +25,21 @@ class UserResponse extends JsonResource
             $root = trim((string) ($folderConfig['root'] ?? 'users/avatars/'), '/');
             $storagePath = $root . '/' . ltrim($avatarPath, '/');
 
-            $avatarUrl = Storage::disk($disk)->url($storagePath);
+            if ($disk === 's3') {
+                $configuredUrl = (string) config('filesystems.disks.s3.url', '');
+                $bucket = (string) config('filesystems.disks.s3.bucket', '');
+                $region = (string) config('filesystems.disks.s3.region', 'us-east-1');
+
+                if (!empty($configuredUrl)) {
+                    $baseUrl = rtrim($configuredUrl, '/');
+                } else {
+                    $baseUrl = sprintf('https://%s.s3.%s.amazonaws.com', $bucket, $region);
+                }
+
+                $avatarUrl = $baseUrl . '/' . ltrim($storagePath, '/');
+            } else {
+                $avatarUrl = Storage::disk($disk)->url($storagePath);
+            }
 
             if (!Str::startsWith($avatarUrl, ['http://', 'https://'])) {
                 $avatarUrl = rtrim((string) config('app.url', ''), '/') . '/' . ltrim($avatarUrl, '/');

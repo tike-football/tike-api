@@ -118,7 +118,7 @@ class AuthController extends Controller
                 ]
             ], 201);
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error(__METHOD__ . ' error: ' . $e->getMessage(), [
                 'exception_message' => $e->getMessage(),
                 'exception_trace' => $e->getTraceAsString()
@@ -168,7 +168,7 @@ class AuthController extends Controller
                 ]
             ], 200);
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error(__METHOD__ . ' error: ' . $e->getMessage(), [
                 'user_id' => $request->user()->id ?? null,
                 'exception_message' => $e->getMessage(),
@@ -204,7 +204,7 @@ class AuthController extends Controller
                 'message' => 'Password updated successfully.',
             ], 200);
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error(__METHOD__ . ' error: ' . $e->getMessage(), [
                 'user_id' => $request->user()->id ?? null,
                 'exception_message' => $e->getMessage(),
@@ -249,7 +249,7 @@ class AuthController extends Controller
                 'message' => 'Password has been reset successfully. Please login with your new password.',
             ], 200);
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error(__METHOD__ . ' error: ' . $e->getMessage(), [
                 'user_id' => $request->user()->id ?? null,
                 'exception_message' => $e->getMessage(),
@@ -283,7 +283,7 @@ class AuthController extends Controller
                 'message' => 'If an account exists with that email, a password reset link has been sent.',
             ], 200);
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error(__METHOD__ . ' error: ' . $e->getMessage(), [
                 'email' => $request->email ?? null,
                 'exception_message' => $e->getMessage(),
