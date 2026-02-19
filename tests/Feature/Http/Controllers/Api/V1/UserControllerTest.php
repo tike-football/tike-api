@@ -125,4 +125,23 @@ class UserControllerTest extends TestCase
                 'message',
             ]);
     }
+
+    public function test_user_profile_uses_default_avatar_when_avatar_path_is_null(): void
+    {
+        $user = User::factory()->create([
+            'avatar_path' => null,
+            'role' => 'user',
+        ]);
+
+        Passport::actingAs($user, ['user:get']);
+
+        $response = $this->getJsonWithApiKey('/api/v1/user');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('user.avatar_path', 'system/default01.png');
+
+        $avatarUrl = $response->json('user.avatar_url');
+        $this->assertNotNull($avatarUrl);
+        $this->assertStringContainsString('/users/avatars/system/default01.png', $avatarUrl);
+    }
 }

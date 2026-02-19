@@ -16,7 +16,7 @@ class UserResponse extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $avatarPath = $this->avatar_path;
+        $avatarPath = !empty($this->avatar_path) ? $this->avatar_path : 'system/default01.png';
         $avatarUrl = null;
 
         if (!empty($avatarPath)) {
