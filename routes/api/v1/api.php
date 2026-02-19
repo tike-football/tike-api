@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CountryController;
+use App\Http\Controllers\Api\V1\UserController;
 use Illuminate\Support\Facades\Route;
 
 // Health check - No API key required (for monitoring)
@@ -46,4 +47,10 @@ Route::middleware(['api.key', 'auth:api'])->prefix('auth')->group(function (): v
         Route::post('reset', [AuthController::class, 'resetPassword'])
             ->middleware(['scope:user:recover-password']);
     });
+});
+
+// User endpoints - Require API key, authentication and scopes
+Route::middleware(['api.key', 'auth:api'])->prefix('user')->group(function (): void {
+    Route::get('/', [UserController::class, 'get'])
+        ->middleware(['scope:user:get']);
 });

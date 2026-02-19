@@ -1,9 +1,11 @@
 <?php
 
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withEvents(discover: false)
@@ -29,5 +31,21 @@ return Application::configure(basePath: dirname(__DIR__))
             return response()->json([
                 'message' => 'Unauthenticated.'
             ], 401);
+        });
+
+        $exceptions->render(function (AuthorizationException $e, $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'message' => $e->getMessage() ?: 'This action is unauthorized.',
+                ], 403);
+            }
+        });
+
+        $exceptions->render(function (HttpException $e, $request) {
+            if ($request->is('api/*') && $e->getStatusCode() === 403) {
+                return response()->json([
+                    'message' => $e->getMessage() ?: 'Forbidden.',
+                ], 403);
+            }
         });
     })->create();

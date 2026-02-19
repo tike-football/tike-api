@@ -77,4 +77,11 @@ return [
         public_path('storage') => storage_path('app/public'),
     ],
 
+    'folders' => [
+        'user_avatars' => [
+            'driver' => env('FILESYSTEM_DISK', 'local'),
+            'root' => env('FOLDER_USERS_AVATARS', 'users/avatars/'),
+        ],
+    ]
+
 ];
