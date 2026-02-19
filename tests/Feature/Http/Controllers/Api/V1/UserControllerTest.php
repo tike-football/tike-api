@@ -18,6 +18,8 @@ class UserControllerTest extends TestCase
             'avatar_path' => 'system/default01.png',
             'role' => 'user',
         ]);
+        $user->setSetting('language', 'es');
+        $user->setSetting('theme', 'dark');
 
         Passport::actingAs($user, ['user:get']);
 
@@ -36,10 +38,13 @@ class UserControllerTest extends TestCase
                     'role',
                     'avatar_path',
                     'avatar_url',
+                    'settings',
                 ],
             ])
             ->assertJsonPath('user.id', $user->id)
-            ->assertJsonPath('user.avatar_path', 'system/default01.png');
+            ->assertJsonPath('user.avatar_path', 'system/default01.png')
+            ->assertJsonPath('user.settings.language', 'es')
+            ->assertJsonPath('user.settings.theme', 'dark');
 
         $avatarUrl = $response->json('user.avatar_url');
         $this->assertNotNull($avatarUrl);
@@ -102,5 +107,22 @@ class UserControllerTest extends TestCase
         $response = $this->getJsonWithApiKey('/api/v1/user');
 
         $response->assertStatus(403);
+    }
+
+    public function test_user_endpoint_returns_json_when_scope_is_missing_without_accept_header(): void
+    {
+        $user = User::factory()->create([
+            'role' => 'user',
+        ]);
+
+        Passport::actingAs($user, ['different:scope']);
+
+        $response = $this->get('/api/v1/user', $this->withApiKeyHeader());
+
+        $response->assertStatus(403)
+            ->assertHeader('Content-Type', 'application/json')
+            ->assertJsonStructure([
+                'message',
+            ]);
     }
 }

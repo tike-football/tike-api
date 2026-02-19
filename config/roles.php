@@ -4,7 +4,8 @@ return [
     'admin' => [
         'scopes' => [
             'test:test',
-            'user:update-password'
+            'user:update-password',
+            'user:get'
         ],
     ],
     'user' => [

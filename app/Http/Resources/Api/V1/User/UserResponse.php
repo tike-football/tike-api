@@ -43,6 +43,9 @@ class UserResponse extends JsonResource
             'role' => $this->role,
             'avatar_path' => $avatarPath,
             'avatar_url' => $avatarUrl,
+            'settings' => $this->settings
+                ->mapWithKeys(fn ($setting): array => [$setting->key => $setting->value])
+                ->toArray(),
         ];
     }
 }
