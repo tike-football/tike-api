@@ -21,7 +21,7 @@ class UserController extends Controller
             return response()->json([
                 'user' => UserResponse::make($user)->resolve(),
             ]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error(__METHOD__ . ' error: ' . $e->getMessage(), [
                 'user_id' => $request->user()->id ?? null,
                 'exception_message' => $e->getMessage(),
