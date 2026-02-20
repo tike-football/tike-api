@@ -47,6 +47,11 @@ class FootballDataManager
         return $this->client()->getPlayers($teamId, $season);
     }
 
+    public function driver(): FootballDataClient
+    {
+        return $this->client();
+    }
+
     private function client(): FootballDataClient
     {
         if ($this->client !== null) {
@@ -64,4 +69,3 @@ class FootballDataManager
         };
     }
 }
-
