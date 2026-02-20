@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Laravel\Passport\Passport;
 
@@ -25,5 +26,9 @@ class AuthServiceProvider extends ServiceProvider
         }
 
         Passport::tokensCan($scopes);
+
+        $accessTokenTtlDays = (int) config('app.passport.access_token_ttl_days', 30);
+        Passport::tokensExpireIn(Carbon::now()->addDays($accessTokenTtlDays));
+        Passport::personalAccessTokensExpireIn(Carbon::now()->addDays($accessTokenTtlDays));
     }
 }

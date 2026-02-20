@@ -27,9 +27,10 @@ class UserResponse extends JsonResource
 
             if ($disk === 's3') {
                 try {
+                    $signedUrlTtlSeconds = (int) config('filesystems.disks.s3.signed_url_ttl_seconds', 7200);
                     $avatarUrl = Storage::disk('s3')->temporaryUrl(
                         $storagePath,
-                        now()->addMinutes(30)
+                        now()->addSeconds($signedUrlTtlSeconds)
                     );
                 } catch (\Throwable $e) {
                     $configuredUrl = (string) config('filesystems.disks.s3.url', '');
