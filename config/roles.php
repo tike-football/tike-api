@@ -5,7 +5,8 @@ return [
         'scopes' => [
             'test:test',
             'user:update-password',
-            'user:get'
+            'user:get',
+            'football-data:sync'
         ],
     ],
     'user' => [
