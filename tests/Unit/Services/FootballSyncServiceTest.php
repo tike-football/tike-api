@@ -2,7 +2,9 @@
 
 namespace Tests\Unit\Services;
 
+use App\Events\FootballData\LeagueSynced;
 use App\Models\League;
+use App\Models\Team;
 use App\Services\FootballDataService\FootballDataClient;
 use App\Services\FootballDataService\FootballDataFixture;
 use App\Services\FootballDataService\FootballDataLeague;
@@ -12,6 +14,7 @@ use App\Services\FootballDataService\FootballDataTeam;
 use App\Services\FootballSyncService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Event;
 use RuntimeException;
 use Tests\TestCase;
 
@@ -21,6 +24,8 @@ class FootballSyncServiceTest extends TestCase
 
     public function test_sync_league_creates_league_record(): void
     {
+        Event::fake([LeagueSynced::class]);
+
         $service = new FootballSyncService(new UnitFakeFootballDataClient(
             new FootballDataLeague(
                 provider: 'api_football',
@@ -62,10 +67,16 @@ class FootballSyncServiceTest extends TestCase
             'country_code' => 'GB',
             'is_active' => 0,
         ]);
+
+        Event::assertDispatched(LeagueSynced::class, function (LeagueSynced $event) use ($league): bool {
+            return $event->league->is($league);
+        });
     }
 
     public function test_sync_league_updates_existing_record(): void
     {
+        Event::fake([LeagueSynced::class]);
+
         League::create([
             'provider' => 'api_football',
             'provider_league_id' => 39,
@@ -101,6 +112,10 @@ class FootballSyncServiceTest extends TestCase
         $this->assertSame('Premier League Updated', $league->name);
         $this->assertFalse((bool) $league->is_active);
         $this->assertSame(1, League::count());
+
+        Event::assertDispatched(LeagueSynced::class, function (LeagueSynced $event) use ($league): bool {
+            return $event->league->is($league);
+        });
     }
 
     public function test_sync_league_throws_exception_when_provider_returns_error(): void
@@ -140,11 +155,141 @@ class FootballSyncServiceTest extends TestCase
 
         $service->syncLeague(39, 2026);
     }
+
+    public function test_sync_teams_saves_all_teams_for_a_league(): void
+    {
+        $league = League::create([
+            'provider' => 'api_football',
+            'provider_league_id' => 39,
+            'name' => 'Premier League',
+            'type' => 'league',
+        ]);
+
+        $teamsResponse = collect([
+            new FootballDataTeam(
+                provider: 'api_football',
+                endpoint: 'teams',
+                teamId: 33,
+                leagueId: 39,
+                season: 2026,
+                response: [
+                    'team' => [
+                        'id' => 33,
+                        'name' => 'Manchester United',
+                        'code' => 'MUN',
+                        'country' => 'England',
+                        'founded' => 1878,
+                        'national' => false,
+                        'logo' => 'https://logo.example/manchester-united.png',
+                    ],
+                    'venue' => [
+                        'id' => 556,
+                        'name' => 'Old Trafford',
+                        'city' => 'Manchester',
+                        'capacity' => 74140,
+                    ],
+                ],
+                errorMessage: null,
+            ),
+            new FootballDataTeam(
+                provider: 'api_football',
+                endpoint: 'teams',
+                teamId: 50,
+                leagueId: 39,
+                season: 2026,
+                response: [
+                    'team' => [
+                        'id' => 50,
+                        'name' => 'Manchester City',
+                        'code' => 'MCI',
+                        'country' => 'England',
+                        'founded' => 1880,
+                        'national' => false,
+                        'logo' => 'https://logo.example/manchester-city.png',
+                    ],
+                    'venue' => [
+                        'id' => 555,
+                        'name' => 'Etihad Stadium',
+                        'city' => 'Manchester',
+                        'capacity' => 55097,
+                    ],
+                ],
+                errorMessage: null,
+            ),
+        ]);
+
+        $service = new FootballSyncService(new UnitFakeFootballDataClient(
+            leagueResponse: new FootballDataLeague(
+                provider: 'api_football',
+                endpoint: 'leagues',
+                leagueId: 39,
+                season: 2026,
+                response: ['league' => ['id' => 39, 'name' => 'Premier League', 'type' => 'League']],
+                errorMessage: null,
+            ),
+            teamsResponse: $teamsResponse,
+        ));
+
+        $savedTeams = $service->syncTeams(39, 2026);
+
+        $this->assertCount(2, $savedTeams);
+        $this->assertSame(2, Team::count());
+        $this->assertDatabaseHas('teams', [
+            'provider' => 'api_football',
+            'provider_team_id' => 33,
+            'league_id' => $league->id,
+            'season' => 2026,
+            'name' => 'Manchester United',
+        ]);
+        $this->assertDatabaseHas('teams', [
+            'provider' => 'api_football',
+            'provider_team_id' => 50,
+            'league_id' => $league->id,
+            'season' => 2026,
+            'name' => 'Manchester City',
+        ]);
+    }
+
+    public function test_sync_teams_throws_exception_when_provider_returns_error(): void
+    {
+        $service = new FootballSyncService(new UnitFakeFootballDataClient(
+            leagueResponse: new FootballDataLeague(
+                provider: 'api_football',
+                endpoint: 'leagues',
+                leagueId: 39,
+                season: 2026,
+                response: ['league' => ['id' => 39, 'name' => 'Premier League', 'type' => 'League']],
+                errorMessage: null,
+            ),
+            teamsResponse: collect([
+                new FootballDataTeam(
+                    provider: 'api_football',
+                    endpoint: 'teams',
+                    teamId: null,
+                    leagueId: 39,
+                    season: 2026,
+                    response: null,
+                    errorMessage: 'Provider unavailable',
+                ),
+            ]),
+        ));
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Provider unavailable');
+
+        $service->syncTeams(39, 2026);
+    }
 }
 
 class UnitFakeFootballDataClient implements FootballDataClient
 {
-    public function __construct(private readonly FootballDataLeague $leagueResponse)
+    /**
+     * @param Collection<int, FootballDataTeam>|null $teamsResponse
+     */
+    public function __construct(
+        private readonly FootballDataLeague $leagueResponse,
+        private readonly ?Collection $teamsResponse = null,
+    )
     {
     }
 
@@ -155,7 +300,7 @@ class UnitFakeFootballDataClient implements FootballDataClient
 
     public function getTeams(int $leagueId, int $season): Collection
     {
-        return collect([
+        return $this->teamsResponse ?? collect([
             new FootballDataTeam('api_football', 'teams', null, $leagueId, $season, null, 'Not implemented in fake'),
         ]);
     }
