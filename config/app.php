@@ -139,6 +139,10 @@ return [
         'reset_password' => env('RESET_PASSWORD_URL', 'http://localhost:8080/reset-password/'),
     ],
 
+    'passport' => [
+        'access_token_ttl_days' => (int) env('PASSPORT_ACCESS_TOKEN_TTL_DAYS', 30),
+    ],
+
 
 
 ];
