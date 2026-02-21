@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Events\FootballData\LeagueSynced;
+use App\Events\FootballData\LeagueTeamsSynced;
 use App\Events\FootballData\TeamSynced;
 use App\Models\Fixture;
 use App\Models\FixtureTeamStat;
@@ -141,6 +142,10 @@ class FootballSyncService
             'season' => $season,
             'teams_count' => $savedTeams->count(),
         ]);
+
+        if ($league !== null) {
+            event(new LeagueTeamsSynced($league, $season));
+        }
 
         return $savedTeams;
     }

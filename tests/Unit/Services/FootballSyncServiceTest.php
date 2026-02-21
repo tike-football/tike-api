@@ -3,6 +3,7 @@
 namespace Tests\Unit\Services;
 
 use App\Events\FootballData\LeagueSynced;
+use App\Events\FootballData\LeagueTeamsSynced;
 use App\Events\FootballData\TeamSynced;
 use App\Models\League;
 use App\Models\Fixture;
@@ -166,7 +167,7 @@ class FootballSyncServiceTest extends TestCase
 
     public function test_sync_teams_saves_all_teams_for_a_league(): void
     {
-        Event::fake([TeamSynced::class]);
+        Event::fake([TeamSynced::class, LeagueTeamsSynced::class]);
 
         $league = League::create([
             'provider' => 'api_football',
@@ -260,6 +261,7 @@ class FootballSyncServiceTest extends TestCase
         ]);
 
         Event::assertDispatched(TeamSynced::class, 2);
+        Event::assertDispatched(LeagueTeamsSynced::class, 1);
     }
 
     public function test_sync_teams_throws_exception_when_provider_returns_error(): void

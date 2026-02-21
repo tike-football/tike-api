@@ -2,6 +2,9 @@
 
 namespace Tests\Feature\Http\Controllers\Api\V1;
 
+use App\Events\FootballData\LeagueSynced;
+use App\Events\FootballData\LeagueTeamsSynced;
+use App\Events\FootballData\TeamSynced;
 use App\Models\League;
 use App\Models\User;
 use App\Services\FootballDataService\FootballDataClient;
@@ -12,6 +15,7 @@ use App\Services\FootballDataService\FootballDataStandings;
 use App\Services\FootballDataService\FootballDataTeam;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Event;
 use Laravel\Passport\Passport;
 use Tests\TestCase;
 use Tests\Traits\WithApiKey;
@@ -22,6 +26,12 @@ class FootballDataServiceControllerTest extends TestCase
 
     public function test_admin_with_scope_can_sync_league(): void
     {
+        Event::fake([
+            LeagueSynced::class,
+            TeamSynced::class,
+            LeagueTeamsSynced::class,
+        ]);
+
         $admin = User::factory()->create([
             'role' => 'admin',
         ]);
