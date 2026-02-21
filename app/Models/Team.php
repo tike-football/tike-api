@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Team extends Model
@@ -56,5 +57,13 @@ class Team extends Model
     public function league(): BelongsTo
     {
         return $this->belongsTo(League::class);
+    }
+
+    public function leagues(): BelongsToMany
+    {
+        return $this->belongsToMany(League::class, 'player_league_stats', 'team_id', 'league_id')
+            ->withPivot(['season', 'provider'])
+            ->withTimestamps()
+            ->distinct();
     }
 }
