@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Services\FootballFixturesCacheService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Cache;
 
 class CacheFixtures extends Command
 {
@@ -26,6 +27,16 @@ class CacheFixtures extends Command
      */
     public function handle(FootballFixturesCacheService $footballCacheService): int
     {
+        $fullCacheId = Cache::get(FootballFixturesCacheService::CACHE_FIXTURES_ID);
+        $changesCacheId = Cache::get(FootballFixturesCacheService::CACHE_FIXTURES_CHANGES_ID);
+
+        if ($fullCacheId !== null && $fullCacheId === $changesCacheId) {
+            $this->info('Full fixtures cache is already up to date. Skipping rebuild.');
+            $this->line('Cache ID: ' . $fullCacheId);
+
+            return self::SUCCESS;
+        }
+
         $payload = $footballCacheService->cacheFixtures();
 
         $this->info('Fixtures cache generated.');

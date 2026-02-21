@@ -14,6 +14,7 @@ class FootballFixturesCacheService
     public const CACHE_FIXTURES = 'cache-fixtures';
     public const CACHE_FIXTURES_CHANGES = 'cache-fixtures-changes';
     public const CACHE_FIXTURES_ID = 'cache-fixtures-id';
+    public const CACHE_FIXTURES_CHANGES_ID = 'cache-fixtures-changes-id';
     private const CACHE_FIXTURES_CHANGES_SNAPSHOT = 'cache-fixtures-changes-snapshot';
 
     /**
@@ -33,9 +34,11 @@ class FootballFixturesCacheService
     {
         $fixtures = $this->fullFixturesQuery()->get();
         $payload = $this->buildPayload($fixtures);
+        $cacheVersionId = $this->generateCacheVersionId();
 
         Cache::forever(self::CACHE_FIXTURES, $payload);
-        Cache::forever(self::CACHE_FIXTURES_ID, now()->format('Yms'));
+        Cache::forever(self::CACHE_FIXTURES_ID, $cacheVersionId);
+        Cache::forever(self::CACHE_FIXTURES_CHANGES_ID, $cacheVersionId);
 
         return $payload;
     }
@@ -185,6 +188,7 @@ class FootballFixturesCacheService
 
         $this->deduplicateIndexes($changes);
         Cache::forever(self::CACHE_FIXTURES_CHANGES, $changes);
+        Cache::forever(self::CACHE_FIXTURES_CHANGES_ID, $this->generateCacheVersionId());
         Cache::forever(self::CACHE_FIXTURES_CHANGES_SNAPSHOT, $currentSnapshot);
 
         return $changes;
@@ -553,5 +557,10 @@ class FootballFixturesCacheService
         }
 
         return 'finished';
+    }
+
+    private function generateCacheVersionId(): string
+    {
+        return now()->format('YmdHisv');
     }
 }
