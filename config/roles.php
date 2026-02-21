@@ -7,6 +7,7 @@ return [
             'user:update-password',
             'user:get',
             'football-data:sync',
+            'football-data:cache',
             'football-data:get'
         ],
     ],

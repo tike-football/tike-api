@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CountryController;
+use App\Http\Controllers\Api\V1\FootballCacheServiceController;
 use App\Http\Controllers\Api\V1\FootballDataController;
 use App\Http\Controllers\Api\V1\FootballDataServiceController;
 use App\Http\Controllers\Api\V1\UserController;
@@ -69,6 +70,10 @@ Route::middleware(['api.key', 'auth:api'])->prefix('admin')->group(function (): 
     Route::prefix('football-data')->group(function (): void {
         Route::middleware(['scope:football-data:sync'])->controller(FootballDataServiceController::class)->group(function (): void {
             Route::post('sync-league', 'syncLeague');
+        });
+
+        Route::middleware(['scope:football-data:cache'])->controller(FootballCacheServiceController::class)->group(function (): void {
+            Route::post('cache-fixtures', 'cacheFixtures');
         });
     });
 });
