@@ -4,6 +4,12 @@ Laravel 12 REST API with OAuth2 authentication (Passport) and queue-based email 
 
 ---
 
+## Additional Documentation
+
+- [Commands And Jobs (Football Data)](docs/CommandsAndJobs.md)
+
+---
+
 ## Requirements
 
 - PHP 8.2+
