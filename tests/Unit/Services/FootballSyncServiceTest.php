@@ -446,6 +446,87 @@ class FootballSyncServiceTest extends TestCase
 
         $service->syncPlayers(33, 2026);
     }
+
+    public function test_sync_players_stores_null_age_when_provider_returns_invalid_age(): void
+    {
+        $league = League::create([
+            'provider' => 'api_football',
+            'provider_league_id' => 244,
+            'name' => 'Veikkausliiga',
+            'type' => 'league',
+        ]);
+
+        Team::create([
+            'provider' => 'api_football',
+            'provider_team_id' => 1165,
+            'league_id' => $league->id,
+            'season' => 2025,
+            'name' => 'KuPS',
+        ]);
+
+        $playersResponse = collect([
+            new FootballDataPlayer(
+                provider: 'api_football',
+                endpoint: 'players',
+                playerId: 505941,
+                teamId: 1165,
+                season: 2025,
+                response: [
+                    'player' => [
+                        'id' => 505941,
+                        'name' => 'R. Tahkola',
+                        'firstname' => 'Roopert',
+                        'lastname' => 'Tahkola',
+                        'age' => 2025,
+                        'birth' => [
+                            'date' => null,
+                            'place' => null,
+                            'country' => 'Finland',
+                        ],
+                        'nationality' => 'Finland',
+                        'injured' => false,
+                    ],
+                    'statistics' => [
+                        [
+                            'team' => ['id' => 1165],
+                            'league' => ['id' => 244, 'name' => 'Veikkausliiga', 'country' => 'Finland'],
+                            'games' => ['appearences' => 2, 'lineups' => 0, 'minutes' => 6, 'position' => 'Midfielder'],
+                            'goals' => ['total' => 0, 'assists' => 0],
+                            'cards' => ['yellow' => 0, 'red' => 0],
+                        ],
+                    ],
+                ],
+                errorMessage: null,
+            ),
+        ]);
+
+        $service = new FootballSyncService(new UnitFakeFootballDataClient(
+            leagueResponse: new FootballDataLeague(
+                provider: 'api_football',
+                endpoint: 'leagues',
+                leagueId: 244,
+                season: 2025,
+                response: ['league' => ['id' => 244, 'name' => 'Veikkausliiga', 'type' => 'League']],
+                errorMessage: null,
+            ),
+            playersResponse: $playersResponse,
+        ));
+
+        $service->syncPlayers(1165, 2025);
+
+        $this->assertDatabaseHas('players', [
+            'provider' => 'api_football',
+            'provider_player_id' => 505941,
+            'full_name' => 'R. Tahkola',
+        ]);
+
+        $player = Player::query()
+            ->where('provider', 'api_football')
+            ->where('provider_player_id', 505941)
+            ->firstOrFail();
+
+        $this->assertNull($player->age);
+    }
 }
 
 class UnitFakeFootballDataClient implements FootballDataClient

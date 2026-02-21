@@ -176,6 +176,17 @@ class FootballSyncService
             $fullName = isset($playerData['name']) ? (string) $playerData['name'] : trim(
                 (string) ($playerData['firstname'] ?? '') . ' ' . (string) ($playerData['lastname'] ?? '')
             );
+            $rawAge = isset($playerData['age']) ? (int) $playerData['age'] : null;
+            $safeAge = $rawAge !== null && $rawAge >= 1 && $rawAge <= 99 ? $rawAge : null;
+
+            if ($rawAge !== null && $safeAge === null) {
+                Log::warning('FootballSyncService received invalid player age, storing null', [
+                    'provider_player_id' => $providerPlayerId,
+                    'raw_age' => $rawAge,
+                    'team_id' => $team->id,
+                    'season' => $season,
+                ]);
+            }
 
             $player = Player::updateOrCreate(
                 [
@@ -186,7 +197,7 @@ class FootballSyncService
                     'firstname' => isset($playerData['firstname']) ? (string) $playerData['firstname'] : null,
                     'lastname' => isset($playerData['lastname']) ? (string) $playerData['lastname'] : null,
                     'full_name' => $fullName !== '' ? $fullName : null,
-                    'age' => isset($playerData['age']) ? (int) $playerData['age'] : null,
+                    'age' => $safeAge,
                     'birth_date' => $birthDate,
                     'birth_place' => isset($birthData['place']) ? (string) $birthData['place'] : null,
                     'birth_country' => isset($birthData['country']) ? (string) $birthData['country'] : null,
