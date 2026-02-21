@@ -10,6 +10,9 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withEvents(discover: false)
+    ->withCommands([
+        __DIR__ . '/../app/Console/Commands',
+    ])
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         commands: __DIR__.'/../routes/console.php',
