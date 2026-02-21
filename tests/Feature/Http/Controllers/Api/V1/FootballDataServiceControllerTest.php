@@ -62,7 +62,7 @@ class FootballDataServiceControllerTest extends TestCase
             )
         ));
 
-        $response = $this->postJsonWithApiKey('/api/v1/football-data/sync-league', [
+        $response = $this->postJsonWithApiKey('/api/v1/admin/football-data/sync-league', [
             'league_id' => 39,
             'season' => 2026,
         ]);
@@ -97,7 +97,7 @@ class FootballDataServiceControllerTest extends TestCase
 
         Passport::actingAs($admin, ['football-data:sync']);
 
-        $response = $this->postJson('/api/v1/football-data/sync-league', [
+        $response = $this->postJson('/api/v1/admin/football-data/sync-league', [
             'league_id' => 39,
             'season' => 2026,
         ]);
@@ -110,7 +110,7 @@ class FootballDataServiceControllerTest extends TestCase
 
     public function test_sync_league_requires_bearer_token(): void
     {
-        $response = $this->postJsonWithApiKey('/api/v1/football-data/sync-league', [
+        $response = $this->postJsonWithApiKey('/api/v1/admin/football-data/sync-league', [
             'league_id' => 39,
             'season' => 2026,
         ]);
@@ -129,7 +129,7 @@ class FootballDataServiceControllerTest extends TestCase
 
         Passport::actingAs($admin, ['different:scope']);
 
-        $response = $this->postJsonWithApiKey('/api/v1/football-data/sync-league', [
+        $response = $this->postJsonWithApiKey('/api/v1/admin/football-data/sync-league', [
             'league_id' => 39,
             'season' => 2026,
         ]);
@@ -145,7 +145,7 @@ class FootballDataServiceControllerTest extends TestCase
 
         Passport::actingAs($admin, ['football-data:sync']);
 
-        $response = $this->postJsonWithApiKey('/api/v1/football-data/sync-league', []);
+        $response = $this->postJsonWithApiKey('/api/v1/admin/football-data/sync-league', []);
 
         $response->assertStatus(422)
             ->assertJson([
@@ -173,7 +173,7 @@ class FootballDataServiceControllerTest extends TestCase
             )
         ));
 
-        $response = $this->postJsonWithApiKey('/api/v1/football-data/sync-league', [
+        $response = $this->postJsonWithApiKey('/api/v1/admin/football-data/sync-league', [
             'league_id' => 39,
             'season' => 2026,
         ]);

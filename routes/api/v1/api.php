@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CountryController;
+use App\Http\Controllers\Api\V1\FootballDataController;
 use App\Http\Controllers\Api\V1\FootballDataServiceController;
 use App\Http\Controllers\Api\V1\UserController;
 use Illuminate\Support\Facades\Route;
@@ -56,8 +57,18 @@ Route::middleware(['api.key', 'auth:api'])->prefix('user')->group(function (): v
         ->middleware(['scope:user:get']);
 });
 
-// Football data endpoints - Require API key, authentication and admin sync scope
+// Football data endpoints - Require API key, authentication and read scope
 Route::middleware(['api.key', 'auth:api'])->prefix('football-data')->group(function (): void {
-    Route::post('sync-league', [FootballDataServiceController::class, 'syncLeague'])
-        ->middleware(['scope:football-data:sync']);
+    Route::middleware(['scope:football-data:get'])->controller(FootballDataController::class)->group(function (): void {
+        Route::get('get-fixtures', 'getFixtures');
+    });
+});
+
+// Admin football data endpoints - Require API key, authentication and sync scope
+Route::middleware(['api.key', 'auth:api'])->prefix('admin')->group(function (): void {
+    Route::prefix('football-data')->group(function (): void {
+        Route::middleware(['scope:football-data:sync'])->controller(FootballDataServiceController::class)->group(function (): void {
+            Route::post('sync-league', 'syncLeague');
+        });
+    });
 });
