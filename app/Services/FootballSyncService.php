@@ -7,6 +7,8 @@ use App\Events\FootballData\TeamSynced;
 use App\Models\Fixture;
 use App\Models\FixtureTeamStat;
 use App\Models\League;
+use App\Models\LeagueStanding;
+use App\Models\LeagueStandingRow;
 use App\Models\Player;
 use App\Models\PlayerLeagueStat;
 use App\Models\Team;
@@ -297,6 +299,163 @@ class FootballSyncService
         ]);
 
         return $savedFixtures;
+    }
+
+    /**
+     * @return Collection<int, LeagueStanding>
+     */
+    public function syncStandings(int $leagueId, int $season): Collection
+    {
+        $footballStanding = $this->footballDataClient->getStandings($leagueId, $season);
+
+        if ($footballStanding->errorMessage !== null || $footballStanding->response === null) {
+            throw new RuntimeException($footballStanding->errorMessage ?? 'Provider returned no standings data.');
+        }
+
+        $leagueData = is_array($footballStanding->response['league'] ?? null) ? $footballStanding->response['league'] : [];
+        $providerLeagueId = (int) ($leagueData['id'] ?? $leagueId);
+
+        $league = League::query()
+            ->where('provider', $footballStanding->provider)
+            ->where('provider_league_id', $providerLeagueId)
+            ->first();
+
+        if ($league === null) {
+            Log::warning('FootballSyncService skipping standings because league does not exist locally', [
+                'provider_league_id' => $providerLeagueId,
+                'season' => $season,
+            ]);
+
+            return collect();
+        }
+
+        $standingsGroups = $leagueData['standings'] ?? [];
+        if (!is_array($standingsGroups)) {
+            $standingsGroups = [];
+        }
+
+        $savedStandings = collect();
+        $savedRowsCount = 0;
+
+        foreach ($standingsGroups as $groupRows) {
+            if (!is_array($groupRows)) {
+                continue;
+            }
+
+            $firstRow = isset($groupRows[0]) && is_array($groupRows[0]) ? $groupRows[0] : [];
+            $standingGroup = isset($firstRow['group']) ? (string) $firstRow['group'] : null;
+            $standingDescription = isset($firstRow['description']) ? (string) $firstRow['description'] : null;
+            $standingForm = isset($firstRow['form']) ? (string) $firstRow['form'] : null;
+
+            $standing = LeagueStanding::updateOrCreate(
+                [
+                    'provider' => $footballStanding->provider,
+                    'league_id' => $league->id,
+                    'season' => isset($leagueData['season']) ? (int) $leagueData['season'] : $season,
+                    'standing_group' => $standingGroup,
+                    'standing_stage' => null,
+                ],
+                [
+                    'standing_type' => isset($leagueData['type']) ? (string) $leagueData['type'] : null,
+                    'form' => $standingForm,
+                    'description' => $standingDescription,
+                    'external_payload' => [
+                        'league' => $leagueData,
+                        'group_rows' => $groupRows,
+                    ],
+                    'last_synced_at' => now(),
+                ]
+            );
+
+            $savedStandings->push($standing);
+
+            foreach ($groupRows as $row) {
+                if (!is_array($row)) {
+                    continue;
+                }
+
+                $providerTeamId = (int) data_get($row, 'team.id', 0);
+                if ($providerTeamId < 1) {
+                    continue;
+                }
+
+                $team = Team::query()
+                    ->where('provider', $footballStanding->provider)
+                    ->where('provider_team_id', $providerTeamId)
+                    ->first();
+
+                if ($team === null) {
+                    Log::warning('FootballSyncService skipping standing row because team does not exist locally', [
+                        'standing_id' => $standing->id,
+                        'provider_team_id' => $providerTeamId,
+                        'provider_league_id' => $providerLeagueId,
+                        'season' => $season,
+                    ]);
+
+                    continue;
+                }
+
+                $all = is_array($row['all'] ?? null) ? $row['all'] : [];
+                $home = is_array($row['home'] ?? null) ? $row['home'] : [];
+                $away = is_array($row['away'] ?? null) ? $row['away'] : [];
+                $goalsDiff = data_get($row, 'goalsDiff');
+
+                LeagueStandingRow::updateOrCreate(
+                    [
+                        'standing_id' => $standing->id,
+                        'team_id' => $team->id,
+                    ],
+                    [
+                        'rank_position' => (int) ($row['rank'] ?? 0),
+                        'points' => isset($row['points']) ? (int) $row['points'] : null,
+                        'goals_diff' => is_numeric($goalsDiff) ? (int) $goalsDiff : null,
+                        'matches_played' => isset($all['played']) ? (int) $all['played'] : null,
+                        'matches_win' => isset($all['win']) ? (int) $all['win'] : null,
+                        'matches_draw' => isset($all['draw']) ? (int) $all['draw'] : null,
+                        'matches_lose' => isset($all['lose']) ? (int) $all['lose'] : null,
+                        'goals_for' => isset($all['goals']['for']) ? (int) $all['goals']['for'] : null,
+                        'goals_against' => isset($all['goals']['against']) ? (int) $all['goals']['against'] : null,
+                        'row_form' => isset($row['form']) ? (string) $row['form'] : null,
+                        'status' => isset($row['status']) ? (string) $row['status'] : null,
+                        'row_description' => isset($row['description']) ? (string) $row['description'] : null,
+                        'home_played' => isset($home['played']) ? (int) $home['played'] : null,
+                        'home_win' => isset($home['win']) ? (int) $home['win'] : null,
+                        'home_draw' => isset($home['draw']) ? (int) $home['draw'] : null,
+                        'home_lose' => isset($home['lose']) ? (int) $home['lose'] : null,
+                        'home_goals_for' => isset($home['goals']['for']) ? (int) $home['goals']['for'] : null,
+                        'home_goals_against' => isset($home['goals']['against']) ? (int) $home['goals']['against'] : null,
+                        'away_played' => isset($away['played']) ? (int) $away['played'] : null,
+                        'away_win' => isset($away['win']) ? (int) $away['win'] : null,
+                        'away_draw' => isset($away['draw']) ? (int) $away['draw'] : null,
+                        'away_lose' => isset($away['lose']) ? (int) $away['lose'] : null,
+                        'away_goals_for' => isset($away['goals']['for']) ? (int) $away['goals']['for'] : null,
+                        'away_goals_against' => isset($away['goals']['against']) ? (int) $away['goals']['against'] : null,
+                        'raw_row_payload' => $row,
+                        'last_synced_at' => now(),
+                    ]
+                );
+
+                $savedRowsCount++;
+
+                Log::info('FootballSyncService standing row synchronized', [
+                    'standing_id' => $standing->id,
+                    'team_id' => $team->id,
+                    'provider_team_id' => $team->provider_team_id,
+                    'rank' => (int) ($row['rank'] ?? 0),
+                    'points' => isset($row['points']) ? (int) $row['points'] : null,
+                ]);
+            }
+        }
+
+        Log::info('FootballSyncService standings synchronization completed', [
+            'provider_league_id' => $providerLeagueId,
+            'league_id' => $league->id,
+            'season' => $season,
+            'standings_count' => $savedStandings->count(),
+            'standing_rows_count' => $savedRowsCount,
+        ]);
+
+        return $savedStandings;
     }
 
     /**

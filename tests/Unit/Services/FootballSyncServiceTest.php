@@ -7,6 +7,8 @@ use App\Events\FootballData\TeamSynced;
 use App\Models\League;
 use App\Models\Fixture;
 use App\Models\FixtureTeamStat;
+use App\Models\LeagueStanding;
+use App\Models\LeagueStandingRow;
 use App\Models\Team;
 use App\Models\Player;
 use App\Models\PlayerLeagueStat;
@@ -491,6 +493,218 @@ class FootballSyncServiceTest extends TestCase
         $this->assertSame(0, FixtureTeamStat::count());
     }
 
+    public function test_sync_standings_saves_standings_and_rows(): void
+    {
+        $league = League::create([
+            'provider' => 'api_football',
+            'provider_league_id' => 39,
+            'name' => 'Premier League',
+            'type' => 'league',
+        ]);
+
+        $teamA = Team::create([
+            'provider' => 'api_football',
+            'provider_team_id' => 33,
+            'name' => 'Manchester United',
+        ]);
+
+        $teamB = Team::create([
+            'provider' => 'api_football',
+            'provider_team_id' => 50,
+            'name' => 'Manchester City',
+        ]);
+
+        $standingsResponse = new FootballDataStandings(
+            provider: 'api_football',
+            endpoint: 'standings',
+            leagueId: 39,
+            season: 2026,
+            response: [
+                'league' => [
+                    'id' => 39,
+                    'season' => 2026,
+                    'type' => 'League',
+                    'standings' => [[
+                        [
+                            'rank' => 1,
+                            'team' => ['id' => 50, 'name' => 'Manchester City'],
+                            'points' => 85,
+                            'goalsDiff' => 45,
+                            'group' => 'Premier League',
+                            'form' => 'WWWWW',
+                            'status' => 'same',
+                            'description' => 'Promotion - Champions League',
+                            'all' => [
+                                'played' => 38,
+                                'win' => 27,
+                                'draw' => 4,
+                                'lose' => 7,
+                                'goals' => ['for' => 89, 'against' => 44],
+                            ],
+                            'home' => [
+                                'played' => 19,
+                                'win' => 15,
+                                'draw' => 2,
+                                'lose' => 2,
+                                'goals' => ['for' => 50, 'against' => 20],
+                            ],
+                            'away' => [
+                                'played' => 19,
+                                'win' => 12,
+                                'draw' => 2,
+                                'lose' => 5,
+                                'goals' => ['for' => 39, 'against' => 24],
+                            ],
+                        ],
+                        [
+                            'rank' => 2,
+                            'team' => ['id' => 33, 'name' => 'Manchester United'],
+                            'points' => 81,
+                            'goalsDiff' => 34,
+                            'group' => 'Premier League',
+                            'form' => 'WDWWW',
+                            'status' => 'same',
+                            'all' => [
+                                'played' => 38,
+                                'win' => 25,
+                                'draw' => 6,
+                                'lose' => 7,
+                                'goals' => ['for' => 78, 'against' => 44],
+                            ],
+                            'home' => [
+                                'played' => 19,
+                                'win' => 14,
+                                'draw' => 3,
+                                'lose' => 2,
+                                'goals' => ['for' => 46, 'against' => 20],
+                            ],
+                            'away' => [
+                                'played' => 19,
+                                'win' => 11,
+                                'draw' => 3,
+                                'lose' => 5,
+                                'goals' => ['for' => 32, 'against' => 24],
+                            ],
+                        ],
+                    ]],
+                ],
+            ],
+            errorMessage: null,
+        );
+
+        $service = new FootballSyncService(new UnitFakeFootballDataClient(
+            leagueResponse: new FootballDataLeague(
+                provider: 'api_football',
+                endpoint: 'leagues',
+                leagueId: 39,
+                season: 2026,
+                response: ['league' => ['id' => 39, 'name' => 'Premier League', 'type' => 'League']],
+                errorMessage: null,
+            ),
+            standingsResponse: $standingsResponse,
+        ));
+
+        $savedStandings = $service->syncStandings(39, 2026);
+
+        $this->assertCount(1, $savedStandings);
+        $this->assertSame(1, LeagueStanding::count());
+        $this->assertSame(2, LeagueStandingRow::count());
+
+        $this->assertDatabaseHas('league_standings', [
+            'provider' => 'api_football',
+            'league_id' => $league->id,
+            'season' => 2026,
+            'standing_group' => 'Premier League',
+        ]);
+
+        $standing = LeagueStanding::query()->firstOrFail();
+
+        $this->assertDatabaseHas('league_standing_rows', [
+            'standing_id' => $standing->id,
+            'team_id' => $teamA->id,
+            'rank_position' => 2,
+            'points' => 81,
+            'goals_diff' => 34,
+        ]);
+
+        $this->assertDatabaseHas('league_standing_rows', [
+            'standing_id' => $standing->id,
+            'team_id' => $teamB->id,
+            'rank_position' => 1,
+            'points' => 85,
+            'goals_diff' => 45,
+        ]);
+    }
+
+    public function test_sync_standings_throws_exception_when_provider_returns_error(): void
+    {
+        $service = new FootballSyncService(new UnitFakeFootballDataClient(
+            leagueResponse: new FootballDataLeague(
+                provider: 'api_football',
+                endpoint: 'leagues',
+                leagueId: 39,
+                season: 2026,
+                response: ['league' => ['id' => 39, 'name' => 'Premier League', 'type' => 'League']],
+                errorMessage: null,
+            ),
+            standingsResponse: new FootballDataStandings(
+                provider: 'api_football',
+                endpoint: 'standings',
+                leagueId: 39,
+                season: 2026,
+                response: null,
+                errorMessage: 'Provider unavailable',
+            ),
+        ));
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Provider unavailable');
+
+        $service->syncStandings(39, 2026);
+    }
+
+    public function test_sync_standings_skips_when_league_does_not_exist_locally(): void
+    {
+        $standingsResponse = new FootballDataStandings(
+            provider: 'api_football',
+            endpoint: 'standings',
+            leagueId: 39,
+            season: 2026,
+            response: [
+                'league' => [
+                    'id' => 39,
+                    'season' => 2026,
+                    'standings' => [[
+                        [
+                            'rank' => 1,
+                            'team' => ['id' => 50],
+                            'points' => 85,
+                        ],
+                    ]],
+                ],
+            ],
+            errorMessage: null,
+        );
+
+        $service = new FootballSyncService(new UnitFakeFootballDataClient(
+            leagueResponse: new FootballDataLeague(
+                provider: 'api_football',
+                endpoint: 'leagues',
+                leagueId: 39,
+                season: 2026,
+                response: ['league' => ['id' => 39, 'name' => 'Premier League', 'type' => 'League']],
+                errorMessage: null,
+            ),
+            standingsResponse: $standingsResponse,
+        ));
+
+        $savedStandings = $service->syncStandings(39, 2026);
+
+        $this->assertCount(0, $savedStandings);
+        $this->assertSame(0, LeagueStanding::count());
+        $this->assertSame(0, LeagueStandingRow::count());
+    }
+
     public function test_sync_players_saves_player_team_season_and_league_stats(): void
     {
         $league = League::create([
@@ -740,6 +954,7 @@ class UnitFakeFootballDataClient implements FootballDataClient
     public function __construct(
         private readonly FootballDataLeague $leagueResponse,
         private readonly ?Collection $teamsResponse = null,
+        private readonly ?FootballDataStandings $standingsResponse = null,
         private readonly ?Collection $fixturesResponse = null,
         private readonly ?Collection $playersResponse = null,
     )
@@ -760,7 +975,8 @@ class UnitFakeFootballDataClient implements FootballDataClient
 
     public function getStandings(int $leagueId, int $season): FootballDataStandings
     {
-        return new FootballDataStandings('api_football', 'standings', $leagueId, $season, null, 'Not implemented in fake');
+        return $this->standingsResponse
+            ?? new FootballDataStandings('api_football', 'standings', $leagueId, $season, null, 'Not implemented in fake');
     }
 
     public function getFixtures(int $leagueId, int $season): Collection
