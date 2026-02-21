@@ -19,6 +19,7 @@ env:
   CONTAINER_NAME: tike-api
   ST_ENV_FILE: appconfig/ST.env
   PASSPORT_SECRET_ARN: arn:aws:secretsmanager:us-east-1:139194331469:secret:tike-staging/passport-CxhtpI
+  FOOTBALL_SECRET_ARN: arn:aws:secretsmanager:us-east-1:139194331469:secret:tike-staging/football-xB859c
 
 jobs:
   tests:
@@ -119,7 +120,7 @@ jobs:
                         | ($old + $stenv | to_entries | map({name: .key, value: .value}))
                       )
                     | .secrets = (
-                        ((.secrets // []) | map(select(.name != "PASSPORT_PRIVATE_KEY" and .name != "PASSPORT_PUBLIC_KEY")))
+                        ((.secrets // []) | map(select(.name != "PASSPORT_PRIVATE_KEY" and .name != "PASSPORT_PUBLIC_KEY" and .name != "API_FOOTBALL_KEY")))
                         + [
                             {
                               "name": "PASSPORT_PRIVATE_KEY",
@@ -128,6 +129,10 @@ jobs:
                             {
                               "name": "PASSPORT_PUBLIC_KEY",
                               "valueFrom": (env.PASSPORT_SECRET_ARN + ":PASSPORT_PUBLIC_KEY::")
+                            },
+                            {
+                              "name": "API_FOOTBALL_KEY",
+                              "valueFrom": (env.FOOTBALL_SECRET_ARN + ":API_FOOTBALL_KEY::")
                             }
                           ]
                       )

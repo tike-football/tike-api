@@ -2,9 +2,16 @@
 
 namespace App\Providers;
 
+use App\Events\FootballData\LeagueSynced;
+use App\Events\FootballData\LeagueTeamsSynced;
+use App\Events\FootballData\TeamSynced;
 use App\Events\User\PasswordForgotRequested;
 use App\Events\User\PasswordUpdated;
 use App\Events\User\UserStored;
+use App\Listeners\FootballData\SyncPlayers;
+use App\Listeners\FootballData\SyncFixtures;
+use App\Listeners\FootballData\SyncStandings;
+use App\Listeners\FootballData\SyncTeams;
 use App\Listeners\User\SendEmailVerification;
 use App\Listeners\User\SendPasswordForgotLink;
 use App\Listeners\User\SendPasswordUpdatedNotification;
@@ -27,6 +34,16 @@ class EventServiceProvider extends ServiceProvider
         PasswordUpdated::class => [
             SendPasswordUpdatedNotification::class,
         ],
+        LeagueSynced::class => [
+            SyncTeams::class,
+        ],
+        TeamSynced::class => [
+            SyncPlayers::class,
+        ],
+        LeagueTeamsSynced::class => [
+            SyncFixtures::class,
+            SyncStandings::class,
+        ],
     ];
 
     /**
@@ -46,4 +63,3 @@ class EventServiceProvider extends ServiceProvider
         // Intentionally left blank.
     }
 }
-

@@ -80,6 +80,12 @@ Run the queue worker as a persistent process:
 php artisan queue:work --queue=emails --tries=3 --timeout=60
 ```
 
+Run the football-data queue worker as a persistent process:
+
+```bash
+php artisan queue:work --queue=football-data --tries=3 --timeout=60
+```
+
 **Important:** In production, use a process manager like Supervisor to automatically restart the worker.
 
 ### Development Mode
@@ -88,6 +94,12 @@ Use `queue:listen` for automatic code reload:
 
 ```bash
 php artisan queue:listen --queue=emails --verbose --tries=3 --timeout=60
+```
+
+Use `queue:listen` for football-data automatic code reload:
+
+```bash
+php artisan queue:listen --queue=football-data --verbose --tries=3 --timeout=60
 ```
 
 ---
