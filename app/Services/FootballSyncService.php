@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Events\FootballData\LeagueSynced;
 use App\Events\FootballData\TeamSynced;
+use App\Models\Fixture;
+use App\Models\FixtureTeamStat;
 use App\Models\League;
 use App\Models\Player;
 use App\Models\PlayerLeagueStat;
@@ -139,6 +141,162 @@ class FootballSyncService
         ]);
 
         return $savedTeams;
+    }
+
+    /**
+     * @return Collection<int, Fixture>
+     */
+    public function syncFixtures(int $leagueId, int $season): Collection
+    {
+        $footballFixtures = $this->footballDataClient->getFixtures($leagueId, $season);
+
+        $savedFixtures = collect();
+
+        foreach ($footballFixtures as $footballFixture) {
+            if ($footballFixture->errorMessage !== null || $footballFixture->response === null) {
+                throw new RuntimeException($footballFixture->errorMessage ?? 'Provider returned no fixtures data.');
+            }
+
+            $fixtureData = is_array($footballFixture->response['fixture'] ?? null) ? $footballFixture->response['fixture'] : [];
+            $leagueData = is_array($footballFixture->response['league'] ?? null) ? $footballFixture->response['league'] : [];
+            $teamsData = is_array($footballFixture->response['teams'] ?? null) ? $footballFixture->response['teams'] : [];
+            $goalsData = is_array($footballFixture->response['goals'] ?? null) ? $footballFixture->response['goals'] : [];
+            $statusData = is_array($fixtureData['status'] ?? null) ? $fixtureData['status'] : [];
+            $venueData = is_array($fixtureData['venue'] ?? null) ? $fixtureData['venue'] : [];
+
+            $providerFixtureId = (int) ($fixtureData['id'] ?? 0);
+            if ($providerFixtureId < 1) {
+                throw new RuntimeException('Provider returned fixture without id.');
+            }
+
+            $providerLeagueId = (int) ($leagueData['id'] ?? $leagueId);
+            $league = League::query()
+                ->where('provider', $footballFixture->provider)
+                ->where('provider_league_id', $providerLeagueId)
+                ->first();
+
+            if ($league === null) {
+                Log::warning('FootballSyncService skipping fixture because league does not exist locally', [
+                    'provider_fixture_id' => $providerFixtureId,
+                    'provider_league_id' => $providerLeagueId,
+                    'season' => $season,
+                ]);
+
+                continue;
+            }
+
+            $homeProviderTeamId = (int) data_get($teamsData, 'home.id', 0);
+            $awayProviderTeamId = (int) data_get($teamsData, 'away.id', 0);
+
+            $homeTeam = $homeProviderTeamId > 0
+                ? Team::query()
+                    ->where('provider', $footballFixture->provider)
+                    ->where('provider_team_id', $homeProviderTeamId)
+                    ->first()
+                : null;
+
+            $awayTeam = $awayProviderTeamId > 0
+                ? Team::query()
+                    ->where('provider', $footballFixture->provider)
+                    ->where('provider_team_id', $awayProviderTeamId)
+                    ->first()
+                : null;
+
+            $statusShort = isset($statusData['short']) ? (string) $statusData['short'] : null;
+            $isFinished = in_array($statusShort, ['FT', 'AET', 'PEN', 'PST', 'CANC', 'ABD', 'AWD', 'WO'], true);
+
+            $fixture = Fixture::updateOrCreate(
+                [
+                    'provider' => $footballFixture->provider,
+                    'provider_fixture_id' => $providerFixtureId,
+                ],
+                [
+                    'league_id' => $league->id,
+                    'season' => isset($leagueData['season']) ? (int) $leagueData['season'] : $season,
+                    'round' => isset($leagueData['round']) ? (string) $leagueData['round'] : null,
+                    'referee' => isset($fixtureData['referee']) ? (string) $fixtureData['referee'] : null,
+                    'timezone' => isset($fixtureData['timezone']) ? (string) $fixtureData['timezone'] : null,
+                    'fixture_date' => isset($fixtureData['date']) ? (string) $fixtureData['date'] : null,
+                    'timestamp' => isset($fixtureData['timestamp']) ? (int) $fixtureData['timestamp'] : null,
+                    'venue_provider_id' => isset($venueData['id']) ? (int) $venueData['id'] : null,
+                    'venue_name' => isset($venueData['name']) ? (string) $venueData['name'] : null,
+                    'venue_city' => isset($venueData['city']) ? (string) $venueData['city'] : null,
+                    'status_long' => isset($statusData['long']) ? (string) $statusData['long'] : null,
+                    'status_short' => $statusShort,
+                    'status_elapsed' => isset($statusData['elapsed']) ? (int) $statusData['elapsed'] : null,
+                    'home_team_id' => $homeTeam?->id,
+                    'away_team_id' => $awayTeam?->id,
+                    'home_goals' => isset($goalsData['home']) ? (int) $goalsData['home'] : null,
+                    'away_goals' => isset($goalsData['away']) ? (int) $goalsData['away'] : null,
+                    'is_active' => !$isFinished,
+                    'external_payload' => $footballFixture->response,
+                    'last_synced_at' => now(),
+                ]
+            );
+
+            Log::info('FootballSyncService fixture synchronized', [
+                'fixture_id' => $fixture->id,
+                'provider_fixture_id' => $fixture->provider_fixture_id,
+                'league_id' => $fixture->league_id,
+                'season' => $fixture->season,
+                'status_short' => $fixture->status_short,
+            ]);
+
+            $homePayload = is_array($teamsData['home'] ?? null) ? $teamsData['home'] : [];
+            $awayPayload = is_array($teamsData['away'] ?? null) ? $teamsData['away'] : [];
+
+            if ($homeTeam !== null) {
+                FixtureTeamStat::updateOrCreate(
+                    [
+                        'fixture_id' => $fixture->id,
+                        'team_id' => $homeTeam->id,
+                    ],
+                    [
+                        'provider' => $footballFixture->provider,
+                        'is_home' => true,
+                        'winner' => isset($homePayload['winner']) ? (bool) $homePayload['winner'] : null,
+                        'goals' => isset($goalsData['home']) ? (int) $goalsData['home'] : null,
+                        'external_payload' => [
+                            'fixture' => $fixtureData,
+                            'team' => $homePayload,
+                            'goals' => ['home' => $goalsData['home'] ?? null],
+                        ],
+                        'last_synced_at' => now(),
+                    ]
+                );
+            }
+
+            if ($awayTeam !== null) {
+                FixtureTeamStat::updateOrCreate(
+                    [
+                        'fixture_id' => $fixture->id,
+                        'team_id' => $awayTeam->id,
+                    ],
+                    [
+                        'provider' => $footballFixture->provider,
+                        'is_home' => false,
+                        'winner' => isset($awayPayload['winner']) ? (bool) $awayPayload['winner'] : null,
+                        'goals' => isset($goalsData['away']) ? (int) $goalsData['away'] : null,
+                        'external_payload' => [
+                            'fixture' => $fixtureData,
+                            'team' => $awayPayload,
+                            'goals' => ['away' => $goalsData['away'] ?? null],
+                        ],
+                        'last_synced_at' => now(),
+                    ]
+                );
+            }
+
+            $savedFixtures->push($fixture);
+        }
+
+        Log::info('FootballSyncService fixtures synchronization completed', [
+            'provider_league_id' => $leagueId,
+            'season' => $season,
+            'fixtures_count' => $savedFixtures->count(),
+        ]);
+
+        return $savedFixtures;
     }
 
     /**

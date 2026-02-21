@@ -5,6 +5,8 @@ namespace Tests\Unit\Services;
 use App\Events\FootballData\LeagueSynced;
 use App\Events\FootballData\TeamSynced;
 use App\Models\League;
+use App\Models\Fixture;
+use App\Models\FixtureTeamStat;
 use App\Models\Team;
 use App\Models\Player;
 use App\Models\PlayerLeagueStat;
@@ -288,6 +290,207 @@ class FootballSyncServiceTest extends TestCase
         $service->syncTeams(39, 2026);
     }
 
+    public function test_sync_fixtures_saves_all_fixtures_for_a_league(): void
+    {
+        $league = League::create([
+            'provider' => 'api_football',
+            'provider_league_id' => 39,
+            'name' => 'Premier League',
+            'type' => 'league',
+        ]);
+
+        $homeTeam = Team::create([
+            'provider' => 'api_football',
+            'provider_team_id' => 33,
+            'name' => 'Manchester United',
+        ]);
+
+        $awayTeam = Team::create([
+            'provider' => 'api_football',
+            'provider_team_id' => 50,
+            'name' => 'Manchester City',
+        ]);
+
+        $fixturesResponse = collect([
+            new FootballDataFixture(
+                provider: 'api_football',
+                endpoint: 'fixtures',
+                fixtureId: 1001,
+                leagueId: 39,
+                season: 2026,
+                response: [
+                    'fixture' => [
+                        'id' => 1001,
+                        'date' => '2026-08-12T16:30:00+00:00',
+                        'timezone' => 'UTC',
+                        'timestamp' => 1786552200,
+                        'venue' => [
+                            'id' => 556,
+                            'name' => 'Old Trafford',
+                            'city' => 'Manchester',
+                        ],
+                        'status' => [
+                            'long' => 'Match Finished',
+                            'short' => 'FT',
+                            'elapsed' => 90,
+                        ],
+                    ],
+                    'league' => [
+                        'id' => 39,
+                        'name' => 'Premier League',
+                        'country' => 'England',
+                        'season' => 2026,
+                        'round' => 'Regular Season - 1',
+                    ],
+                    'teams' => [
+                        'home' => ['id' => 33],
+                        'away' => ['id' => 50],
+                    ],
+                    'goals' => [
+                        'home' => 2,
+                        'away' => 1,
+                    ],
+                ],
+                errorMessage: null,
+            ),
+        ]);
+
+        $service = new FootballSyncService(new UnitFakeFootballDataClient(
+            leagueResponse: new FootballDataLeague(
+                provider: 'api_football',
+                endpoint: 'leagues',
+                leagueId: 39,
+                season: 2026,
+                response: ['league' => ['id' => 39, 'name' => 'Premier League', 'type' => 'League']],
+                errorMessage: null,
+            ),
+            fixturesResponse: $fixturesResponse,
+        ));
+
+        $savedFixtures = $service->syncFixtures(39, 2026);
+
+        $this->assertCount(1, $savedFixtures);
+        $this->assertSame(1, Fixture::count());
+        $this->assertSame(2, FixtureTeamStat::count());
+        $this->assertDatabaseHas('fixtures', [
+            'provider' => 'api_football',
+            'provider_fixture_id' => 1001,
+            'league_id' => $league->id,
+            'season' => 2026,
+            'home_team_id' => $homeTeam->id,
+            'away_team_id' => $awayTeam->id,
+            'home_goals' => 2,
+            'away_goals' => 1,
+            'status_short' => 'FT',
+            'is_active' => 0,
+        ]);
+        $fixture = Fixture::query()->where('provider_fixture_id', 1001)->firstOrFail();
+        $this->assertDatabaseHas('fixture_team_stats', [
+            'fixture_id' => $fixture->id,
+            'team_id' => $homeTeam->id,
+            'is_home' => 1,
+            'goals' => 2,
+        ]);
+        $this->assertDatabaseHas('fixture_team_stats', [
+            'fixture_id' => $fixture->id,
+            'team_id' => $awayTeam->id,
+            'is_home' => 0,
+            'goals' => 1,
+        ]);
+    }
+
+    public function test_sync_fixtures_throws_exception_when_provider_returns_error(): void
+    {
+        $service = new FootballSyncService(new UnitFakeFootballDataClient(
+            leagueResponse: new FootballDataLeague(
+                provider: 'api_football',
+                endpoint: 'leagues',
+                leagueId: 39,
+                season: 2026,
+                response: ['league' => ['id' => 39, 'name' => 'Premier League', 'type' => 'League']],
+                errorMessage: null,
+            ),
+            fixturesResponse: collect([
+                new FootballDataFixture(
+                    provider: 'api_football',
+                    endpoint: 'fixtures',
+                    fixtureId: null,
+                    leagueId: 39,
+                    season: 2026,
+                    response: null,
+                    errorMessage: 'Provider unavailable',
+                ),
+            ]),
+        ));
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Provider unavailable');
+
+        $service->syncFixtures(39, 2026);
+    }
+
+    public function test_sync_fixtures_skips_fixture_when_league_does_not_exist_locally(): void
+    {
+        Team::create([
+            'provider' => 'api_football',
+            'provider_team_id' => 33,
+            'name' => 'Manchester United',
+        ]);
+
+        Team::create([
+            'provider' => 'api_football',
+            'provider_team_id' => 50,
+            'name' => 'Manchester City',
+        ]);
+
+        $fixturesResponse = collect([
+            new FootballDataFixture(
+                provider: 'api_football',
+                endpoint: 'fixtures',
+                fixtureId: 1002,
+                leagueId: 39,
+                season: 2026,
+                response: [
+                    'fixture' => [
+                        'id' => 1002,
+                        'status' => ['short' => 'NS'],
+                    ],
+                    'league' => [
+                        'id' => 39,
+                        'season' => 2026,
+                    ],
+                    'teams' => [
+                        'home' => ['id' => 33],
+                        'away' => ['id' => 50],
+                    ],
+                    'goals' => [
+                        'home' => null,
+                        'away' => null,
+                    ],
+                ],
+                errorMessage: null,
+            ),
+        ]);
+
+        $service = new FootballSyncService(new UnitFakeFootballDataClient(
+            leagueResponse: new FootballDataLeague(
+                provider: 'api_football',
+                endpoint: 'leagues',
+                leagueId: 39,
+                season: 2026,
+                response: ['league' => ['id' => 39, 'name' => 'Premier League', 'type' => 'League']],
+                errorMessage: null,
+            ),
+            fixturesResponse: $fixturesResponse,
+        ));
+
+        $savedFixtures = $service->syncFixtures(39, 2026);
+
+        $this->assertCount(0, $savedFixtures);
+        $this->assertSame(0, Fixture::count());
+        $this->assertSame(0, FixtureTeamStat::count());
+    }
+
     public function test_sync_players_saves_player_team_season_and_league_stats(): void
     {
         $league = League::create([
@@ -537,6 +740,7 @@ class UnitFakeFootballDataClient implements FootballDataClient
     public function __construct(
         private readonly FootballDataLeague $leagueResponse,
         private readonly ?Collection $teamsResponse = null,
+        private readonly ?Collection $fixturesResponse = null,
         private readonly ?Collection $playersResponse = null,
     )
     {
@@ -561,7 +765,7 @@ class UnitFakeFootballDataClient implements FootballDataClient
 
     public function getFixtures(int $leagueId, int $season): Collection
     {
-        return collect([
+        return $this->fixturesResponse ?? collect([
             new FootballDataFixture('api_football', 'fixtures', null, $leagueId, $season, null, 'Not implemented in fake'),
         ]);
     }
