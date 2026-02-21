@@ -328,6 +328,7 @@ class FootballFixturesCacheService
                 'id' => (int) $fixture->provider_fixture_id,
                 'league_id' => (int) $fixture->league->provider_league_id,
                 'season' => (int) $fixture->season,
+                'round' => $fixture->round,
                 'status' => $status,
                 'status_short' => $fixture->status_short,
                 'minute' => $fixture->status_elapsed,

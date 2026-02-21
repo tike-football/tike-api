@@ -57,6 +57,7 @@ class FootballFixturesCacheServiceTest extends TestCase
             'provider_fixture_id' => 1001,
             'league_id' => $league->id,
             'season' => 2026,
+            'round' => 'Regular Season - 10',
             'status_short' => '2H',
             'status_elapsed' => 67,
             'fixture_date' => now(),
@@ -156,6 +157,7 @@ class FootballFixturesCacheServiceTest extends TestCase
         $this->assertContains('1001', $cached['indexes']['by_status']['live']);
         $this->assertContains('1001', $cached['indexes']['by_league']['39']['live']);
         $this->assertContains('1001', $cached['indexes']['team_matches']['42']['live']);
+        $this->assertSame('Regular Season - 10', $cached['matches']['1001']['round']);
         $this->assertNotNull($cacheId);
         $this->assertMatchesRegularExpression('/^\d{17}$/', (string) $cacheId);
         $this->assertSame($cacheId, $changesCacheId);
