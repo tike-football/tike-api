@@ -101,7 +101,9 @@ class CacheFixturesCommandTest extends TestCase
             'status_elapsed' => 15,
         ]);
 
-        Cache::forget(FootballFixturesCacheService::CACHE_FIXTURES_CHANGES);
+        Cache::forever(FootballFixturesCacheService::CACHE_FIXTURES_CHANGES, [
+            'matches' => ['stale' => true],
+        ]);
 
         $this->artisan('football-data:cache-fixtures-changes')
             ->assertExitCode(0);
@@ -112,5 +114,46 @@ class CacheFixturesCommandTest extends TestCase
         $this->assertArrayHasKey('matches', $cached);
         $this->assertArrayHasKey('1001', $cached['matches']);
         $this->assertSame(1, $cached['matches']['1001']['score']['home']);
+    }
+
+    public function test_cache_fixtures_changes_command_skips_when_no_relevant_fixtures(): void
+    {
+        $league = League::create([
+            'provider' => 'api_football',
+            'provider_league_id' => 39,
+            'name' => 'Premier League',
+            'type' => 'league',
+            'current' => true,
+        ]);
+
+        $homeTeam = Team::create([
+            'provider' => 'api_football',
+            'provider_team_id' => 42,
+            'name' => 'Arsenal',
+        ]);
+
+        $awayTeam = Team::create([
+            'provider' => 'api_football',
+            'provider_team_id' => 49,
+            'name' => 'Chelsea',
+        ]);
+
+        Fixture::create([
+            'provider' => 'api_football',
+            'provider_fixture_id' => 1001,
+            'league_id' => $league->id,
+            'season' => 2026,
+            'status_short' => 'NS',
+            'fixture_date' => now()->addHours(2),
+            'home_team_id' => $homeTeam->id,
+            'away_team_id' => $awayTeam->id,
+        ]);
+
+        Cache::forget(FootballFixturesCacheService::CACHE_FIXTURES_CHANGES);
+
+        $this->artisan('football-data:cache-fixtures-changes')
+            ->assertExitCode(0);
+
+        $this->assertNull(Cache::get(FootballFixturesCacheService::CACHE_FIXTURES_CHANGES));
     }
 }

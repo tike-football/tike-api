@@ -190,6 +190,11 @@ class FootballFixturesCacheService
         return $changes;
     }
 
+    public function hasRelevantFixturesForChanges(): bool
+    {
+        return $this->changesFixturesQuery(withRelations: false)->exists();
+    }
+
     private function fullFixturesQuery()
     {
         return Fixture::query()
@@ -198,21 +203,20 @@ class FootballFixturesCacheService
             ->orderBy('fixture_date');
     }
 
-    private function changesFixturesQuery()
+    private function changesFixturesQuery(bool $withRelations = true)
     {
         $now = now();
         $inFiveMinutes = $now->copy()->addMinutes(5);
         $fiveMinutesAgo = $now->copy()->subMinutes(5);
 
-        return Fixture::query()
-            ->with(['league', 'homeTeam', 'awayTeam', 'teamStats.team'])
+        $query = Fixture::query()
             ->whereHas('league', fn ($query) => $query->where('current', true))
-            ->where(function ($query) use ($inFiveMinutes, $fiveMinutesAgo) {
+            ->where(function ($query) use ($now, $inFiveMinutes, $fiveMinutesAgo) {
                 $query->whereIn('status_short', self::LIVE_STATUS_SHORTS)
-                    ->orWhere(function ($upcomingQuery) use ($inFiveMinutes) {
+                    ->orWhere(function ($upcomingQuery) use ($now, $inFiveMinutes) {
                         $upcomingQuery->whereIn('status_short', self::UPCOMING_STATUS_SHORTS)
                             ->whereNotNull('fixture_date')
-                            ->whereBetween('fixture_date', [now(), $inFiveMinutes]);
+                            ->whereBetween('fixture_date', [$now, $inFiveMinutes]);
                     })
                     ->orWhere(function ($finishedQuery) use ($fiveMinutesAgo) {
                         $finishedQuery
@@ -220,8 +224,13 @@ class FootballFixturesCacheService
                             ->whereNotNull('fixture_date')
                             ->where('fixture_date', '>=', $fiveMinutesAgo);
                     });
-            })
-            ->orderBy('fixture_date');
+            });
+
+        if ($withRelations) {
+            $query->with(['league', 'homeTeam', 'awayTeam', 'teamStats.team']);
+        }
+
+        return $query->orderBy('fixture_date');
     }
 
     /**
