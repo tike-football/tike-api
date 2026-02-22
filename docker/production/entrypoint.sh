@@ -8,7 +8,9 @@ mkdir -p \
   storage/framework/sessions \
   storage/framework/views \
   storage/logs \
-  bootstrap/cache
+  bootstrap/cache \
+  /run/nginx \
+  /var/lib/nginx/tmp
 
 php artisan config:clear || true
 php artisan cache:clear || true
@@ -18,6 +20,9 @@ php artisan view:clear || true
 # Ensure runtime writable paths are owned by the same user as php-fpm workers.
 chown -R www-data:www-data storage bootstrap/cache
 chmod -R ug+rwX storage bootstrap/cache
+
+# nginx workers run as "nginx" in this image.
+chown -R nginx:nginx /run/nginx /var/lib/nginx
 
 # Keep Passport keys stable across deploys.
 if [ -z "${PASSPORT_PRIVATE_KEY:-}" ] || [ -z "${PASSPORT_PUBLIC_KEY:-}" ]; then
