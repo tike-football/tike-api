@@ -134,6 +134,9 @@ class FootballFixturesCacheService
                             'name' => $leaguePayload['name'] ?? null,
                             'country' => $leaguePayload['country'] ?? null,
                             'season' => $leaguePayload['season'] ?? null,
+                            'round' => $leaguePayload['round'] ?? null,
+                            'logo' => $leaguePayload['logo'] ?? null,
+                            'flag' => $leaguePayload['flag'] ?? null,
                             'teams' => [],
                             'matches' => [
                                 'live' => [],
@@ -265,6 +268,7 @@ class FootballFixturesCacheService
         ];
 
         $teamLocalIds = [];
+        $leagueRoundStatus = [];
 
         foreach ($fixtures as $fixture) {
             if ($fixture->league === null) {
@@ -281,6 +285,9 @@ class FootballFixturesCacheService
                     'name' => $fixture->league->name,
                     'country' => $fixture->league->country_name,
                     'season' => (int) $fixture->season,
+                    'round' => null,
+                    'logo' => $fixture->league->logo,
+                    'flag' => $fixture->league->flag,
                     'teams' => [],
                     'matches' => [
                         'live' => [],
@@ -346,6 +353,14 @@ class FootballFixturesCacheService
             $payload['indexes']['by_status'][$status][] = $fixtureKey;
             $payload['indexes']['by_league'][$leagueProviderId][$status][] = $fixtureKey;
             $payload['leagues'][$leagueProviderId]['matches'][$status][] = $fixtureKey;
+
+            $currentRound = $payload['leagues'][$leagueProviderId]['round'] ?? null;
+            $fixtureRound = $fixture->round;
+            $currentRoundStatus = $leagueRoundStatus[$leagueProviderId] ?? null;
+            if ($this->shouldPromoteLeagueRound($currentRound, $fixtureRound, $status, $currentRoundStatus)) {
+                $payload['leagues'][$leagueProviderId]['round'] = $fixtureRound;
+                $leagueRoundStatus[$leagueProviderId] = $status;
+            }
 
             if ($homeProviderTeamKey !== null && $fixture->homeTeam !== null) {
                 $payload['leagues'][$leagueProviderId]['teams'][] = $homeProviderTeamKey;
@@ -563,5 +578,36 @@ class FootballFixturesCacheService
     private function generateCacheVersionId(): string
     {
         return now()->format('YmdHisv');
+    }
+
+    private function shouldPromoteLeagueRound(
+        ?string $currentRound,
+        ?string $candidateRound,
+        string $candidateStatus,
+        ?string $currentStatus
+    ): bool
+    {
+        if ($candidateRound === null || trim($candidateRound) === '') {
+            return false;
+        }
+
+        if ($currentRound === null || trim($currentRound) === '') {
+            return true;
+        }
+
+        $priority = [
+            'finished' => 1,
+            'upcoming' => 2,
+            'live' => 3,
+        ];
+
+        $candidatePriority = $priority[$candidateStatus] ?? 0;
+        $currentPriority = $priority[$currentStatus ?? ''] ?? 0;
+
+        if ($candidatePriority > $currentPriority) {
+            return true;
+        }
+
+        return $candidatePriority === $currentPriority;
     }
 }
