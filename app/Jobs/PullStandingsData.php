@@ -17,17 +17,11 @@ class PullStandingsData implements ShouldQueue
     use Queueable;
     use SerializesModels;
 
-    /**
-     * The name of the queue the job should be sent to.
-     *
-     * @var string
-     */
-    public $queue = 'football-data';
-
     public function __construct(
         public readonly int $leagueId,
         public readonly int $season
     ) {
+        $this->onQueue('football-data');
     }
 
     public function handle(FootballSyncService $footballSyncService): void
@@ -47,4 +41,3 @@ class PullStandingsData implements ShouldQueue
         ]);
     }
 }
-
