@@ -226,10 +226,10 @@ class FootballFixturesCacheService
             })
             ->where(function ($query) use ($now, $inFiveMinutes, $fiveMinutesAgo) {
                 $query->whereIn('status_short', self::LIVE_STATUS_SHORTS)
-                    ->orWhere(function ($upcomingQuery) use ($now, $inFiveMinutes) {
+                    ->orWhere(function ($upcomingQuery) use ($fiveMinutesAgo, $inFiveMinutes) {
                         $upcomingQuery->whereIn('status_short', self::UPCOMING_STATUS_SHORTS)
                             ->whereNotNull('fixture_date')
-                            ->whereBetween('fixture_date', [$now, $inFiveMinutes]);
+                            ->whereBetween('fixture_date', [$fiveMinutesAgo, $inFiveMinutes]);
                     })
                     ->orWhere(function ($finishedQuery) use ($fiveMinutesAgo) {
                         $finishedQuery
