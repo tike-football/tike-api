@@ -197,9 +197,9 @@ class FootballFixturesCacheService
         return $changes;
     }
 
-    public function hasRelevantFixturesForChanges(): bool
+    public function hasRelevantFixturesForChanges(?int $providerLeagueId = null): bool
     {
-        return $this->changesFixturesQuery(withRelations: false)->exists();
+        return $this->changesFixturesQuery(withRelations: false, providerLeagueId: $providerLeagueId)->exists();
     }
 
     private function fullFixturesQuery()
@@ -210,14 +210,20 @@ class FootballFixturesCacheService
             ->orderBy('fixture_date');
     }
 
-    private function changesFixturesQuery(bool $withRelations = true)
+    private function changesFixturesQuery(bool $withRelations = true, ?int $providerLeagueId = null)
     {
         $now = now();
         $inFiveMinutes = $now->copy()->addMinutes(5);
         $fiveMinutesAgo = $now->copy()->subMinutes(5);
 
         $query = Fixture::query()
-            ->whereHas('league', fn ($query) => $query->where('current', true))
+            ->whereHas('league', function ($query) use ($providerLeagueId) {
+                $query->where('current', true);
+
+                if ($providerLeagueId !== null) {
+                    $query->where('provider_league_id', $providerLeagueId);
+                }
+            })
             ->where(function ($query) use ($now, $inFiveMinutes, $fiveMinutesAgo) {
                 $query->whereIn('status_short', self::LIVE_STATUS_SHORTS)
                     ->orWhere(function ($upcomingQuery) use ($now, $inFiveMinutes) {
