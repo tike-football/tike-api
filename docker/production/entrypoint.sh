@@ -42,5 +42,6 @@ chown www-data:www-data storage/oauth-private.key storage/oauth-public.key
 chmod 640 storage/oauth-private.key storage/oauth-public.key
 
 php artisan migrate --force || true
+php artisan football-data:cache-fixtures || true
 
 exec /usr/bin/supervisord -c /etc/supervisord.conf
