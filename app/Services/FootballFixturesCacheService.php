@@ -50,6 +50,12 @@ class FootballFixturesCacheService
     {
         $fixtures = $this->changesFixturesQuery()->get();
         $currentSnapshot = $this->buildPayload($fixtures);
+        $fullCachePayload = Cache::get(self::CACHE_FIXTURES, [
+            'matches' => [],
+            'indexes' => [],
+            'leagues' => [],
+            'teams' => [],
+        ]);
         $previousSnapshot = Cache::get(self::CACHE_FIXTURES_CHANGES_SNAPSHOT, [
             'matches' => [],
             'teams' => [],
@@ -60,12 +66,13 @@ class FootballFixturesCacheService
         $changedMatchIds = [];
         $removedMatchIds = [];
 
+        $baselineMatches = is_array($fullCachePayload['matches'] ?? null) ? $fullCachePayload['matches'] : [];
         $previousMatches = is_array($previousSnapshot['matches'] ?? null) ? $previousSnapshot['matches'] : [];
         $currentMatches = is_array($currentSnapshot['matches'] ?? null) ? $currentSnapshot['matches'] : [];
 
         foreach ($currentMatches as $matchId => $matchPayload) {
-            $previousMatchPayload = $previousMatches[$matchId] ?? null;
-            if ($previousMatchPayload !== $matchPayload) {
+            $baselineMatchPayload = $baselineMatches[$matchId] ?? null;
+            if ($baselineMatchPayload !== $matchPayload) {
                 $changedMatchIds[] = (string) $matchId;
             }
         }
@@ -75,6 +82,9 @@ class FootballFixturesCacheService
                 $removedMatchIds[] = (string) $matchId;
             }
         }
+
+        $hasChanges = !empty($changedMatchIds) || !empty($removedMatchIds);
+        $changedMatchContexts = [];
 
         $changes = [
             'meta' => [
@@ -114,6 +124,20 @@ class FootballFixturesCacheService
                 if (!in_array($status, ['live', 'upcoming', 'finished'], true)) {
                     $status = 'finished';
                 }
+
+                $teamKeys = [];
+                foreach (['home_team_id', 'away_team_id'] as $teamIdField) {
+                    $teamId = $match[$teamIdField] ?? null;
+                    if ($teamId !== null) {
+                        $teamKeys[] = (string) $teamId;
+                    }
+                }
+
+                $changedMatchContexts[$matchId] = [
+                    'status' => $status,
+                    'league_id' => $leagueId,
+                    'team_ids' => array_values(array_unique($teamKeys)),
+                ];
 
                 $changes['indexes']['by_status'][$status][] = $matchId;
 
@@ -170,6 +194,145 @@ class FootballFixturesCacheService
 
                     if (isset($currentSnapshot['teams'][$teamKey]) && !isset($changes['teams'][$teamKey])) {
                         $changes['teams'][$teamKey] = $currentSnapshot['teams'][$teamKey];
+                    }
+                }
+            }
+        }
+
+        if ($hasChanges && is_array($fullCachePayload['indexes'] ?? null)) {
+            $changes['indexes'] = $fullCachePayload['indexes'];
+        } elseif ($hasChanges && is_array($currentSnapshot['indexes'] ?? null)) {
+            $changes['indexes'] = $currentSnapshot['indexes'];
+        }
+
+        if ($hasChanges && is_array($fullCachePayload['leagues'] ?? null)) {
+            foreach ($changes['leagues'] as $leagueId => &$leaguePayload) {
+                if (isset($fullCachePayload['leagues'][$leagueId]['matches']) && is_array($fullCachePayload['leagues'][$leagueId]['matches'])) {
+                    $leaguePayload['matches'] = $fullCachePayload['leagues'][$leagueId]['matches'];
+                }
+            }
+            unset($leaguePayload);
+        }
+
+        if ($hasChanges && is_array($fullCachePayload['teams'] ?? null)) {
+            foreach ($changes['teams'] as $teamId => &$teamPayload) {
+                if (isset($fullCachePayload['teams'][$teamId]['matches']) && is_array($fullCachePayload['teams'][$teamId]['matches'])) {
+                    $teamPayload['matches'] = $fullCachePayload['teams'][$teamId]['matches'];
+                }
+            }
+            unset($teamPayload);
+        }
+
+        if ($hasChanges) {
+            foreach ($changedMatchContexts as $matchId => $context) {
+                $targetStatus = $context['status'] ?? 'finished';
+                $targetLeagueId = (string) ($context['league_id'] ?? '');
+                $targetTeamIds = is_array($context['team_ids'] ?? null) ? $context['team_ids'] : [];
+
+                foreach (['live', 'upcoming', 'finished'] as $status) {
+                    $changes['indexes']['by_status'][$status] = array_values(array_filter(
+                        $changes['indexes']['by_status'][$status] ?? [],
+                        fn ($id) => (string) $id !== (string) $matchId
+                    ));
+                }
+                $changes['indexes']['by_status'][$targetStatus][] = $matchId;
+
+                if (!isset($changes['indexes']['by_league'][$targetLeagueId])) {
+                    $changes['indexes']['by_league'][$targetLeagueId] = [
+                        'live' => [],
+                        'upcoming' => [],
+                        'finished' => [],
+                    ];
+                }
+                foreach (['live', 'upcoming', 'finished'] as $status) {
+                    $changes['indexes']['by_league'][$targetLeagueId][$status] = array_values(array_filter(
+                        $changes['indexes']['by_league'][$targetLeagueId][$status] ?? [],
+                        fn ($id) => (string) $id !== (string) $matchId
+                    ));
+                }
+                $changes['indexes']['by_league'][$targetLeagueId][$targetStatus][] = $matchId;
+
+                foreach ($targetTeamIds as $teamId) {
+                    if (!isset($changes['indexes']['team_matches'][$teamId])) {
+                        $changes['indexes']['team_matches'][$teamId] = [
+                            'live' => [],
+                            'upcoming' => [],
+                            'finished' => [],
+                        ];
+                    }
+                    foreach (['live', 'upcoming', 'finished'] as $status) {
+                        $changes['indexes']['team_matches'][$teamId][$status] = array_values(array_filter(
+                            $changes['indexes']['team_matches'][$teamId][$status] ?? [],
+                            fn ($id) => (string) $id !== (string) $matchId
+                        ));
+                    }
+                    $changes['indexes']['team_matches'][$teamId][$targetStatus][] = $matchId;
+                }
+
+                if (isset($changes['leagues'][$targetLeagueId]['matches'])) {
+                    foreach (['live', 'upcoming', 'finished'] as $status) {
+                        $changes['leagues'][$targetLeagueId]['matches'][$status] = array_values(array_filter(
+                            $changes['leagues'][$targetLeagueId]['matches'][$status] ?? [],
+                            fn ($id) => (string) $id !== (string) $matchId
+                        ));
+                    }
+                    $changes['leagues'][$targetLeagueId]['matches'][$targetStatus][] = $matchId;
+                }
+
+                foreach ($targetTeamIds as $teamId) {
+                    if (isset($changes['teams'][$teamId]['matches'])) {
+                        foreach (['live', 'upcoming', 'finished'] as $status) {
+                            $changes['teams'][$teamId]['matches'][$status] = array_values(array_filter(
+                                $changes['teams'][$teamId]['matches'][$status] ?? [],
+                                fn ($id) => (string) $id !== (string) $matchId
+                            ));
+                        }
+                        $changes['teams'][$teamId]['matches'][$targetStatus][] = $matchId;
+                    }
+                }
+            }
+
+            if (!empty($removedMatchIds)) {
+                foreach (['live', 'upcoming', 'finished'] as $status) {
+                    $changes['indexes']['by_status'][$status] = array_values(array_filter(
+                        $changes['indexes']['by_status'][$status] ?? [],
+                        fn ($id) => !in_array((string) $id, $removedMatchIds, true)
+                    ));
+                }
+
+                foreach ($changes['indexes']['by_league'] as $leagueId => $byStatus) {
+                    foreach (['live', 'upcoming', 'finished'] as $status) {
+                        $changes['indexes']['by_league'][$leagueId][$status] = array_values(array_filter(
+                            $byStatus[$status] ?? [],
+                            fn ($id) => !in_array((string) $id, $removedMatchIds, true)
+                        ));
+                    }
+                }
+
+                foreach ($changes['indexes']['team_matches'] as $teamId => $byStatus) {
+                    foreach (['live', 'upcoming', 'finished'] as $status) {
+                        $changes['indexes']['team_matches'][$teamId][$status] = array_values(array_filter(
+                            $byStatus[$status] ?? [],
+                            fn ($id) => !in_array((string) $id, $removedMatchIds, true)
+                        ));
+                    }
+                }
+
+                foreach ($changes['leagues'] as $leagueId => $leaguePayload) {
+                    foreach (['live', 'upcoming', 'finished'] as $status) {
+                        $changes['leagues'][$leagueId]['matches'][$status] = array_values(array_filter(
+                            $leaguePayload['matches'][$status] ?? [],
+                            fn ($id) => !in_array((string) $id, $removedMatchIds, true)
+                        ));
+                    }
+                }
+
+                foreach ($changes['teams'] as $teamId => $teamPayload) {
+                    foreach (['live', 'upcoming', 'finished'] as $status) {
+                        $changes['teams'][$teamId]['matches'][$status] = array_values(array_filter(
+                            $teamPayload['matches'][$status] ?? [],
+                            fn ($id) => !in_array((string) $id, $removedMatchIds, true)
+                        ));
                     }
                 }
             }

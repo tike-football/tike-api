@@ -225,6 +225,7 @@ class FootballFixturesCacheServiceTest extends TestCase
         $this->assertNotNull(Cache::get(FootballFixturesCacheService::CACHE_FIXTURES_CHANGES));
 
         $secondRun = $service->cacheFixtureChanges();
-        $this->assertSame([], $secondRun['matches']);
+        $this->assertArrayHasKey('1001', $secondRun['matches']);
+        $this->assertSame(1, $secondRun['matches']['1001']['score']['home']);
     }
 }
