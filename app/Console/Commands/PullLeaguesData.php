@@ -28,6 +28,8 @@ class PullLeaguesData extends Command
      */
     public function handle(FootballSyncService $footballSyncService): int
     {
+        Log::info($this->getName() . ' started');
+
         $activeLeagues = League::query()
             ->where('is_active', true)
             ->orderBy('provider_league_id')
@@ -89,4 +91,3 @@ class PullLeaguesData extends Command
         return now()->year;
     }
 }
-

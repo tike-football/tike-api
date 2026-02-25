@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Services\FootballFixturesCacheService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class CacheFixturesChanges extends Command
 {
@@ -27,6 +28,8 @@ class CacheFixturesChanges extends Command
      */
     public function handle(FootballFixturesCacheService $footballCacheService): int
     {
+        Log::info($this->getName() . ' started');
+
         if (!$footballCacheService->hasRelevantFixturesForChanges()) {
             Cache::forget(FootballFixturesCacheService::CACHE_FIXTURES_CHANGES);
             $this->info('No relevant fixtures to process for incremental changes.');

@@ -2,6 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\PullStandingsData;
+use App\Models\Fixture;
 use App\Models\League;
 use App\Services\FootballFixturesCacheService;
 use App\Services\FootballSyncService;
@@ -32,6 +34,8 @@ class PullFixturesData extends Command
         FootballFixturesCacheService $footballCacheService
     ): int
     {
+        Log::info($this->getName() . ' started');
+
         if (!$footballCacheService->hasRelevantFixturesForChanges()) {
             $this->info('No relevant fixtures globally (live, starts in next 5 minutes, or finished in last 5 minutes). Skipping.');
             return self::SUCCESS;
@@ -63,10 +67,41 @@ class PullFixturesData extends Command
             }
 
             try {
+                $previousStatuses = Fixture::query()
+                    ->where('league_id', $league->id)
+                    ->where('season', $season)
+                    ->pluck('status_short', 'provider_fixture_id')
+                    ->map(fn (?string $status): string => (string) $status)
+                    ->all();
+
                 $fixtures = $footballSyncService->syncFixtures($leagueId, $season);
                 $fixturesCount = $fixtures->count();
                 $syncedLeagues++;
                 $totalFixtures += $fixturesCount;
+
+                $shouldDispatchStandingsSync = false;
+                foreach ($fixtures as $fixture) {
+                    $fixtureKey = (string) $fixture->provider_fixture_id;
+                    $previousStatus = $previousStatuses[$fixtureKey] ?? null;
+
+                    if ($previousStatus === null || $previousStatus === '') {
+                        continue;
+                    }
+
+                    if (
+                        !$this->isFinishedStatus($previousStatus)
+                        && $this->isFinishedStatus($fixture->status_short)
+                    ) {
+                        $shouldDispatchStandingsSync = true;
+                        break;
+                    }
+                }
+
+                if ($shouldDispatchStandingsSync) {
+                    PullStandingsData::dispatch($leagueId, $season)->onQueue('football-data');
+                    $this->line("Queued PullStandingsData for league {$leagueId} (season {$season}).");
+                }
+
                 $this->line("Synced fixtures for league {$leagueId} (season {$season}): {$fixturesCount}");
             } catch (\Throwable $e) {
                 $failed++;
@@ -104,5 +139,10 @@ class PullFixturesData extends Command
         }
 
         return now()->year;
+    }
+
+    private function isFinishedStatus(?string $statusShort): bool
+    {
+        return in_array(strtoupper((string) $statusShort), FootballSyncService::FINISHED_STATUS_SHORTS, true);
     }
 }
