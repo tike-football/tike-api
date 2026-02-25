@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Services\FootballFixturesCacheService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class CacheFixtures extends Command
 {
@@ -27,6 +28,8 @@ class CacheFixtures extends Command
      */
     public function handle(FootballFixturesCacheService $footballCacheService): int
     {
+        Log::info($this->getName() . ' started');
+
         $fullCacheId = Cache::get(FootballFixturesCacheService::CACHE_FIXTURES_ID);
         $changesCacheId = Cache::get(FootballFixturesCacheService::CACHE_FIXTURES_CHANGES_ID);
 

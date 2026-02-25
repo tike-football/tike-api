@@ -21,6 +21,11 @@ use RuntimeException;
 
 class FootballSyncService
 {
+    /**
+     * @var array<int, string>
+     */
+    public const FINISHED_STATUS_SHORTS = ['FT', 'AET', 'PEN'];
+
     public function __construct(
         private readonly FootballDataClient $footballDataClient
     ) {
@@ -210,7 +215,7 @@ class FootballSyncService
                 : null;
 
             $statusShort = isset($statusData['short']) ? (string) $statusData['short'] : null;
-            $isFinished = in_array($statusShort, ['FT', 'AET', 'PEN', 'PST', 'CANC', 'ABD', 'AWD', 'WO'], true);
+            $isFinished = in_array($statusShort, self::FINISHED_STATUS_SHORTS, true);
 
             $fixture = Fixture::updateOrCreate(
                 [
