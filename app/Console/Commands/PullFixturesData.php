@@ -8,10 +8,13 @@ use App\Models\League;
 use App\Services\FootballFixturesCacheService;
 use App\Services\FootballSyncService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class PullFixturesData extends Command
 {
+    private const STALE_SYNC_MINUTES = 15;
+
     /**
      * The name and signature of the console command.
      *
@@ -36,11 +39,6 @@ class PullFixturesData extends Command
     {
         Log::info($this->getName() . ' started');
 
-        if (!$footballCacheService->hasRelevantFixturesForChanges()) {
-            $this->info('No relevant fixtures globally (live, starts in next 5 minutes, or finished in last 5 minutes). Skipping.');
-            return self::SUCCESS;
-        }
-
         $activeLeagues = League::query()
             ->where('is_active', true)
             ->orderBy('provider_league_id')
@@ -60,10 +58,18 @@ class PullFixturesData extends Command
         foreach ($activeLeagues as $league) {
             $leagueId = (int) $league->provider_league_id;
             $season = $this->resolveSeason($league);
+            $hasRelevantFixtures = $footballCacheService->hasRelevantFixturesForChanges($leagueId);
+            $isStaleSync = $this->isLeagueFixturesSyncStale((int) $league->id, $season);
 
-            if (!$footballCacheService->hasRelevantFixturesForChanges($leagueId)) {
+            if (!$hasRelevantFixtures && !$isStaleSync) {
                 $this->line("Skipping league {$leagueId}: no relevant fixtures in current window.");
                 continue;
+            }
+
+            if (!$hasRelevantFixtures && $isStaleSync) {
+                $this->line(
+                    "League {$leagueId} has no relevant fixtures in current window, forcing sync due stale data (>" . self::STALE_SYNC_MINUTES . ' min).'
+                );
             }
 
             try {
@@ -144,5 +150,19 @@ class PullFixturesData extends Command
     private function isFinishedStatus(?string $statusShort): bool
     {
         return in_array(strtoupper((string) $statusShort), FootballSyncService::FINISHED_STATUS_SHORTS, true);
+    }
+
+    private function isLeagueFixturesSyncStale(int $leagueLocalId, int $season): bool
+    {
+        $lastSyncedAt = Fixture::query()
+            ->where('league_id', $leagueLocalId)
+            ->where('season', $season)
+            ->max('last_synced_at');
+
+        if ($lastSyncedAt === null) {
+            return true;
+        }
+
+        return Carbon::parse((string) $lastSyncedAt)->lte(now()->subMinutes(self::STALE_SYNC_MINUTES));
     }
 }
