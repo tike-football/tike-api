@@ -30,6 +30,18 @@ class CacheFixturesChanges extends Command
     {
         Log::info($this->getName() . ' started');
 
+        $fullCacheId = Cache::get(FootballFixturesCacheService::CACHE_FIXTURES_ID);
+        if ($fullCacheId === null || trim((string) $fullCacheId) === '') {
+            $payload = $footballCacheService->cacheFixtures();
+
+            $this->info('Full fixtures cache was missing. Rebuilt full cache before incremental changes.');
+            $this->line('Cache key: ' . FootballFixturesCacheService::CACHE_FIXTURES);
+            $this->line('Leagues cached: ' . count($payload['leagues']));
+            $this->line('Matches cached: ' . count($payload['matches']));
+
+            return self::SUCCESS;
+        }
+
         if (!$footballCacheService->hasRelevantFixturesForChanges()) {
             Cache::forget(FootballFixturesCacheService::CACHE_FIXTURES_CHANGES);
             $this->info('No relevant fixtures to process for incremental changes.');
