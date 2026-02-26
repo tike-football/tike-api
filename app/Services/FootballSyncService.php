@@ -216,6 +216,14 @@ class FootballSyncService
 
             $statusShort = isset($statusData['short']) ? (string) $statusData['short'] : null;
             $isFinished = in_array($statusShort, self::FINISHED_STATUS_SHORTS, true);
+            $existingFixture = Fixture::query()
+                ->where('provider', $footballFixture->provider)
+                ->where('provider_fixture_id', $providerFixtureId)
+                ->first(['id', 'finished_at']);
+            $finishedAt = $existingFixture?->finished_at;
+            if ($isFinished && $finishedAt === null) {
+                $finishedAt = now();
+            }
 
             $fixture = Fixture::updateOrCreate(
                 [
@@ -242,6 +250,7 @@ class FootballSyncService
                     'away_goals' => isset($goalsData['away']) ? (int) $goalsData['away'] : null,
                     'is_active' => !$isFinished,
                     'external_payload' => $footballFixture->response,
+                    'finished_at' => $finishedAt,
                     'last_synced_at' => now(),
                 ]
             );

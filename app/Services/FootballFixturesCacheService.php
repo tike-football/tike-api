@@ -397,8 +397,8 @@ class FootballFixturesCacheService
                     ->orWhere(function ($finishedQuery) use ($fiveMinutesAgo) {
                         $finishedQuery
                             ->whereNotIn('status_short', array_merge(self::LIVE_STATUS_SHORTS, self::UPCOMING_STATUS_SHORTS))
-                            ->whereNotNull('fixture_date')
-                            ->where('fixture_date', '>=', $fiveMinutesAgo);
+                            ->whereNotNull('finished_at')
+                            ->where('finished_at', '>=', $fiveMinutesAgo);
                     });
             });
 
