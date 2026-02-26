@@ -58,7 +58,7 @@ class CacheFixturesCommandTest extends TestCase
         $this->assertArrayHasKey('1001', $cached['matches']);
     }
 
-    public function test_cache_fixtures_command_skips_when_full_and_changes_ids_are_equal(): void
+    public function test_cache_fixtures_command_rebuilds_when_full_and_changes_ids_are_equal(): void
     {
         $league = League::create([
             'provider' => 'api_football',
@@ -97,7 +97,11 @@ class CacheFixturesCommandTest extends TestCase
         $this->artisan('football-data:cache-fixtures')
             ->assertExitCode(0);
 
-        $this->assertNull(Cache::get(FootballFixturesCacheService::CACHE_FIXTURES));
+        $cached = Cache::get(FootballFixturesCacheService::CACHE_FIXTURES);
+
+        $this->assertNotNull($cached);
+        $this->assertArrayHasKey('matches', $cached);
+        $this->assertArrayHasKey('1001', $cached['matches']);
     }
 
     public function test_cache_fixtures_changes_command_stores_changes_payload_in_cache(): void
@@ -137,6 +141,7 @@ class CacheFixturesCommandTest extends TestCase
         ]);
 
         app(\App\Services\FootballFixturesCacheService::class)->cacheFixtureChanges();
+        app(\App\Services\FootballFixturesCacheService::class)->cacheFixtures();
 
         $fixture->update([
             'home_goals' => 1,
