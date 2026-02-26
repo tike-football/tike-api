@@ -30,9 +30,6 @@ class CacheFixtures extends Command
     {
         Log::info($this->getName() . ' started');
 
-        $fullCacheId = Cache::get(FootballFixturesCacheService::CACHE_FIXTURES_ID);
-        $changesCacheId = Cache::get(FootballFixturesCacheService::CACHE_FIXTURES_CHANGES_ID);
-
         $payload = $footballCacheService->cacheFixtures();
 
         $this->info('Fixtures cache generated.');
