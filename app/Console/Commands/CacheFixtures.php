@@ -33,13 +33,6 @@ class CacheFixtures extends Command
         $fullCacheId = Cache::get(FootballFixturesCacheService::CACHE_FIXTURES_ID);
         $changesCacheId = Cache::get(FootballFixturesCacheService::CACHE_FIXTURES_CHANGES_ID);
 
-        if ($fullCacheId !== null && $fullCacheId === $changesCacheId) {
-            $this->info('Full fixtures cache is already up to date. Skipping rebuild.');
-            $this->line('Cache ID: ' . $fullCacheId);
-
-            return self::SUCCESS;
-        }
-
         $payload = $footballCacheService->cacheFixtures();
 
         $this->info('Fixtures cache generated.');
