@@ -16,9 +16,15 @@ return Application::configure(basePath: dirname(__DIR__))
     ])
     ->withSchedule(function (Schedule $schedule): void {
         $schedule->command('football-data:pull-leagues-data')->dailyAt('00:00');
-        $schedule->command('football-data:pull-fixtures-data')->everyMinute()->withoutOverlapping();
+        $schedule->command('football-data:pull-fixtures-data')
+            ->everyMinute()
+            ->withoutOverlapping(5)
+            ->runInBackground();
         $schedule->command('football-data:cache-fixtures')->hourly()->withoutOverlapping();
-        $schedule->command('football-data:cache-fixtures-changes')->everyMinute()->withoutOverlapping();
+        $schedule->command('football-data:cache-fixtures-changes')
+            ->everyMinute()
+            ->withoutOverlapping(2)
+            ->runInBackground();
     })
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
