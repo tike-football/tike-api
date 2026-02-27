@@ -13,6 +13,7 @@ class FootballFixturesCacheService
 {
     public const CACHE_FIXTURES = 'cache-fixtures';
     public const CACHE_FIXTURES_CHANGES = 'cache-fixtures-changes';
+    public const CACHE_FIXTURES_MERGED = 'cache-fixtures-merged';
     public const CACHE_FIXTURES_ID = 'cache-fixtures-id';
     public const CACHE_FIXTURES_CHANGES_ID = 'cache-fixtures-changes-id';
     private const CACHE_FIXTURES_CHANGES_SNAPSHOT = 'cache-fixtures-changes-snapshot';
@@ -37,6 +38,7 @@ class FootballFixturesCacheService
         $cacheVersionId = $this->generateCacheVersionId();
 
         Cache::forever(self::CACHE_FIXTURES, $payload);
+        Cache::forever(self::CACHE_FIXTURES_MERGED, $payload);
         Cache::forever(self::CACHE_FIXTURES_ID, $cacheVersionId);
         Cache::forever(self::CACHE_FIXTURES_CHANGES_ID, $cacheVersionId);
 
@@ -353,11 +355,62 @@ class FootballFixturesCacheService
         }
 
         $this->deduplicateIndexes($changes);
+        $mergedPayload = $this->mergeFullAndChangesPayload($fullCachePayload, $changes, $hasChanges);
         Cache::forever(self::CACHE_FIXTURES_CHANGES, $changes);
+        Cache::forever(self::CACHE_FIXTURES_MERGED, $mergedPayload);
         Cache::forever(self::CACHE_FIXTURES_CHANGES_ID, $this->generateCacheVersionId());
         Cache::forever(self::CACHE_FIXTURES_CHANGES_SNAPSHOT, $currentSnapshot);
 
         return $changes;
+    }
+
+    /**
+     * @param array<string, mixed> $fullPayload
+     * @param array<string, mixed> $changesPayload
+     * @return array<string, mixed>
+     */
+    private function mergeFullAndChangesPayload(array $fullPayload, array $changesPayload, bool $hasChanges): array
+    {
+        if (!$hasChanges) {
+            return $fullPayload;
+        }
+
+        $merged = $fullPayload;
+
+        $removedMatchIds = $changesPayload['meta']['removed_match_ids'] ?? [];
+        if (!is_array($removedMatchIds)) {
+            $removedMatchIds = [];
+        }
+
+        foreach ($removedMatchIds as $removedMatchId) {
+            unset($merged['matches'][(string) $removedMatchId]);
+        }
+
+        foreach ($changesPayload['matches'] ?? [] as $matchId => $matchPayload) {
+            $merged['matches'][(string) $matchId] = $matchPayload;
+        }
+
+        foreach ($changesPayload['leagues'] ?? [] as $leagueId => $leaguePayload) {
+            $merged['leagues'][(string) $leagueId] = $leaguePayload;
+        }
+
+        foreach ($changesPayload['teams'] ?? [] as $teamId => $teamPayload) {
+            $merged['teams'][(string) $teamId] = $teamPayload;
+        }
+
+        foreach ($changesPayload['players'] ?? [] as $playerId => $playerPayload) {
+            $merged['players'][(string) $playerId] = $playerPayload;
+        }
+
+        if (isset($changesPayload['indexes']) && is_array($changesPayload['indexes'])) {
+            $merged['indexes'] = $changesPayload['indexes'];
+        }
+
+        if (isset($changesPayload['meta']['generated_at'])) {
+            $merged['meta']['generated_at'] = $changesPayload['meta']['generated_at'];
+        }
+
+        return $merged;
     }
 
     public function hasRelevantFixturesForChanges(?int $providerLeagueId = null): bool
