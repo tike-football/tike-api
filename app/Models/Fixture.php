@@ -38,6 +38,7 @@ class Fixture extends Model
         'away_goals',
         'is_active',
         'external_payload',
+        'finished_at',
         'last_synced_at',
     ];
 
@@ -52,6 +53,7 @@ class Fixture extends Model
             'fixture_date' => 'datetime',
             'is_active' => 'boolean',
             'external_payload' => 'array',
+            'finished_at' => 'datetime',
             'last_synced_at' => 'datetime',
         ];
     }

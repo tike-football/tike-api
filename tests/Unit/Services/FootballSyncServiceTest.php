@@ -6,6 +6,7 @@ use App\Events\FootballData\LeagueSynced;
 use App\Events\FootballData\LeagueTeamsSynced;
 use App\Events\FootballData\TeamSynced;
 use App\Models\League;
+use App\Models\LeagueSeason;
 use App\Models\Fixture;
 use App\Models\FixtureTeamStat;
 use App\Models\LeagueStanding;
@@ -54,6 +55,19 @@ class FootballSyncServiceTest extends TestCase
                         'code' => 'GB',
                         'flag' => 'https://flag.example/gb.png',
                     ],
+                    'seasons' => [
+                        [
+                            'year' => 2026,
+                            'start' => '2026-08-01',
+                            'end' => '2027-05-25',
+                            'current' => true,
+                            'coverage' => [
+                                'fixtures' => [
+                                    'events' => true,
+                                ],
+                            ],
+                        ],
+                    ],
                 ],
                 errorMessage: null,
             )
@@ -76,6 +90,14 @@ class FootballSyncServiceTest extends TestCase
             'country_code' => 'GB',
             'is_active' => 0,
         ]);
+        $this->assertDatabaseHas('league_seasons', [
+            'league_id' => $league->id,
+            'year' => 2026,
+            'start' => '2026-08-01 00:00:00',
+            'end' => '2027-05-25 00:00:00',
+            'current' => 1,
+        ]);
+        $this->assertSame(1, LeagueSeason::count());
 
         Event::assertDispatched(LeagueSynced::class, function (LeagueSynced $event) use ($league): bool {
             return $event->league->is($league);
