@@ -56,11 +56,16 @@ class FootballDataController extends Controller
 
     private function fullPayloadResponse(?string $fullCacheId, ?string $changesCacheId): JsonResponse
     {
+        $fixtures = Cache::get(FootballFixturesCacheService::CACHE_FIXTURES_MERGED);
+        if ($fixtures === null) {
+            $fixtures = Cache::get(FootballFixturesCacheService::CACHE_FIXTURES, (object) []);
+        }
+
         return response()->json([
             'message' => 'Fixtures cache loaded.',
             'cache_fixtures_id' => $fullCacheId,
             'cache_fixtures_changes_id' => $changesCacheId,
-            'fixtures' => Cache::get(FootballFixturesCacheService::CACHE_FIXTURES, (object) []),
+            'fixtures' => $fixtures,
         ]);
     }
 
