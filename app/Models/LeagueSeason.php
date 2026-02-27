@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class League extends Model
+class LeagueSeason extends Model
 {
     use HasFactory;
 
@@ -16,18 +16,12 @@ class League extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'provider',
-        'provider_league_id',
-        'name',
-        'type',
-        'country_name',
-        'country_code',
-        'logo',
-        'flag',
+        'league_id',
+        'year',
+        'start',
+        'end',
         'current',
-        'external_payload',
-        'last_synced_at',
-        'is_active',
+        'structure',
     ];
 
     /**
@@ -38,15 +32,15 @@ class League extends Model
     protected function casts(): array
     {
         return [
+            'start' => 'date',
+            'end' => 'date',
             'current' => 'boolean',
-            'external_payload' => 'array',
-            'last_synced_at' => 'datetime',
-            'is_active' => 'boolean',
+            'structure' => 'array',
         ];
     }
 
-    public function seasons(): HasMany
+    public function league(): BelongsTo
     {
-        return $this->hasMany(LeagueSeason::class);
+        return $this->belongsTo(League::class);
     }
 }

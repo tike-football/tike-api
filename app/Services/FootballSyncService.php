@@ -8,6 +8,7 @@ use App\Events\FootballData\TeamSynced;
 use App\Models\Fixture;
 use App\Models\FixtureTeamStat;
 use App\Models\League;
+use App\Models\LeagueSeason;
 use App\Models\LeagueStanding;
 use App\Models\LeagueStandingRow;
 use App\Models\Player;
@@ -69,9 +70,41 @@ class FootballSyncService
             'name' => $league->name,
         ]);
 
+        $this->syncLeagueSeasons($league, $footballLeague->response);
+
         event(new LeagueSynced($league));
 
         return $league;
+    }
+
+    /**
+     * @param array<string, mixed> $leagueResponse
+     */
+    private function syncLeagueSeasons(League $league, array $leagueResponse): void
+    {
+        $seasons = data_get($leagueResponse, 'seasons', []);
+        if (!is_array($seasons)) {
+            return;
+        }
+
+        foreach ($seasons as $season) {
+            if (!is_array($season) || !isset($season['year'])) {
+                continue;
+            }
+
+            LeagueSeason::updateOrCreate(
+                [
+                    'league_id' => $league->id,
+                    'year' => (int) $season['year'],
+                ],
+                [
+                    'start' => isset($season['start']) ? (string) $season['start'] : null,
+                    'end' => isset($season['end']) ? (string) $season['end'] : null,
+                    'current' => (bool) ($season['current'] ?? false),
+                    'structure' => is_array($season['coverage'] ?? null) ? $season['coverage'] : null,
+                ]
+            );
+        }
     }
 
     /**
