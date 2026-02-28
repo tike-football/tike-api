@@ -1,0 +1,194 @@
+{
+  "league_id": null,
+  "provider_league_id": null,
+  "season": null,
+  "league_name": null,
+  "season_structure": {
+    "schema_version": 1,
+    "competition_type": "hybrid",
+    "current_phase": "F1",
+    "notes": "Template: replace placeholders and remove phases not used by the competition.",
+    "phase_variants_guide": {
+      "phase_type": ["group", "playoff"],
+      "group_mode": ["single_group", "multi_group"],
+      "match_type": ["single_leg", "two_legs"],
+      "seeding_method": ["draw", "ranking", "fixed_bracket"],
+      "qualification_method": ["ranking_table", "best_ranked", "manual"]
+    },
+    "phases": {
+      "F1": {
+        "phase_id": "F1",
+        "phase_name": "Group Stage",
+        "order": 1,
+        "phase_type": "group",
+        "group_mode": "multi_group",
+        "groups": [
+          {
+            "group_id": "A",
+            "name": "Group A",
+            "teams": [null, null, null, null],
+            "matches": [
+              {
+                "fixture_id": null,
+                "home_team_id": null,
+                "away_team_id": null,
+                "round": null,
+                "fixture_date": null,
+                "match_type": "single_leg"
+              }
+            ]
+          }
+        ],
+        "qualification": {
+          "advances_to_phase": "F2",
+          "method": "ranking_table",
+          "qualified_positions": [1, 2],
+          "best_ranked_count": 0,
+          "description": "Top 2 of each group qualify."
+        }
+      },
+      "F2": {
+        "phase_id": "F2",
+        "phase_name": "Knockout Playoff",
+        "order": 2,
+        "phase_type": "playoff",
+        "match_type": "two_legs",
+        "seeding_method": "draw",
+        "classified_team_slots": {
+          "F1A1": null,
+          "F1A2": null,
+          "F1B1": null,
+          "F1B2": null,
+          "WCBR1": null,
+          "WCBR2": null
+        },
+        "ties": [
+          {
+            "tie_id": "F2A",
+            "name": "Playoff 1",
+            "teams": ["F1A1", "F1B2"],
+            "winner_slot": "F2W1",
+            "matches": [
+              {
+                "fixture_id": null,
+                "leg": 1,
+                "home_team_id": null,
+                "away_team_id": null,
+                "fixture_date": null
+              },
+              {
+                "fixture_id": null,
+                "leg": 2,
+                "home_team_id": null,
+                "away_team_id": null,
+                "fixture_date": null
+              }
+            ]
+          }
+        ],
+        "qualification": {
+          "advances_to_phase": "F3",
+          "method": "manual",
+          "description": "Winners advance to next phase."
+        }
+      },
+      "F3": {
+        "phase_id": "F3",
+        "phase_name": "Semifinals",
+        "order": 3,
+        "phase_type": "playoff",
+        "match_type": "single_leg",
+        "seeding_method": "fixed_bracket",
+        "ties": [
+          {
+            "tie_id": "F3A",
+            "name": "Semifinal 1",
+            "teams": ["F2W1", "F2W2"],
+            "winner_slot": "F3W1",
+            "loser_slot": "F3L1",
+            "matches": [
+              {
+                "fixture_id": null,
+                "leg": 1,
+                "home_team_id": null,
+                "away_team_id": null,
+                "fixture_date": null
+              }
+            ]
+          },
+          {
+            "tie_id": "F3B",
+            "name": "Semifinal 2",
+            "teams": ["F2W3", "F2W4"],
+            "winner_slot": "F3W2",
+            "loser_slot": "F3L2",
+            "matches": [
+              {
+                "fixture_id": null,
+                "leg": 1,
+                "home_team_id": null,
+                "away_team_id": null,
+                "fixture_date": null
+              }
+            ]
+          }
+        ],
+        "qualification": {
+          "advances_to_phase": "F4",
+          "method": "manual",
+          "description": "Semifinal winners advance to final."
+        }
+      },
+      "F4": {
+        "phase_id": "F4",
+        "phase_name": "Final",
+        "order": 4,
+        "phase_type": "playoff",
+        "match_type": "single_leg",
+        "seeding_method": "ranking",
+        "ties": [
+          {
+            "tie_id": "F4A",
+            "name": "Final",
+            "teams": ["F3W1", "F3W2"],
+            "winner_slot": "CHAMPION",
+            "matches": [
+              {
+                "fixture_id": null,
+                "leg": 1,
+                "home_team_id": null,
+                "away_team_id": null,
+                "fixture_date": null
+              }
+            ]
+          }
+        ]
+      },
+      "F5": {
+        "phase_id": "F5",
+        "phase_name": "Third Place",
+        "order": 5,
+        "phase_type": "playoff",
+        "match_type": "single_leg",
+        "seeding_method": "fixed_bracket",
+        "ties": [
+          {
+            "tie_id": "F5A",
+            "name": "Third Place Match",
+            "teams": ["F3L1", "F3L2"],
+            "winner_slot": "THIRD_PLACE",
+            "matches": [
+              {
+                "fixture_id": null,
+                "leg": 1,
+                "home_team_id": null,
+                "away_team_id": null,
+                "fixture_date": null
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class League extends Model
@@ -48,5 +49,19 @@ class League extends Model
     public function seasons(): HasMany
     {
         return $this->hasMany(LeagueSeason::class);
+    }
+
+    public function currentSeason(): HasOne
+    {
+        return $this->hasOne(LeagueSeason::class)
+            ->where('current', true)
+            ->latestOfMany('year');
+    }
+
+    public function currentSeasonYear(): ?int
+    {
+        $season = $this->currentSeason;
+
+        return $season !== null ? (int) $season->year : null;
     }
 }

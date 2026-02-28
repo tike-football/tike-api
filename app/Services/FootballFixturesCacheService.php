@@ -423,6 +423,19 @@ class FootballFixturesCacheService
         return Fixture::query()
             ->with(['league', 'homeTeam', 'awayTeam', 'teamStats.team'])
             ->whereHas('league', fn ($query) => $query->where('current', true))
+            ->where(function ($query) {
+                $query->whereExists(function ($seasonQuery) {
+                    $seasonQuery->selectRaw('1')
+                        ->from('league_seasons')
+                        ->whereColumn('league_seasons.league_id', 'fixtures.league_id')
+                        ->whereColumn('league_seasons.year', 'fixtures.season')
+                        ->where('league_seasons.current', true);
+                })->orWhereNotExists(function ($seasonQuery) {
+                    $seasonQuery->selectRaw('1')
+                        ->from('league_seasons')
+                        ->whereColumn('league_seasons.league_id', 'fixtures.league_id');
+                });
+            })
             ->orderBy('fixture_date');
     }
 
@@ -439,6 +452,19 @@ class FootballFixturesCacheService
                 if ($providerLeagueId !== null) {
                     $query->where('provider_league_id', $providerLeagueId);
                 }
+            })
+            ->where(function ($query) {
+                $query->whereExists(function ($seasonQuery) {
+                    $seasonQuery->selectRaw('1')
+                        ->from('league_seasons')
+                        ->whereColumn('league_seasons.league_id', 'fixtures.league_id')
+                        ->whereColumn('league_seasons.year', 'fixtures.season')
+                        ->where('league_seasons.current', true);
+                })->orWhereNotExists(function ($seasonQuery) {
+                    $seasonQuery->selectRaw('1')
+                        ->from('league_seasons')
+                        ->whereColumn('league_seasons.league_id', 'fixtures.league_id');
+                });
             })
             ->where(function ($query) use ($now, $inFiveMinutes, $fiveMinutesAgo) {
                 $query->whereIn('status_short', self::LIVE_STATUS_SHORTS)
