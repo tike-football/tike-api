@@ -41,6 +41,7 @@ class PullFixturesData extends Command
 
         $activeLeagues = League::query()
             ->where('is_active', true)
+            ->with('currentSeason')
             ->orderBy('provider_league_id')
             ->get();
 
@@ -57,22 +58,28 @@ class PullFixturesData extends Command
 
         foreach ($activeLeagues as $league) {
             $leagueId = (int) $league->provider_league_id;
-            $season = $this->resolveSeason($league);
-            $hasRelevantFixtures = $footballCacheService->hasRelevantFixturesForChanges($leagueId);
-            $isStaleSync = $this->isLeagueFixturesSyncStale((int) $league->id, $season);
-
-            if (!$hasRelevantFixtures && !$isStaleSync) {
-                $this->line("Skipping league {$leagueId}: no relevant fixtures in current window.");
+            $season = $league->currentSeasonYear();
+            if ($season === null) {
+                $this->line("Skipping league {$leagueId}: no current season configured.");
                 continue;
             }
 
-            if (!$hasRelevantFixtures && $isStaleSync) {
-                $this->line(
-                    "League {$leagueId} has no relevant fixtures in current window, forcing sync due stale data (>" . self::STALE_SYNC_MINUTES . ' min).'
-                );
-            }
+            $hasRelevantFixtures = $footballCacheService->hasRelevantFixturesForChanges($leagueId);
 
             try {
+                $isStaleSync = $this->isLeagueFixturesSyncStale((int) $league->id, $season);
+
+                if (!$hasRelevantFixtures && !$isStaleSync) {
+                    $this->line("Skipping league {$leagueId}: no relevant fixtures in current window.");
+                    continue;
+                }
+
+                if (!$hasRelevantFixtures && $isStaleSync) {
+                    $this->line(
+                        "League {$leagueId} has no relevant fixtures in current window, forcing sync due stale data (>" . self::STALE_SYNC_MINUTES . ' min).'
+                    );
+                }
+
                 $previousStatuses = Fixture::query()
                     ->where('league_id', $league->id)
                     ->where('season', $season)
@@ -124,27 +131,6 @@ class PullFixturesData extends Command
         $this->info("Completed. Leagues synced: {$syncedLeagues}. Fixtures synced: {$totalFixtures}. Failed: {$failed}.");
 
         return $failed > 0 ? self::FAILURE : self::SUCCESS;
-    }
-
-    private function resolveSeason(League $league): int
-    {
-        $seasons = data_get($league->external_payload, 'seasons', []);
-        if (!is_array($seasons) || $seasons === []) {
-            return now()->year;
-        }
-
-        foreach ($seasons as $season) {
-            if (is_array($season) && (bool) ($season['current'] ?? false) && isset($season['year'])) {
-                return (int) $season['year'];
-            }
-        }
-
-        $firstYear = data_get($seasons, '0.year');
-        if ($firstYear !== null) {
-            return (int) $firstYear;
-        }
-
-        return now()->year;
     }
 
     private function isFinishedStatus(?string $statusShort): bool

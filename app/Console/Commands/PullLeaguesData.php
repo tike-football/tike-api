@@ -32,6 +32,7 @@ class PullLeaguesData extends Command
 
         $activeLeagues = League::query()
             ->where('is_active', true)
+            ->with('currentSeason')
             ->orderBy('provider_league_id')
             ->get();
 
@@ -47,9 +48,14 @@ class PullLeaguesData extends Command
 
         foreach ($activeLeagues as $league) {
             $leagueId = (int) $league->provider_league_id;
-            $season = $this->resolveSeason($league);
 
             try {
+                $season = $league->currentSeasonYear();
+                if ($season === null) {
+                    $this->line("Skipping league {$leagueId}: no current season configured.");
+                    continue;
+                }
+
                 $footballSyncService->syncLeague($leagueId, $season);
                 $synced++;
                 $this->line("Synced league {$leagueId} (season {$season}).");
@@ -68,26 +74,5 @@ class PullLeaguesData extends Command
         $this->info("Completed. Synced: {$synced}. Failed: {$failed}.");
 
         return $failed > 0 ? self::FAILURE : self::SUCCESS;
-    }
-
-    private function resolveSeason(League $league): int
-    {
-        $seasons = data_get($league->external_payload, 'seasons', []);
-        if (!is_array($seasons) || $seasons === []) {
-            return now()->year;
-        }
-
-        foreach ($seasons as $season) {
-            if (is_array($season) && (bool) ($season['current'] ?? false) && isset($season['year'])) {
-                return (int) $season['year'];
-            }
-        }
-
-        $firstYear = data_get($seasons, '0.year');
-        if ($firstYear !== null) {
-            return (int) $firstYear;
-        }
-
-        return now()->year;
     }
 }
