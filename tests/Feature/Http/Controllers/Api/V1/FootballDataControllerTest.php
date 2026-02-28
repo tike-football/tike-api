@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Http\Controllers\Api\V1;
 
+use App\Models\League;
+use App\Models\LeagueSeason;
 use App\Models\User;
 use App\Services\FootballFixturesCacheService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -148,5 +150,87 @@ class FootballDataControllerTest extends TestCase
                 'message' => 'Fixtures changes cache loaded.',
             ])
             ->assertJsonPath('fixtures.matches.1001.status', 'live');
+    }
+
+    public function test_get_league_structure_requires_scope(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        Passport::actingAs($user, ['different:scope']);
+
+        $response = $this->getJsonWithApiKey('/api/v1/football-data/get-league-structure?league_id=1&season=2026');
+
+        $response->assertStatus(403);
+    }
+
+    public function test_get_league_structure_validates_required_fields(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        Passport::actingAs($user, ['football-data:get']);
+
+        $response = $this->getJsonWithApiKey('/api/v1/football-data/get-league-structure');
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'message' => 'Validation failed.',
+            ])
+            ->assertJsonValidationErrors(['league_id', 'season']);
+    }
+
+    public function test_get_league_structure_returns_404_when_league_season_not_found(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        Passport::actingAs($user, ['football-data:get']);
+
+        $response = $this->getJsonWithApiKey('/api/v1/football-data/get-league-structure?league_id=9999&season=2026');
+
+        $response->assertStatus(404)
+            ->assertJson([
+                'message' => 'League season not found.',
+            ]);
+    }
+
+    public function test_get_league_structure_returns_structure_payload(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        Passport::actingAs($user, ['football-data:get']);
+
+        $league = League::query()->create([
+            'provider' => 'api_football',
+            'provider_league_id' => 239,
+            'name' => 'Liga BetPlay',
+            'type' => 'cup',
+            'country_name' => 'Colombia',
+            'country_code' => 'CO',
+            'logo' => null,
+            'flag' => null,
+            'current' => true,
+            'is_active' => true,
+            'external_payload' => null,
+            'last_synced_at' => null,
+        ]);
+
+        LeagueSeason::query()->create([
+            'league_id' => $league->id,
+            'year' => 2026,
+            'start' => '2026-01-01',
+            'end' => '2026-12-31',
+            'current' => true,
+            'structure' => [
+                'league_id' => $league->id,
+                'season_structure' => [
+                    'current_phase' => 'F1',
+                ],
+            ],
+        ]);
+
+        $response = $this->getJsonWithApiKey('/api/v1/football-data/get-league-structure?league_id=' . $league->id . '&season=2026');
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'message' => 'League structure loaded.',
+                'league_id' => $league->id,
+                'season' => 2026,
+            ])
+            ->assertJsonPath('structure.season_structure.current_phase', 'F1');
     }
 }

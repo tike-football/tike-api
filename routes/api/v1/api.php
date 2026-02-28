@@ -62,6 +62,7 @@ Route::middleware(['api.key', 'auth:api'])->prefix('user')->group(function (): v
 Route::middleware(['api.key', 'auth:api'])->prefix('football-data')->group(function (): void {
     Route::middleware(['scope:football-data:get'])->controller(FootballDataController::class)->group(function (): void {
         Route::get('get-fixtures', 'getFixtures');
+        Route::get('get-league-structure', 'getLeagueStructure');
     });
 });
 
@@ -70,6 +71,7 @@ Route::middleware(['api.key', 'auth:api'])->prefix('admin')->group(function (): 
     Route::prefix('football-data')->group(function (): void {
         Route::middleware(['scope:football-data:sync'])->controller(FootballDataServiceController::class)->group(function (): void {
             Route::post('sync-league', 'syncLeague');
+            Route::post('sync-league-structure', 'syncLeagueStructure');
         });
 
         Route::middleware(['scope:football-data:cache'])->controller(FootballCacheServiceController::class)->group(function (): void {
