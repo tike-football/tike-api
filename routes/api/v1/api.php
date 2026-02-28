@@ -70,6 +70,7 @@ Route::middleware(['api.key', 'auth:api'])->prefix('admin')->group(function (): 
     Route::prefix('football-data')->group(function (): void {
         Route::middleware(['scope:football-data:sync'])->controller(FootballDataServiceController::class)->group(function (): void {
             Route::post('sync-league', 'syncLeague');
+            Route::post('sync-league-structure', 'syncLeagueStructure');
         });
 
         Route::middleware(['scope:football-data:cache'])->controller(FootballCacheServiceController::class)->group(function (): void {

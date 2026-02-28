@@ -13,10 +13,12 @@ use App\Services\FootballDataService\FootballDataLeague;
 use App\Services\FootballDataService\FootballDataPlayer;
 use App\Services\FootballDataService\FootballDataStandings;
 use App\Services\FootballDataService\FootballDataTeam;
+use App\Services\FootballSyncLeagueStructureService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use Laravel\Passport\Passport;
+use Mockery;
 use Tests\TestCase;
 use Tests\Traits\WithApiKey;
 
@@ -185,6 +187,68 @@ class FootballDataServiceControllerTest extends TestCase
             ]);
 
         $this->assertSame(0, League::count());
+    }
+
+    public function test_admin_with_scope_can_sync_league_structure(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+        ]);
+
+        Passport::actingAs($admin, ['football-data:sync']);
+
+        $serviceMock = Mockery::mock(FootballSyncLeagueStructureService::class);
+        $serviceMock->shouldReceive('syncLeagueStructure')
+            ->once()
+            ->with(97, 2026)
+            ->andReturn(true);
+        $this->app->instance(FootballSyncLeagueStructureService::class, $serviceMock);
+
+        $response = $this->postJsonWithApiKey('/api/v1/admin/football-data/sync-league-structure', [
+            'league_id' => 97,
+            'season' => 2026,
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'message' => 'League structure synchronization completed.',
+                'league_id' => 97,
+                'season' => 2026,
+                'updated' => true,
+            ]);
+    }
+
+    public function test_sync_league_structure_requires_scope(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+        ]);
+
+        Passport::actingAs($admin, ['different:scope']);
+
+        $response = $this->postJsonWithApiKey('/api/v1/admin/football-data/sync-league-structure', [
+            'league_id' => 97,
+            'season' => 2026,
+        ]);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_sync_league_structure_validates_required_fields(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+        ]);
+
+        Passport::actingAs($admin, ['football-data:sync']);
+
+        $response = $this->postJsonWithApiKey('/api/v1/admin/football-data/sync-league-structure', []);
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'message' => 'Validation failed.',
+            ])
+            ->assertJsonValidationErrors(['league_id', 'season']);
     }
 }
 
