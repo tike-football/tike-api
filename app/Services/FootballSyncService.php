@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Events\FootballData\FixtureFinished;
 use App\Events\FootballData\LeagueSynced;
 use App\Events\FootballData\LeagueTeamsSynced;
 use App\Events\FootballData\TeamSynced;
@@ -253,6 +254,7 @@ class FootballSyncService
                 ->where('provider', $footballFixture->provider)
                 ->where('provider_fixture_id', $providerFixtureId)
                 ->first(['id', 'finished_at']);
+            $wasAlreadyFinished = $existingFixture?->finished_at !== null;
             $finishedAt = $existingFixture?->finished_at;
             if ($isFinished && $finishedAt === null) {
                 $finishedAt = now();
@@ -295,6 +297,14 @@ class FootballSyncService
                 'season' => $fixture->season,
                 'status_short' => $fixture->status_short,
             ]);
+
+            if ($isFinished && !$wasAlreadyFinished) {
+                event(new FixtureFinished(
+                    $league,
+                    (int) $fixture->season,
+                    (int) $fixture->provider_fixture_id
+                ));
+            }
 
             $homePayload = is_array($teamsData['home'] ?? null) ? $teamsData['home'] : [];
             $awayPayload = is_array($teamsData['away'] ?? null) ? $teamsData['away'] : [];
