@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Services;
 
+use App\Events\FootballData\FixtureFinished;
 use App\Events\FootballData\LeagueSynced;
 use App\Events\FootballData\LeagueTeamsSynced;
 use App\Events\FootballData\TeamSynced;
@@ -515,6 +516,191 @@ class FootballSyncServiceTest extends TestCase
         $this->assertCount(0, $savedFixtures);
         $this->assertSame(0, Fixture::count());
         $this->assertSame(0, FixtureTeamStat::count());
+    }
+
+    public function test_sync_fixtures_dispatches_fixture_finished_when_fixture_transitions_to_finished(): void
+    {
+        Event::fake([FixtureFinished::class]);
+
+        $league = League::create([
+            'provider' => 'api_football',
+            'provider_league_id' => 39,
+            'name' => 'Premier League',
+            'type' => 'league',
+        ]);
+
+        $homeTeam = Team::create([
+            'provider' => 'api_football',
+            'provider_team_id' => 33,
+            'name' => 'Manchester United',
+        ]);
+
+        $awayTeam = Team::create([
+            'provider' => 'api_football',
+            'provider_team_id' => 50,
+            'name' => 'Manchester City',
+        ]);
+
+        Fixture::create([
+            'provider' => 'api_football',
+            'provider_fixture_id' => 1001,
+            'league_id' => $league->id,
+            'season' => 2026,
+            'status_short' => 'NS',
+            'home_team_id' => $homeTeam->id,
+            'away_team_id' => $awayTeam->id,
+            'finished_at' => null,
+        ]);
+
+        $fixturesResponse = collect([
+            new FootballDataFixture(
+                provider: 'api_football',
+                endpoint: 'fixtures',
+                fixtureId: 1001,
+                leagueId: 39,
+                season: 2026,
+                response: [
+                    'fixture' => [
+                        'id' => 1001,
+                        'date' => '2026-08-12T16:30:00+00:00',
+                        'timezone' => 'UTC',
+                        'timestamp' => 1786552200,
+                        'status' => [
+                            'long' => 'Match Finished',
+                            'short' => 'FT',
+                            'elapsed' => 90,
+                        ],
+                        'venue' => [
+                            'id' => 556,
+                            'name' => 'Old Trafford',
+                            'city' => 'Manchester',
+                        ],
+                    ],
+                    'league' => [
+                        'id' => 39,
+                        'season' => 2026,
+                        'round' => 'Regular Season - 1',
+                    ],
+                    'teams' => [
+                        'home' => ['id' => 33],
+                        'away' => ['id' => 50],
+                    ],
+                    'goals' => [
+                        'home' => 2,
+                        'away' => 1,
+                    ],
+                ],
+                errorMessage: null,
+            ),
+        ]);
+
+        $service = new FootballSyncService(new UnitFakeFootballDataClient(
+            leagueResponse: new FootballDataLeague(
+                provider: 'api_football',
+                endpoint: 'leagues',
+                leagueId: 39,
+                season: 2026,
+                response: ['league' => ['id' => 39, 'name' => 'Premier League', 'type' => 'League']],
+                errorMessage: null,
+            ),
+            fixturesResponse: $fixturesResponse,
+        ));
+
+        $service->syncFixtures(39, 2026);
+
+        Event::assertDispatched(FixtureFinished::class, function (FixtureFinished $event) use ($league): bool {
+            return $event->league->is($league)
+                && $event->season === 2026
+                && $event->providerFixtureId === 1001;
+        });
+    }
+
+    public function test_sync_fixtures_does_not_dispatch_fixture_finished_when_fixture_was_already_finished(): void
+    {
+        Event::fake([FixtureFinished::class]);
+
+        $league = League::create([
+            'provider' => 'api_football',
+            'provider_league_id' => 39,
+            'name' => 'Premier League',
+            'type' => 'league',
+        ]);
+
+        $homeTeam = Team::create([
+            'provider' => 'api_football',
+            'provider_team_id' => 33,
+            'name' => 'Manchester United',
+        ]);
+
+        $awayTeam = Team::create([
+            'provider' => 'api_football',
+            'provider_team_id' => 50,
+            'name' => 'Manchester City',
+        ]);
+
+        Fixture::create([
+            'provider' => 'api_football',
+            'provider_fixture_id' => 1001,
+            'league_id' => $league->id,
+            'season' => 2026,
+            'status_short' => 'FT',
+            'home_team_id' => $homeTeam->id,
+            'away_team_id' => $awayTeam->id,
+            'finished_at' => now(),
+        ]);
+
+        $fixturesResponse = collect([
+            new FootballDataFixture(
+                provider: 'api_football',
+                endpoint: 'fixtures',
+                fixtureId: 1001,
+                leagueId: 39,
+                season: 2026,
+                response: [
+                    'fixture' => [
+                        'id' => 1001,
+                        'date' => '2026-08-12T16:30:00+00:00',
+                        'timezone' => 'UTC',
+                        'timestamp' => 1786552200,
+                        'status' => [
+                            'long' => 'Match Finished',
+                            'short' => 'FT',
+                            'elapsed' => 90,
+                        ],
+                    ],
+                    'league' => [
+                        'id' => 39,
+                        'season' => 2026,
+                        'round' => 'Regular Season - 1',
+                    ],
+                    'teams' => [
+                        'home' => ['id' => 33],
+                        'away' => ['id' => 50],
+                    ],
+                    'goals' => [
+                        'home' => 2,
+                        'away' => 1,
+                    ],
+                ],
+                errorMessage: null,
+            ),
+        ]);
+
+        $service = new FootballSyncService(new UnitFakeFootballDataClient(
+            leagueResponse: new FootballDataLeague(
+                provider: 'api_football',
+                endpoint: 'leagues',
+                leagueId: 39,
+                season: 2026,
+                response: ['league' => ['id' => 39, 'name' => 'Premier League', 'type' => 'League']],
+                errorMessage: null,
+            ),
+            fixturesResponse: $fixturesResponse,
+        ));
+
+        $service->syncFixtures(39, 2026);
+
+        Event::assertNotDispatched(FixtureFinished::class);
     }
 
     public function test_sync_standings_saves_standings_and_rows(): void
