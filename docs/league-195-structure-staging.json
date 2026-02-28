@@ -1562,7 +1562,269 @@
           ],
           "slot_assignment": "draw_or_manual",
           "slot_assignment_description": "Los equipos clasificados se cargan en F1R1..F1R8 seg\u00fan sorteo o carga manual."
-        }
+        },
+        "standings": [
+          {
+            "position": 1,
+            "team": 100,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 2,
+            "team": 101,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 3,
+            "team": 99,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 4,
+            "team": 96,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 5,
+            "team": 94,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 6,
+            "team": 90,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 7,
+            "team": 93,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 8,
+            "team": 88,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 9,
+            "team": 87,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 10,
+            "team": 83,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 11,
+            "team": 84,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 12,
+            "team": 86,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 13,
+            "team": 89,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 14,
+            "team": 85,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 15,
+            "team": 91,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 16,
+            "team": 97,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 17,
+            "team": 95,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 18,
+            "team": 98,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 19,
+            "team": 102,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 20,
+            "team": 92,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          }
+        ]
       },
       "F2": {
         "phase_id": "F2",
@@ -1596,6 +1858,34 @@
             "teams": [
               "F1R1",
               "F1R2"
+            ],
+            "standings": [
+              {
+                "position": 1,
+                "team": "F1R1",
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              },
+              {
+                "position": 2,
+                "team": "F1R2",
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              }
             ]
           },
           {
@@ -1622,6 +1912,34 @@
             "teams": [
               "F1R3",
               "F1R4"
+            ],
+            "standings": [
+              {
+                "position": 1,
+                "team": "F1R3",
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              },
+              {
+                "position": 2,
+                "team": "F1R4",
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              }
             ]
           },
           {
@@ -1648,6 +1966,34 @@
             "teams": [
               "F1R5",
               "F1R6"
+            ],
+            "standings": [
+              {
+                "position": 1,
+                "team": "F1R5",
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              },
+              {
+                "position": 2,
+                "team": "F1R6",
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              }
             ]
           },
           {
@@ -1674,6 +2020,34 @@
             "teams": [
               "F1R7",
               "F1R8"
+            ],
+            "standings": [
+              {
+                "position": 1,
+                "team": "F1R7",
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              },
+              {
+                "position": 2,
+                "team": "F1R8",
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              }
             ]
           }
         ],
@@ -1750,6 +2124,34 @@
             "teams": [
               "F2C",
               "F2A"
+            ],
+            "standings": [
+              {
+                "position": 1,
+                "team": "F2C",
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              },
+              {
+                "position": 2,
+                "team": "F2A",
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              }
             ]
           },
           {
@@ -1776,6 +2178,34 @@
             "teams": [
               "F2D",
               "F2B"
+            ],
+            "standings": [
+              {
+                "position": 1,
+                "team": "F2D",
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              },
+              {
+                "position": 2,
+                "team": "F2B",
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              }
             ]
           }
         ],
@@ -1820,6 +2250,34 @@
             "teams": [
               "F3B",
               "F3A"
+            ],
+            "standings": [
+              {
+                "position": 1,
+                "team": "F3B",
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              },
+              {
+                "position": 2,
+                "team": "F3A",
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              }
             ]
           }
         ],

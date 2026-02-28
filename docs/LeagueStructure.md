@@ -9,7 +9,8 @@ Provide one consistent format for:
 - league and playoff phases,
 - qualification rules,
 - pairings and team slots,
-- confirmed and pending fixtures.
+- confirmed and pending fixtures,
+- standings rows in every competitive step.
 
 ## Base Structure
 
@@ -30,6 +31,21 @@ Provide one consistent format for:
         "phase_type": "group",
         "group_mode": "single_group|multi_group",
         "match_type": "single_leg|two_legs",
+        "standings": [
+          {
+            "position": 1,
+            "team": 264,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          }
+        ],
         "qualification": {
           "advances_to_phase": "F2",
           "method": "ranking_table|best_ranked|manual",
@@ -69,6 +85,34 @@ Provide one consistent format for:
             "tie_id": "F2A",
             "name": "Quarterfinal 1",
             "teams": ["F1R1", "F1R8"],
+            "standings": [
+              {
+                "position": 1,
+                "team": "F1R1",
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              },
+              {
+                "position": 2,
+                "team": "F1R8",
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              }
+            ],
             "matches": [
               { "fixture_id": null, "leg": 1, "home_team_id": null, "away_team_id": null },
               { "fixture_id": null, "leg": 2, "home_team_id": null, "away_team_id": null }
@@ -86,6 +130,31 @@ Provide one consistent format for:
 - `group`: standings table (single table or multiple groups).
 - `playoff`: knockout ties.
 - `hybrid` (competition level): league/group phase + knockout phases.
+
+## Standings Rules
+
+- `single_group`: add `phase.standings` with one row per team in that group.
+- `multi_group`: add `group.standings` in each item inside `phase.groups`.
+- `playoff`: add `tie.standings` in every tie (normally 2 rows, one per team/slot).
+- If results are not available yet, create all standings rows anyway with stat fields in `null`.
+
+Standard standings row:
+
+```json
+{
+  "position": 1,
+  "team": 264,
+  "points": null,
+  "matches_played": null,
+  "matches_won": null,
+  "matches_drawn": null,
+  "matches_lost": null,
+  "goals_for": null,
+  "goals_against": null,
+  "home_goals_for": null,
+  "away_goals_for": null
+}
+```
 
 ## Organization And Qualification
 
@@ -120,12 +189,13 @@ Mandatory rules:
 2) Return phases as an object (not an array), keyed by F1, F2, F3...
 3) Include current_phase in season_structure.
 4) Every phase must include: phase_id, phase_name, order, phase_type, match_type.
-5) If phase_type=group: include group_mode, qualification, and matches.
-6) If phase_type=playoff: include seeding_method, ties, and matches per leg.
+5) If phase_type=group: include group_mode, qualification, matches, and standings.
+6) If phase_type=playoff: include seeding_method, ties, matches per leg, and standings per tie.
 7) If teams/fixtures are unknown, use null (do not invent IDs).
 8) If home/away leg rules depend on ranking, write them in notes/description.
 9) Keep stable naming and ordering (F2A, F2B, F3A...).
-10) Return only valid JSON.
+10) For multi_group, each group must include its own standings rows.
+11) Return only valid JSON.
 
 Tournament context:
 <paste exact competition rules here>
@@ -154,6 +224,10 @@ Task:
 - Keep unknown values as null.
 - Keep phases as object: F1, F2, F3...
 - Set season_structure.current_phase correctly.
+- Ensure standings are present in all applicable places:
+  - phase.standings for single_group,
+  - group.standings for multi_group,
+  - tie.standings for playoff ties.
 - Return JSON only.
 
 Base JSON:
@@ -174,6 +248,7 @@ Format:
 - From Round of 16 onward: knockout ties, two legs.
 - Final is single match at neutral venue.
 Include current_phase and phases as an object.
+Include standings in every phase/tie (use null stats when unknown).
 Use null when teams/fixtures are not known yet.
 Return JSON only.
 ```
@@ -189,6 +264,7 @@ Format:
 - Knockout rounds are single-leg matches.
 - Include third-place match.
 Include current_phase and phases as an object.
+Include standings in group phase and every knockout tie (null stats allowed).
 Use null when teams/fixtures are not known yet.
 Return JSON only.
 ```
