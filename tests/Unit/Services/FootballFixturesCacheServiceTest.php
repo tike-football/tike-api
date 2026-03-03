@@ -149,15 +149,20 @@ class FootballFixturesCacheServiceTest extends TestCase
         $this->assertArrayHasKey('matches', $cached);
         $this->assertArrayHasKey('players', $cached);
 
-        $this->assertArrayHasKey('39', $cached['leagues']);
-        $this->assertArrayHasKey('1001', $cached['matches']);
-        $this->assertArrayHasKey('42', $cached['teams']);
-        $this->assertArrayHasKey('501', $cached['players']);
+        $leagueKey = (string) $league->id;
+        $fixtureKey = (string) $fixture->id;
+        $teamKey = (string) $homeTeam->id;
+        $playerKey = (string) $player->id;
 
-        $this->assertContains('1001', $cached['indexes']['by_status']['live']);
-        $this->assertContains('1001', $cached['indexes']['by_league']['39']['live']);
-        $this->assertContains('1001', $cached['indexes']['team_matches']['42']['live']);
-        $this->assertSame('Regular Season - 10', $cached['matches']['1001']['round']);
+        $this->assertArrayHasKey($leagueKey, $cached['leagues']);
+        $this->assertArrayHasKey($fixtureKey, $cached['matches']);
+        $this->assertArrayHasKey($teamKey, $cached['teams']);
+        $this->assertArrayHasKey($playerKey, $cached['players']);
+
+        $this->assertContains($fixtureKey, $cached['indexes']['by_status']['live']);
+        $this->assertContains($fixtureKey, $cached['indexes']['by_league'][$leagueKey]['live']);
+        $this->assertContains($fixtureKey, $cached['indexes']['team_matches'][$teamKey]['live']);
+        $this->assertSame('Regular Season - 10', $cached['matches'][$fixtureKey]['round']);
         $this->assertNotNull($cacheId);
         $this->assertMatchesRegularExpression('/^\d{17}$/', (string) $cacheId);
         $this->assertSame($cacheId, $changesCacheId);
@@ -216,8 +221,10 @@ class FootballFixturesCacheServiceTest extends TestCase
 
         $changes = $service->cacheFixtureChanges();
 
-        $this->assertArrayHasKey('1001', $changes['matches']);
-        $this->assertSame(1, $changes['matches']['1001']['score']['home']);
+        $fixtureKey = (string) $fixture->id;
+
+        $this->assertArrayHasKey($fixtureKey, $changes['matches']);
+        $this->assertSame(1, $changes['matches'][$fixtureKey]['score']['home']);
         $this->assertSame($fullCacheId, Cache::get(FootballFixturesCacheService::CACHE_FIXTURES_ID));
         $updatedChangesCacheId = Cache::get(FootballFixturesCacheService::CACHE_FIXTURES_CHANGES_ID);
         $this->assertNotNull($updatedChangesCacheId);
@@ -225,7 +232,7 @@ class FootballFixturesCacheServiceTest extends TestCase
         $this->assertNotNull(Cache::get(FootballFixturesCacheService::CACHE_FIXTURES_CHANGES));
 
         $secondRun = $service->cacheFixtureChanges();
-        $this->assertArrayHasKey('1001', $secondRun['matches']);
-        $this->assertSame(1, $secondRun['matches']['1001']['score']['home']);
+        $this->assertArrayHasKey($fixtureKey, $secondRun['matches']);
+        $this->assertSame(1, $secondRun['matches'][$fixtureKey]['score']['home']);
     }
 }
