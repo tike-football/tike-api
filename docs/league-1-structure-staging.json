@@ -1731,7 +1731,7 @@
                 "away_team_id": 21
               }
             ],
-            "winner_slot": "F2A"
+            "winner_slot": "PO1_W"
           },
           {
             "tie_id": "PO2",
@@ -1785,7 +1785,7 @@
                 "away_team_id": 55
               }
             ],
-            "winner_slot": "F2B"
+            "winner_slot": "PO2_W"
           },
           {
             "tie_id": "PO3",
@@ -1839,7 +1839,7 @@
                 "away_team_id": 62
               }
             ],
-            "winner_slot": "F2C"
+            "winner_slot": "PO3_W"
           },
           {
             "tie_id": "PO4",
@@ -1893,7 +1893,7 @@
                 "away_team_id": 20
               }
             ],
-            "winner_slot": "F2D"
+            "winner_slot": "PO4_W"
           },
           {
             "tie_id": "PO5",
@@ -1947,7 +1947,7 @@
                 "away_team_id": 24
               }
             ],
-            "winner_slot": "F2E"
+            "winner_slot": "PO5_W"
           },
           {
             "tie_id": "PO6",
@@ -2001,7 +2001,7 @@
                 "away_team_id": 39
               }
             ],
-            "winner_slot": "F2F"
+            "winner_slot": "PO6_W"
           },
           {
             "tie_id": "PO7",
@@ -2055,7 +2055,7 @@
                 "away_team_id": 58
               }
             ],
-            "winner_slot": "F2G"
+            "winner_slot": "PO7_W"
           }
         ]
       },
@@ -2074,62 +2074,8 @@
             "draw_type": "draw",
             "match_type": "two_legs",
             "teams": [
-              2,
-              61
-            ],
-            "standings": [
-              {
-                "position": 1,
-                "team": 2,
-                "points": null,
-                "matches_played": null,
-                "matches_won": null,
-                "matches_drawn": null,
-                "matches_lost": null,
-                "goals_for": null,
-                "goals_against": null,
-                "home_goals_for": null,
-                "away_goals_for": null
-              },
-              {
-                "position": 2,
-                "team": 61,
-                "points": null,
-                "matches_played": null,
-                "matches_won": null,
-                "matches_drawn": null,
-                "matches_lost": null,
-                "goals_for": null,
-                "goals_against": null,
-                "home_goals_for": null,
-                "away_goals_for": null
-              }
-            ],
-            "legs": [
-              {
-                "leg": 1,
-                "fixture_id": 452,
-                "home_team_id": 61,
-                "away_team_id": 2
-              },
-              {
-                "leg": 2,
-                "fixture_id": 453,
-                "home_team_id": 2,
-                "away_team_id": 61
-              }
-            ],
-            "winner_slot": "F3A"
-          },
-          {
-            "tie_id": "R162",
-            "name": "Octavos 2",
-            "order": 2,
-            "draw_type": "draw",
-            "match_type": "two_legs",
-            "teams": [
-              1,
-              34
+              "PO1_W",
+              "PO2_W"
             ],
             "standings": [
               {
@@ -2173,179 +2119,17 @@
                 "away_team_id": 1
               }
             ],
-            "winner_slot": "F3B"
+            "winner_slot": "R161_W"
           },
           {
-            "tie_id": "R163",
-            "name": "Octavos 3",
-            "order": 3,
+            "tie_id": "R162",
+            "name": "Octavos 2",
+            "order": 2,
             "draw_type": "draw",
             "match_type": "two_legs",
             "teams": [
-              11,
-              32
-            ],
-            "standings": [
-              {
-                "position": 1,
-                "team": 11,
-                "points": null,
-                "matches_played": null,
-                "matches_won": null,
-                "matches_drawn": null,
-                "matches_lost": null,
-                "goals_for": null,
-                "goals_against": null,
-                "home_goals_for": null,
-                "away_goals_for": null
-              },
-              {
-                "position": 2,
-                "team": 32,
-                "points": null,
-                "matches_played": null,
-                "matches_won": null,
-                "matches_drawn": null,
-                "matches_lost": null,
-                "goals_for": null,
-                "goals_against": null,
-                "home_goals_for": null,
-                "away_goals_for": null
-              }
-            ],
-            "legs": [
-              {
-                "leg": 1,
-                "fixture_id": 449,
-                "home_team_id": 32,
-                "away_team_id": 11
-              },
-              {
-                "leg": 2,
-                "fixture_id": 458,
-                "home_team_id": 11,
-                "away_team_id": 32
-              }
-            ],
-            "winner_slot": "F3C"
-          },
-          {
-            "tie_id": "R164",
-            "name": "Octavos 4",
-            "order": 4,
-            "draw_type": "draw",
-            "match_type": "two_legs",
-            "teams": [
-              4,
-              35
-            ],
-            "standings": [
-              {
-                "position": 1,
-                "team": 4,
-                "points": null,
-                "matches_played": null,
-                "matches_won": null,
-                "matches_drawn": null,
-                "matches_lost": null,
-                "goals_for": null,
-                "goals_against": null,
-                "home_goals_for": null,
-                "away_goals_for": null
-              },
-              {
-                "position": 2,
-                "team": 35,
-                "points": null,
-                "matches_played": null,
-                "matches_won": null,
-                "matches_drawn": null,
-                "matches_lost": null,
-                "goals_for": null,
-                "goals_against": null,
-                "home_goals_for": null,
-                "away_goals_for": null
-              }
-            ],
-            "legs": [
-              {
-                "leg": 1,
-                "fixture_id": 450,
-                "home_team_id": 35,
-                "away_team_id": 4
-              },
-              {
-                "leg": 2,
-                "fixture_id": 455,
-                "home_team_id": 4,
-                "away_team_id": 35
-              }
-            ],
-            "winner_slot": "F3D"
-          },
-          {
-            "tie_id": "R165",
-            "name": "Octavos 5",
-            "order": 5,
-            "draw_type": "draw",
-            "match_type": "two_legs",
-            "teams": [
-              3,
-              13
-            ],
-            "standings": [
-              {
-                "position": 1,
-                "team": 3,
-                "points": null,
-                "matches_played": null,
-                "matches_won": null,
-                "matches_drawn": null,
-                "matches_lost": null,
-                "goals_for": null,
-                "goals_against": null,
-                "home_goals_for": null,
-                "away_goals_for": null
-              },
-              {
-                "position": 2,
-                "team": 13,
-                "points": null,
-                "matches_played": null,
-                "matches_won": null,
-                "matches_drawn": null,
-                "matches_lost": null,
-                "goals_for": null,
-                "goals_against": null,
-                "home_goals_for": null,
-                "away_goals_for": null
-              }
-            ],
-            "legs": [
-              {
-                "leg": 1,
-                "fixture_id": 447,
-                "home_team_id": 13,
-                "away_team_id": 3
-              },
-              {
-                "leg": 2,
-                "fixture_id": 454,
-                "home_team_id": 3,
-                "away_team_id": 13
-              }
-            ],
-            "winner_slot": "F3E"
-          },
-          {
-            "tie_id": "R166",
-            "name": "Octavos 6",
-            "order": 6,
-            "draw_type": "draw",
-            "match_type": "two_legs",
-            "teams": [
-              5,
-              9
+              "PO3_W",
+              "PO4_W"
             ],
             "standings": [
               {
@@ -2389,17 +2173,71 @@
                 "away_team_id": 9
               }
             ],
-            "winner_slot": "F3F"
+            "winner_slot": "R162_W"
           },
           {
-            "tie_id": "R167",
-            "name": "Octavos 7",
-            "order": 7,
+            "tie_id": "R163",
+            "name": "Octavos 3",
+            "order": 3,
             "draw_type": "draw",
             "match_type": "two_legs",
             "teams": [
-              19,
-              24
+              "PO5_W",
+              "PO6_W"
+            ],
+            "standings": [
+              {
+                "position": 1,
+                "team": 3,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              },
+              {
+                "position": 2,
+                "team": 13,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              }
+            ],
+            "legs": [
+              {
+                "leg": 1,
+                "fixture_id": 447,
+                "home_team_id": 13,
+                "away_team_id": 3
+              },
+              {
+                "leg": 2,
+                "fixture_id": 454,
+                "home_team_id": 3,
+                "away_team_id": 13
+              }
+            ],
+            "winner_slot": "R163_W"
+          },
+          {
+            "tie_id": "R164",
+            "name": "Octavos 4",
+            "order": 4,
+            "draw_type": "draw",
+            "match_type": "two_legs",
+            "teams": [
+              "PO7_W",
+              "PO8_W"
             ],
             "standings": [
               {
@@ -2443,17 +2281,125 @@
                 "away_team_id": 24
               }
             ],
-            "winner_slot": "F3G"
+            "winner_slot": "R164_W"
           },
           {
-            "tie_id": "R168",
-            "name": "Octavos 8",
-            "order": 8,
+            "tie_id": "R165",
+            "name": "Octavos 5",
+            "order": 5,
             "draw_type": "draw",
             "match_type": "two_legs",
             "teams": [
-              6,
-              38
+              "PO9_W",
+              "PO10_W"
+            ],
+            "standings": [
+              {
+                "position": 1,
+                "team": 11,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              },
+              {
+                "position": 2,
+                "team": 32,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              }
+            ],
+            "legs": [
+              {
+                "leg": 1,
+                "fixture_id": 449,
+                "home_team_id": 32,
+                "away_team_id": 11
+              },
+              {
+                "leg": 2,
+                "fixture_id": 458,
+                "home_team_id": 11,
+                "away_team_id": 32
+              }
+            ],
+            "winner_slot": "R165_W"
+          },
+          {
+            "tie_id": "R166",
+            "name": "Octavos 6",
+            "order": 6,
+            "draw_type": "draw",
+            "match_type": "two_legs",
+            "teams": [
+              "PO11_W",
+              "PO12_W"
+            ],
+            "standings": [
+              {
+                "position": 1,
+                "team": 4,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              },
+              {
+                "position": 2,
+                "team": 35,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              }
+            ],
+            "legs": [
+              {
+                "leg": 1,
+                "fixture_id": 450,
+                "home_team_id": 35,
+                "away_team_id": 4
+              },
+              {
+                "leg": 2,
+                "fixture_id": 455,
+                "home_team_id": 4,
+                "away_team_id": 35
+              }
+            ],
+            "winner_slot": "R166_W"
+          },
+          {
+            "tie_id": "R167",
+            "name": "Octavos 7",
+            "order": 7,
+            "draw_type": "draw",
+            "match_type": "two_legs",
+            "teams": [
+              "PO13_W",
+              "PO14_W"
             ],
             "standings": [
               {
@@ -2497,7 +2443,61 @@
                 "away_team_id": 38
               }
             ],
-            "winner_slot": "F3H"
+            "winner_slot": "R167_W"
+          },
+          {
+            "tie_id": "R168",
+            "name": "Octavos 8",
+            "order": 8,
+            "draw_type": "draw",
+            "match_type": "two_legs",
+            "teams": [
+              "PO15_W",
+              "PO16_W"
+            ],
+            "standings": [
+              {
+                "position": 1,
+                "team": 2,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              },
+              {
+                "position": 2,
+                "team": 61,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              }
+            ],
+            "legs": [
+              {
+                "leg": 1,
+                "fixture_id": 452,
+                "home_team_id": 61,
+                "away_team_id": 2
+              },
+              {
+                "leg": 2,
+                "fixture_id": 453,
+                "home_team_id": 2,
+                "away_team_id": 61
+              }
+            ],
+            "winner_slot": "R168_W"
           }
         ]
       },
@@ -2516,8 +2516,8 @@
             "draw_type": "draw",
             "match_type": "two_legs",
             "teams": [
-              "F3A",
-              "F3B"
+              "R161_W",
+              "R162_W"
             ],
             "standings": [
               {
@@ -2561,7 +2561,7 @@
                 "away_team_id": null
               }
             ],
-            "winner_slot": "F4A"
+            "winner_slot": "QF1_W"
           },
           {
             "tie_id": "QF2",
@@ -2570,8 +2570,8 @@
             "draw_type": "draw",
             "match_type": "two_legs",
             "teams": [
-              "F3C",
-              "F3D"
+              "R163_W",
+              "R164_W"
             ],
             "standings": [
               {
@@ -2615,7 +2615,7 @@
                 "away_team_id": null
               }
             ],
-            "winner_slot": "F4B"
+            "winner_slot": "QF2_W"
           },
           {
             "tie_id": "QF3",
@@ -2624,8 +2624,8 @@
             "draw_type": "draw",
             "match_type": "two_legs",
             "teams": [
-              "F3E",
-              "F3F"
+              "R165_W",
+              "R166_W"
             ],
             "standings": [
               {
@@ -2669,7 +2669,7 @@
                 "away_team_id": null
               }
             ],
-            "winner_slot": "F4C"
+            "winner_slot": "QF3_W"
           },
           {
             "tie_id": "QF4",
@@ -2678,8 +2678,8 @@
             "draw_type": "draw",
             "match_type": "two_legs",
             "teams": [
-              "F3G",
-              "F3H"
+              "R167_W",
+              "R168_W"
             ],
             "standings": [
               {
@@ -2723,7 +2723,7 @@
                 "away_team_id": null
               }
             ],
-            "winner_slot": "F4D"
+            "winner_slot": "QF4_W"
           }
         ]
       },
@@ -2742,8 +2742,8 @@
             "draw_type": "draw",
             "match_type": "two_legs",
             "teams": [
-              "F4A",
-              "F4B"
+              "QF1_W",
+              "QF2_W"
             ],
             "standings": [
               {
@@ -2787,7 +2787,7 @@
                 "away_team_id": null
               }
             ],
-            "winner_slot": "F5A"
+            "winner_slot": "SF1_W"
           },
           {
             "tie_id": "SF2",
@@ -2796,8 +2796,8 @@
             "draw_type": "draw",
             "match_type": "two_legs",
             "teams": [
-              "F4C",
-              "F4D"
+              "QF3_W",
+              "QF4_W"
             ],
             "standings": [
               {
@@ -2841,7 +2841,7 @@
                 "away_team_id": null
               }
             ],
-            "winner_slot": "F5B"
+            "winner_slot": "SF2_W"
           }
         ]
       },
@@ -2854,14 +2854,14 @@
         "seeding_method": "draw",
         "ties": [
           {
-            "tie_id": "F1",
-            "name": "Final 1",
+            "tie_id": "F",
+            "name": "Final",
             "order": 1,
             "draw_type": "draw",
             "match_type": "single_leg",
             "teams": [
-              "F5A",
-              "F5B"
+              "SF1_W",
+              "SF2_W"
             ],
             "standings": [
               {
@@ -2899,27 +2899,247 @@
                 "away_team_id": null
               }
             ],
-            "winner_slot": "F6A"
+            "winner_slot": "F_W"
           }
         ]
       }
     },
     "classified_team_slots": {
-      "F1R1": null,
-      "F1R2": null,
-      "F1R3": null,
-      "F1R4": null,
-      "F1R5": null,
-      "F1R6": null,
-      "F1R7": null,
-      "F1R8": null,
-      "F2A": null,
-      "F2B": null,
-      "F2C": null,
-      "F2D": null,
-      "F3A": null,
-      "F3B": null,
-      "F4A": null
+      "F1R1": {
+        "team1": null,
+        "team2": null,
+        "value": null
+      },
+      "F1R2": {
+        "team1": null,
+        "team2": null,
+        "value": null
+      },
+      "F1R3": {
+        "team1": null,
+        "team2": null,
+        "value": null
+      },
+      "F1R4": {
+        "team1": null,
+        "team2": null,
+        "value": null
+      },
+      "F1R5": {
+        "team1": null,
+        "team2": null,
+        "value": null
+      },
+      "F1R6": {
+        "team1": null,
+        "team2": null,
+        "value": null
+      },
+      "F1R7": {
+        "team1": null,
+        "team2": null,
+        "value": null
+      },
+      "F1R8": {
+        "team1": null,
+        "team2": null,
+        "value": null
+      },
+      "F1R9": {
+        "team1": null,
+        "team2": null,
+        "value": null
+      },
+      "F1R10": {
+        "team1": null,
+        "team2": null,
+        "value": null
+      },
+      "F1R11": {
+        "team1": null,
+        "team2": null,
+        "value": null
+      },
+      "F1R12": {
+        "team1": null,
+        "team2": null,
+        "value": null
+      },
+      "F1R13": {
+        "team1": null,
+        "team2": null,
+        "value": null
+      },
+      "F1R14": {
+        "team1": null,
+        "team2": null,
+        "value": null
+      },
+      "F1R15": {
+        "team1": null,
+        "team2": null,
+        "value": null
+      },
+      "F1R16": {
+        "team1": null,
+        "team2": null,
+        "value": null
+      },
+      "F1R17": {
+        "team1": null,
+        "team2": null,
+        "value": null
+      },
+      "F1R18": {
+        "team1": null,
+        "team2": null,
+        "value": null
+      },
+      "F1R19": {
+        "team1": null,
+        "team2": null,
+        "value": null
+      },
+      "F1R20": {
+        "team1": null,
+        "team2": null,
+        "value": null
+      },
+      "F1R21": {
+        "team1": null,
+        "team2": null,
+        "value": null
+      },
+      "F1R22": {
+        "team1": null,
+        "team2": null,
+        "value": null
+      },
+      "F1R23": {
+        "team1": null,
+        "team2": null,
+        "value": null
+      },
+      "F1R24": {
+        "team1": null,
+        "team2": null,
+        "value": null
+      },
+      "PO1_W": {
+        "team1": "F1R9",
+        "team2": "F1R24",
+        "value": null
+      },
+      "PO2_W": {
+        "team1": "F1R10",
+        "team2": "F1R23",
+        "value": null
+      },
+      "PO3_W": {
+        "team1": "F1R11",
+        "team2": "F1R22",
+        "value": null
+      },
+      "PO4_W": {
+        "team1": "F1R12",
+        "team2": "F1R21",
+        "value": null
+      },
+      "PO5_W": {
+        "team1": "F1R13",
+        "team2": "F1R20",
+        "value": null
+      },
+      "PO6_W": {
+        "team1": "F1R14",
+        "team2": "F1R19",
+        "value": null
+      },
+      "PO7_W": {
+        "team1": "F1R15",
+        "team2": "F1R18",
+        "value": null
+      },
+      "PO8_W": {
+        "team1": "F1R16",
+        "team2": "F1R17",
+        "value": null
+      },
+      "R161_W": {
+        "team1": "PO1_W",
+        "team2": "PO2_W",
+        "value": null
+      },
+      "R162_W": {
+        "team1": "PO3_W",
+        "team2": "PO4_W",
+        "value": null
+      },
+      "R163_W": {
+        "team1": "PO5_W",
+        "team2": "PO6_W",
+        "value": null
+      },
+      "R164_W": {
+        "team1": "PO7_W",
+        "team2": "PO8_W",
+        "value": null
+      },
+      "R165_W": {
+        "team1": "PO9_W",
+        "team2": "PO10_W",
+        "value": null
+      },
+      "R166_W": {
+        "team1": "PO11_W",
+        "team2": "PO12_W",
+        "value": null
+      },
+      "R167_W": {
+        "team1": "PO13_W",
+        "team2": "PO14_W",
+        "value": null
+      },
+      "R168_W": {
+        "team1": "PO15_W",
+        "team2": "PO16_W",
+        "value": null
+      },
+      "QF1_W": {
+        "team1": "R161_W",
+        "team2": "R162_W",
+        "value": null
+      },
+      "QF2_W": {
+        "team1": "R163_W",
+        "team2": "R164_W",
+        "value": null
+      },
+      "QF3_W": {
+        "team1": "R165_W",
+        "team2": "R166_W",
+        "value": null
+      },
+      "QF4_W": {
+        "team1": "R167_W",
+        "team2": "R168_W",
+        "value": null
+      },
+      "SF1_W": {
+        "team1": "QF1_W",
+        "team2": "QF2_W",
+        "value": null
+      },
+      "SF2_W": {
+        "team1": "QF3_W",
+        "team2": "QF4_W",
+        "value": null
+      },
+      "F_W": {
+        "team1": "SF1_W",
+        "team2": "SF2_W",
+        "value": null
+      }
     }
   }
 }

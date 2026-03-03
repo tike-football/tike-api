@@ -90,11 +90,10 @@ class FootballSyncLeagueStructureService
             }
 
             if (isset($phase['classified_team_slots']) && is_array($phase['classified_team_slots'])) {
-                foreach (array_keys($phase['classified_team_slots']) as $slot) {
-                    if (array_key_exists($slot, $slotAssignments)) {
-                        $phase['classified_team_slots'][$slot] = $slotAssignments[$slot];
-                    }
-                }
+                $phase['classified_team_slots'] = $this->applySlotAssignmentsToSlots(
+                    $phase['classified_team_slots'],
+                    $slotAssignments
+                );
             }
 
             foreach (($phase['ties'] ?? []) as $tie) {
@@ -121,6 +120,12 @@ class FootballSyncLeagueStructureService
         }
 
         $seasonStructure['phases'] = $phases;
+        if (isset($seasonStructure['classified_team_slots']) && is_array($seasonStructure['classified_team_slots'])) {
+            $seasonStructure['classified_team_slots'] = $this->applySlotAssignmentsToSlots(
+                $seasonStructure['classified_team_slots'],
+                $slotAssignments
+            );
+        }
         $seasonStructure = $this->syncCurrentPhase($seasonStructure, $slotAssignments, $fixtures);
         $structure['season_structure'] = $seasonStructure;
 
@@ -1048,5 +1053,31 @@ class FootballSyncLeagueStructureService
             ->values();
 
         return $items->pluck('key')->all();
+    }
+
+    /**
+     * @param array<string, mixed> $slots
+     * @param array<string, int> $slotAssignments
+     * @return array<string, mixed>
+     */
+    private function applySlotAssignmentsToSlots(array $slots, array $slotAssignments): array
+    {
+        foreach ($slots as $slotKey => $slotValue) {
+            if (!array_key_exists($slotKey, $slotAssignments)) {
+                continue;
+            }
+
+            $assigned = $slotAssignments[$slotKey];
+
+            if (is_array($slotValue)) {
+                $slotValue['value'] = $assigned;
+                $slots[$slotKey] = $slotValue;
+                continue;
+            }
+
+            $slots[$slotKey] = $assigned;
+        }
+
+        return $slots;
     }
 }
