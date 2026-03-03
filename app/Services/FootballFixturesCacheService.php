@@ -523,13 +523,13 @@ class FootballFixturesCacheService
                 continue;
             }
 
-            $fixtureKey = (string) $fixture->provider_fixture_id;
-            $leagueProviderId = (string) $fixture->league->provider_league_id;
+            $fixtureKey = (string) $fixture->id;
+            $leagueKey = (string) $fixture->league->id;
             $status = $this->mapFixtureStatus($fixture->status_short);
 
-            if (!isset($payload['leagues'][$leagueProviderId])) {
-                $payload['leagues'][$leagueProviderId] = [
-                    'id' => (int) $fixture->league->provider_league_id,
+            if (!isset($payload['leagues'][$leagueKey])) {
+                $payload['leagues'][$leagueKey] = [
+                    'id' => (int) $fixture->league->id,
                     'name' => $fixture->league->name,
                     'country' => $fixture->league->country_name,
                     'season' => (int) $fixture->season,
@@ -545,51 +545,51 @@ class FootballFixturesCacheService
                 ];
             }
 
-            if (!isset($payload['indexes']['by_league'][$leagueProviderId])) {
-                $payload['indexes']['by_league'][$leagueProviderId] = [
+            if (!isset($payload['indexes']['by_league'][$leagueKey])) {
+                $payload['indexes']['by_league'][$leagueKey] = [
                     'live' => [],
                     'upcoming' => [],
                     'finished' => [],
                 ];
             }
 
-            $homeProviderTeamId = $fixture->homeTeam?->provider_team_id;
-            $awayProviderTeamId = $fixture->awayTeam?->provider_team_id;
-            $homeProviderTeamKey = $homeProviderTeamId !== null ? (string) $homeProviderTeamId : null;
-            $awayProviderTeamKey = $awayProviderTeamId !== null ? (string) $awayProviderTeamId : null;
+            $homeTeamId = $fixture->homeTeam?->id;
+            $awayTeamId = $fixture->awayTeam?->id;
+            $homeTeamKey = $homeTeamId !== null ? (string) $homeTeamId : null;
+            $awayTeamKey = $awayTeamId !== null ? (string) $awayTeamId : null;
 
             $teamStats = [];
             $playersByTeam = [];
 
             foreach ($fixture->teamStats as $stat) {
-                $providerTeamId = $stat->team?->provider_team_id;
-                if ($providerTeamId === null) {
+                $statTeamId = $stat->team?->id;
+                if ($statTeamId === null) {
                     continue;
                 }
 
-                $providerTeamKey = (string) $providerTeamId;
-                $teamStats[$providerTeamKey] = [
+                $statTeamKey = (string) $statTeamId;
+                $teamStats[$statTeamKey] = [
                     'goals' => $stat->goals,
                     'winner' => $stat->winner,
                     'statistics' => $stat->raw_statistics,
                 ];
-                $playersByTeam[$providerTeamKey] = [
+                $playersByTeam[$statTeamKey] = [
                     'starters' => [],
                     'bench' => [],
                 ];
             }
 
             $payload['matches'][$fixtureKey] = [
-                'id' => (int) $fixture->provider_fixture_id,
-                'league_id' => (int) $fixture->league->provider_league_id,
+                'id' => (int) $fixture->id,
+                'league_id' => (int) $fixture->league->id,
                 'season' => (int) $fixture->season,
                 'round' => $fixture->round,
                 'status' => $status,
                 'status_short' => $fixture->status_short,
                 'minute' => $fixture->status_elapsed,
                 'date' => $fixture->fixture_date?->toIso8601String(),
-                'home_team_id' => $homeProviderTeamId,
-                'away_team_id' => $awayProviderTeamId,
+                'home_team_id' => $homeTeamId,
+                'away_team_id' => $awayTeamId,
                 'score' => [
                     'home' => $fixture->home_goals,
                     'away' => $fixture->away_goals,
@@ -599,36 +599,36 @@ class FootballFixturesCacheService
             ];
 
             $payload['indexes']['by_status'][$status][] = $fixtureKey;
-            $payload['indexes']['by_league'][$leagueProviderId][$status][] = $fixtureKey;
-            $payload['leagues'][$leagueProviderId]['matches'][$status][] = $fixtureKey;
+            $payload['indexes']['by_league'][$leagueKey][$status][] = $fixtureKey;
+            $payload['leagues'][$leagueKey]['matches'][$status][] = $fixtureKey;
 
-            $currentRound = $payload['leagues'][$leagueProviderId]['round'] ?? null;
+            $currentRound = $payload['leagues'][$leagueKey]['round'] ?? null;
             $fixtureRound = $fixture->round;
-            $currentRoundStatus = $leagueRoundStatus[$leagueProviderId] ?? null;
+            $currentRoundStatus = $leagueRoundStatus[$leagueKey] ?? null;
             if ($this->shouldPromoteLeagueRound($currentRound, $fixtureRound, $status, $currentRoundStatus)) {
-                $payload['leagues'][$leagueProviderId]['round'] = $fixtureRound;
-                $leagueRoundStatus[$leagueProviderId] = $status;
+                $payload['leagues'][$leagueKey]['round'] = $fixtureRound;
+                $leagueRoundStatus[$leagueKey] = $status;
             }
 
-            if ($homeProviderTeamKey !== null && $fixture->homeTeam !== null) {
-                $payload['leagues'][$leagueProviderId]['teams'][] = $homeProviderTeamKey;
-                $payload['indexes']['team_matches'][$homeProviderTeamKey] = $payload['indexes']['team_matches'][$homeProviderTeamKey] ?? [
+            if ($homeTeamKey !== null && $fixture->homeTeam !== null) {
+                $payload['leagues'][$leagueKey]['teams'][] = $homeTeamKey;
+                $payload['indexes']['team_matches'][$homeTeamKey] = $payload['indexes']['team_matches'][$homeTeamKey] ?? [
                     'live' => [],
                     'upcoming' => [],
                     'finished' => [],
                 ];
-                $payload['indexes']['team_matches'][$homeProviderTeamKey][$status][] = $fixtureKey;
+                $payload['indexes']['team_matches'][$homeTeamKey][$status][] = $fixtureKey;
                 $teamLocalIds[] = $fixture->homeTeam->id;
             }
 
-            if ($awayProviderTeamKey !== null && $fixture->awayTeam !== null) {
-                $payload['leagues'][$leagueProviderId]['teams'][] = $awayProviderTeamKey;
-                $payload['indexes']['team_matches'][$awayProviderTeamKey] = $payload['indexes']['team_matches'][$awayProviderTeamKey] ?? [
+            if ($awayTeamKey !== null && $fixture->awayTeam !== null) {
+                $payload['leagues'][$leagueKey]['teams'][] = $awayTeamKey;
+                $payload['indexes']['team_matches'][$awayTeamKey] = $payload['indexes']['team_matches'][$awayTeamKey] ?? [
                     'live' => [],
                     'upcoming' => [],
                     'finished' => [],
                 ];
-                $payload['indexes']['team_matches'][$awayProviderTeamKey][$status][] = $fixtureKey;
+                $payload['indexes']['team_matches'][$awayTeamKey][$status][] = $fixtureKey;
                 $teamLocalIds[] = $fixture->awayTeam->id;
             }
         }
@@ -666,17 +666,17 @@ class FootballFixturesCacheService
                 continue;
             }
 
-            $teamProviderId = $row->team?->provider_team_id;
-            if ($teamProviderId === null) {
+            $teamId = $row->team?->id;
+            if ($teamId === null) {
                 continue;
             }
 
-            $teamProviderKey = (string) $teamProviderId;
-            $leagueProviderId = (int) $row->standing->league->provider_league_id;
+            $teamKey = (string) $teamId;
+            $leagueId = (int) $row->standing->league->id;
             $season = (int) $row->standing->season;
-            $leagueSeasonKey = $leagueProviderId . '_' . $season;
+            $leagueSeasonKey = $leagueId . '_' . $season;
 
-            $teamLeagueStats[$teamProviderKey][$leagueSeasonKey] = [
+            $teamLeagueStats[$teamKey][$leagueSeasonKey] = [
                 'rank' => $row->rank_position,
                 'points' => $row->points,
                 'played' => $row->matches_played,
@@ -697,18 +697,18 @@ class FootballFixturesCacheService
         $teamPlayers = [];
 
         foreach ($teams as $team) {
-            $providerTeamKey = (string) $team->provider_team_id;
+            $teamKey = (string) $team->id;
 
             $leagueIds = [];
             foreach ($playerStats->where('team_id', $team->id) as $stat) {
                 if ($stat->league !== null) {
-                    $leagueIds[] = (int) $stat->league->provider_league_id;
+                    $leagueIds[] = (int) $stat->league->id;
                 }
             }
             $leagueIds = array_values(array_unique($leagueIds));
 
-            $payload['teams'][$providerTeamKey] = [
-                'id' => (int) $team->provider_team_id,
+            $payload['teams'][$teamKey] = [
+                'id' => (int) $team->id,
                 'league_ids' => $leagueIds,
                 'name' => $team->name,
                 'code' => $team->code,
@@ -720,8 +720,8 @@ class FootballFixturesCacheService
                     'city' => $team->venue_city,
                 ],
                 'current_form' => null,
-                'league_stats' => $teamLeagueStats[$providerTeamKey] ?? [],
-                'matches' => $payload['indexes']['team_matches'][$providerTeamKey] ?? [
+                'league_stats' => $teamLeagueStats[$teamKey] ?? [],
+                'matches' => $payload['indexes']['team_matches'][$teamKey] ?? [
                     'live' => [],
                     'upcoming' => [],
                     'finished' => [],
@@ -735,24 +735,24 @@ class FootballFixturesCacheService
                 continue;
             }
 
-            $playerKey = (string) $stat->player->provider_player_id;
-            $teamProviderId = (int) $stat->team->provider_team_id;
-            $teamProviderKey = (string) $teamProviderId;
-            $leagueProviderId = (int) $stat->league->provider_league_id;
-            $leagueSeasonKey = $leagueProviderId . '_' . (int) $stat->season;
+            $playerKey = (string) $stat->player->id;
+            $teamId = (int) $stat->team->id;
+            $teamKey = (string) $teamId;
+            $leagueId = (int) $stat->league->id;
+            $leagueSeasonKey = $leagueId . '_' . (int) $stat->season;
 
             if (!isset($payload['players'][$playerKey])) {
                 $payload['players'][$playerKey] = [
-                    'id' => (int) $stat->player->provider_player_id,
+                    'id' => (int) $stat->player->id,
                     'name' => $stat->player->full_name ?? trim((string) $stat->player->firstname . ' ' . (string) $stat->player->lastname),
-                    'team_id' => $teamProviderId,
+                    'team_id' => $teamId,
                     'league_ids' => [],
                     'match_stats' => [],
                     'league_stats' => [],
                 ];
             }
 
-            $payload['players'][$playerKey]['league_ids'][] = $leagueProviderId;
+            $payload['players'][$playerKey]['league_ids'][] = $leagueId;
             $payload['players'][$playerKey]['league_stats'][$leagueSeasonKey] = [
                 'appearances' => $stat->games_appearences,
                 'goals' => $stat->goals_total,
@@ -761,7 +761,7 @@ class FootballFixturesCacheService
                 'red_cards' => $stat->cards_red,
             ];
 
-            $teamPlayers[$teamProviderKey][] = $playerKey;
+            $teamPlayers[$teamKey][] = $playerKey;
         }
 
         foreach ($payload['teams'] as $teamKey => &$teamPayload) {

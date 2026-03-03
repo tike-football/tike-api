@@ -36,7 +36,7 @@ class CacheFixturesCommandTest extends TestCase
             'name' => 'Chelsea',
         ]);
 
-        Fixture::create([
+        $fixture = Fixture::create([
             'provider' => 'api_football',
             'provider_fixture_id' => 1001,
             'league_id' => $league->id,
@@ -55,7 +55,7 @@ class CacheFixturesCommandTest extends TestCase
 
         $this->assertNotNull($cached);
         $this->assertArrayHasKey('matches', $cached);
-        $this->assertArrayHasKey('1001', $cached['matches']);
+        $this->assertArrayHasKey((string) $fixture->id, $cached['matches']);
     }
 
     public function test_cache_fixtures_command_rebuilds_when_full_and_changes_ids_are_equal(): void
@@ -80,7 +80,7 @@ class CacheFixturesCommandTest extends TestCase
             'name' => 'Chelsea',
         ]);
 
-        Fixture::create([
+        $fixture = Fixture::create([
             'provider' => 'api_football',
             'provider_fixture_id' => 1001,
             'league_id' => $league->id,
@@ -101,7 +101,7 @@ class CacheFixturesCommandTest extends TestCase
 
         $this->assertNotNull($cached);
         $this->assertArrayHasKey('matches', $cached);
-        $this->assertArrayHasKey('1001', $cached['matches']);
+        $this->assertArrayHasKey((string) $fixture->id, $cached['matches']);
     }
 
     public function test_cache_fixtures_changes_command_stores_changes_payload_in_cache(): void
@@ -159,8 +159,9 @@ class CacheFixturesCommandTest extends TestCase
 
         $this->assertNotNull($cached);
         $this->assertArrayHasKey('matches', $cached);
-        $this->assertArrayHasKey('1001', $cached['matches']);
-        $this->assertSame(1, $cached['matches']['1001']['score']['home']);
+        $fixtureKey = (string) $fixture->id;
+        $this->assertArrayHasKey($fixtureKey, $cached['matches']);
+        $this->assertSame(1, $cached['matches'][$fixtureKey]['score']['home']);
     }
 
     public function test_cache_fixtures_changes_command_skips_when_no_relevant_fixtures(): void
