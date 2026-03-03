@@ -89,13 +89,6 @@ class FootballSyncLeagueStructureService
             );
             }
 
-            if (isset($phase['classified_team_slots']) && is_array($phase['classified_team_slots'])) {
-                $phase['classified_team_slots'] = $this->applySlotAssignmentsToSlots(
-                    $phase['classified_team_slots'],
-                    $slotAssignments
-                );
-            }
-
             foreach (($phase['ties'] ?? []) as $tie) {
                 if (!is_array($tie)) {
                     continue;
@@ -114,6 +107,13 @@ class FootballSyncLeagueStructureService
                 ) {
                     $slotAssignments[$winnerSlot] = $winnerTeam;
                 }
+            }
+
+            if (isset($phase['classified_team_slots']) && is_array($phase['classified_team_slots'])) {
+                $phase['classified_team_slots'] = $this->applySlotAssignmentsToSlots(
+                    $phase['classified_team_slots'],
+                    $slotAssignments
+                );
             }
 
             $phases[$phaseKey] = $phase;
