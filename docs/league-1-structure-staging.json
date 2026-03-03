@@ -1,0 +1,2925 @@
+{
+  "league_id": 1,
+  "provider_league_id": 2,
+  "season_structure": {
+    "schema_version": 1,
+    "competition_type": "hybrid",
+    "current_phase": "F3",
+    "notes": "Estructura basada en el formato actual (Fase de liga + Play-off + Octavos + Cuartos + Semifinal + Final). Fases posteriores sin fixtures definidos quedan en null.",
+    "phases": {
+      "F1": {
+        "phase_id": "F1",
+        "phase_name": "Fase de Liga",
+        "order": 1,
+        "phase_type": "group",
+        "group_mode": "single_group",
+        "match_type": "single_leg",
+        "standings": [
+          {
+            "position": 1,
+            "team": 1,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 2,
+            "team": 2,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 3,
+            "team": 3,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 4,
+            "team": 4,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 5,
+            "team": 5,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 6,
+            "team": 6,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 7,
+            "team": 7,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 8,
+            "team": 9,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 9,
+            "team": 10,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 10,
+            "team": 11,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 11,
+            "team": 12,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 12,
+            "team": 13,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 13,
+            "team": 14,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 14,
+            "team": 15,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 15,
+            "team": 16,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 16,
+            "team": 18,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 17,
+            "team": 19,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 18,
+            "team": 24,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 19,
+            "team": 29,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 20,
+            "team": 30,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 21,
+            "team": 31,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 22,
+            "team": 32,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 23,
+            "team": 33,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 24,
+            "team": 34,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 25,
+            "team": 35,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 26,
+            "team": 36,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 27,
+            "team": 37,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 28,
+            "team": 38,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 29,
+            "team": 40,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 30,
+            "team": 41,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 31,
+            "team": 43,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 32,
+            "team": 47,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 33,
+            "team": 61,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 34,
+            "team": 64,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 35,
+            "team": 70,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          },
+          {
+            "position": 36,
+            "team": 75,
+            "points": null,
+            "matches_played": null,
+            "matches_won": null,
+            "matches_drawn": null,
+            "matches_lost": null,
+            "goals_for": null,
+            "goals_against": null,
+            "home_goals_for": null,
+            "away_goals_for": null
+          }
+        ],
+        "qualification": {
+          "advances_to_phase": "F2",
+          "method": "ranking_table",
+          "qualified_positions": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24
+          ],
+          "description": "Posiciones 1-8 avanzan a Octavos; 9-24 juegan Play-off.",
+          "qualified_count": 24
+        },
+        "matches": [
+          {
+            "fixture_id": 93,
+            "home_team_id": 16,
+            "away_team_id": 70,
+            "round": "League Stage - 1",
+            "fixture_date": "2025-09-16 16:45:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 94,
+            "home_team_id": 36,
+            "away_team_id": 3,
+            "round": "League Stage - 1",
+            "fixture_date": "2025-09-16 16:45:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 95,
+            "home_team_id": 4,
+            "away_team_id": 37,
+            "round": "League Stage - 1",
+            "fixture_date": "2025-09-16 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 96,
+            "home_team_id": 18,
+            "away_team_id": 41,
+            "round": "League Stage - 1",
+            "fixture_date": "2025-09-16 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 97,
+            "home_team_id": 31,
+            "away_team_id": 12,
+            "round": "League Stage - 1",
+            "fixture_date": "2025-09-16 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 98,
+            "home_team_id": 38,
+            "away_team_id": 7,
+            "round": "League Stage - 1",
+            "fixture_date": "2025-09-16 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 99,
+            "home_team_id": 40,
+            "away_team_id": 75,
+            "round": "League Stage - 1",
+            "fixture_date": "2025-09-17 16:45:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 100,
+            "home_team_id": 43,
+            "away_team_id": 24,
+            "round": "League Stage - 1",
+            "fixture_date": "2025-09-17 16:45:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 101,
+            "home_team_id": 2,
+            "away_team_id": 35,
+            "round": "League Stage - 1",
+            "fixture_date": "2025-09-17 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 102,
+            "home_team_id": 9,
+            "away_team_id": 32,
+            "round": "League Stage - 1",
+            "fixture_date": "2025-09-17 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 103,
+            "home_team_id": 11,
+            "away_team_id": 5,
+            "round": "League Stage - 1",
+            "fixture_date": "2025-09-17 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 104,
+            "home_team_id": 15,
+            "away_team_id": 33,
+            "round": "League Stage - 1",
+            "fixture_date": "2025-09-17 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 105,
+            "home_team_id": 29,
+            "away_team_id": 13,
+            "round": "League Stage - 1",
+            "fixture_date": "2025-09-18 16:45:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 106,
+            "home_team_id": 47,
+            "away_team_id": 10,
+            "round": "League Stage - 1",
+            "fixture_date": "2025-09-18 16:45:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 107,
+            "home_team_id": 1,
+            "away_team_id": 34,
+            "round": "League Stage - 1",
+            "fixture_date": "2025-09-18 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 108,
+            "home_team_id": 6,
+            "away_team_id": 30,
+            "round": "League Stage - 1",
+            "fixture_date": "2025-09-18 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 109,
+            "home_team_id": 14,
+            "away_team_id": 61,
+            "round": "League Stage - 1",
+            "fixture_date": "2025-09-18 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 110,
+            "home_team_id": 19,
+            "away_team_id": 64,
+            "round": "League Stage - 1",
+            "fixture_date": "2025-09-18 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 111,
+            "home_team_id": 32,
+            "away_team_id": 47,
+            "round": "League Stage - 2",
+            "fixture_date": "2025-09-30 16:45:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 112,
+            "home_team_id": 64,
+            "away_team_id": 38,
+            "round": "League Stage - 2",
+            "fixture_date": "2025-09-30 16:45:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 113,
+            "home_team_id": 5,
+            "away_team_id": 18,
+            "round": "League Stage - 2",
+            "fixture_date": "2025-09-30 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 114,
+            "home_team_id": 7,
+            "away_team_id": 15,
+            "round": "League Stage - 2",
+            "fixture_date": "2025-09-30 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 115,
+            "home_team_id": 24,
+            "away_team_id": 4,
+            "round": "League Stage - 2",
+            "fixture_date": "2025-09-30 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 116,
+            "home_team_id": 33,
+            "away_team_id": 43,
+            "round": "League Stage - 2",
+            "fixture_date": "2025-09-30 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 117,
+            "home_team_id": 35,
+            "away_team_id": 14,
+            "round": "League Stage - 2",
+            "fixture_date": "2025-09-30 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 118,
+            "home_team_id": 61,
+            "away_team_id": 2,
+            "round": "League Stage - 2",
+            "fixture_date": "2025-09-30 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 119,
+            "home_team_id": 75,
+            "away_team_id": 11,
+            "round": "League Stage - 2",
+            "fixture_date": "2025-09-30 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 120,
+            "home_team_id": 41,
+            "away_team_id": 29,
+            "round": "League Stage - 2",
+            "fixture_date": "2025-10-01 16:45:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 121,
+            "home_team_id": 70,
+            "away_team_id": 1,
+            "round": "League Stage - 2",
+            "fixture_date": "2025-10-01 16:45:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 122,
+            "home_team_id": 3,
+            "away_team_id": 40,
+            "round": "League Stage - 2",
+            "fixture_date": "2025-10-01 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 123,
+            "home_team_id": 10,
+            "away_team_id": 6,
+            "round": "League Stage - 2",
+            "fixture_date": "2025-10-01 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 124,
+            "home_team_id": 12,
+            "away_team_id": 36,
+            "round": "League Stage - 2",
+            "fixture_date": "2025-10-01 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 125,
+            "home_team_id": 13,
+            "away_team_id": 16,
+            "round": "League Stage - 2",
+            "fixture_date": "2025-10-01 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 126,
+            "home_team_id": 30,
+            "away_team_id": 19,
+            "round": "League Stage - 2",
+            "fixture_date": "2025-10-01 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 127,
+            "home_team_id": 34,
+            "away_team_id": 9,
+            "round": "League Stage - 2",
+            "fixture_date": "2025-10-01 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 128,
+            "home_team_id": 37,
+            "away_team_id": 31,
+            "round": "League Stage - 2",
+            "fixture_date": "2025-10-01 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 129,
+            "home_team_id": 34,
+            "away_team_id": 40,
+            "round": "League Stage - 3",
+            "fixture_date": "2025-10-21 16:45:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 130,
+            "home_team_id": 64,
+            "away_team_id": 75,
+            "round": "League Stage - 3",
+            "fixture_date": "2025-10-21 16:45:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 131,
+            "home_team_id": 1,
+            "away_team_id": 18,
+            "round": "League Stage - 3",
+            "fixture_date": "2025-10-21 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 132,
+            "home_team_id": 3,
+            "away_team_id": 35,
+            "round": "League Stage - 3",
+            "fixture_date": "2025-10-21 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 133,
+            "home_team_id": 13,
+            "away_team_id": 9,
+            "round": "League Stage - 3",
+            "fixture_date": "2025-10-21 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 134,
+            "home_team_id": 16,
+            "away_team_id": 30,
+            "round": "League Stage - 3",
+            "fixture_date": "2025-10-21 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 135,
+            "home_team_id": 29,
+            "away_team_id": 12,
+            "round": "League Stage - 3",
+            "fixture_date": "2025-10-21 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 136,
+            "home_team_id": 37,
+            "away_team_id": 6,
+            "round": "League Stage - 3",
+            "fixture_date": "2025-10-21 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 137,
+            "home_team_id": 70,
+            "away_team_id": 33,
+            "round": "League Stage - 3",
+            "fixture_date": "2025-10-21 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 138,
+            "home_team_id": 36,
+            "away_team_id": 41,
+            "round": "League Stage - 3",
+            "fixture_date": "2025-10-22 16:45:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 139,
+            "home_team_id": 61,
+            "away_team_id": 24,
+            "round": "League Stage - 3",
+            "fixture_date": "2025-10-22 16:45:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 140,
+            "home_team_id": 5,
+            "away_team_id": 15,
+            "round": "League Stage - 3",
+            "fixture_date": "2025-10-22 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 141,
+            "home_team_id": 10,
+            "away_team_id": 4,
+            "round": "League Stage - 3",
+            "fixture_date": "2025-10-22 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 142,
+            "home_team_id": 11,
+            "away_team_id": 47,
+            "round": "League Stage - 3",
+            "fixture_date": "2025-10-22 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 143,
+            "home_team_id": 14,
+            "away_team_id": 2,
+            "round": "League Stage - 3",
+            "fixture_date": "2025-10-22 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 144,
+            "home_team_id": 19,
+            "away_team_id": 7,
+            "round": "League Stage - 3",
+            "fixture_date": "2025-10-22 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 145,
+            "home_team_id": 32,
+            "away_team_id": 43,
+            "round": "League Stage - 3",
+            "fixture_date": "2025-10-22 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 146,
+            "home_team_id": 38,
+            "away_team_id": 31,
+            "round": "League Stage - 3",
+            "fixture_date": "2025-10-22 19:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 147,
+            "home_team_id": 30,
+            "away_team_id": 14,
+            "round": "League Stage - 4",
+            "fixture_date": "2025-11-04 17:45:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 148,
+            "home_team_id": 43,
+            "away_team_id": 3,
+            "round": "League Stage - 4",
+            "fixture_date": "2025-11-04 17:45:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 149,
+            "home_team_id": 2,
+            "away_team_id": 38,
+            "round": "League Stage - 4",
+            "fixture_date": "2025-11-04 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 150,
+            "home_team_id": 4,
+            "away_team_id": 29,
+            "round": "League Stage - 4",
+            "fixture_date": "2025-11-04 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 151,
+            "home_team_id": 9,
+            "away_team_id": 11,
+            "round": "League Stage - 4",
+            "fixture_date": "2025-11-04 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 152,
+            "home_team_id": 24,
+            "away_team_id": 10,
+            "round": "League Stage - 4",
+            "fixture_date": "2025-11-04 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 153,
+            "home_team_id": 31,
+            "away_team_id": 19,
+            "round": "League Stage - 4",
+            "fixture_date": "2025-11-04 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 154,
+            "home_team_id": 35,
+            "away_team_id": 70,
+            "round": "League Stage - 4",
+            "fixture_date": "2025-11-04 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 155,
+            "home_team_id": 40,
+            "away_team_id": 16,
+            "round": "League Stage - 4",
+            "fixture_date": "2025-11-04 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 156,
+            "home_team_id": 41,
+            "away_team_id": 5,
+            "round": "League Stage - 4",
+            "fixture_date": "2025-11-05 17:45:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 157,
+            "home_team_id": 75,
+            "away_team_id": 37,
+            "round": "League Stage - 4",
+            "fixture_date": "2025-11-05 17:45:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 158,
+            "home_team_id": 1,
+            "away_team_id": 36,
+            "round": "League Stage - 4",
+            "fixture_date": "2025-11-05 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 159,
+            "home_team_id": 6,
+            "away_team_id": 12,
+            "round": "League Stage - 4",
+            "fixture_date": "2025-11-05 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 160,
+            "home_team_id": 7,
+            "away_team_id": 32,
+            "round": "League Stage - 4",
+            "fixture_date": "2025-11-05 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 161,
+            "home_team_id": 15,
+            "away_team_id": 61,
+            "round": "League Stage - 4",
+            "fixture_date": "2025-11-05 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 162,
+            "home_team_id": 18,
+            "away_team_id": 13,
+            "round": "League Stage - 4",
+            "fixture_date": "2025-11-05 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 163,
+            "home_team_id": 33,
+            "away_team_id": 64,
+            "round": "League Stage - 4",
+            "fixture_date": "2025-11-05 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 164,
+            "home_team_id": 47,
+            "away_team_id": 34,
+            "round": "League Stage - 4",
+            "fixture_date": "2025-11-05 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 165,
+            "home_team_id": 15,
+            "away_team_id": 18,
+            "round": "League Stage - 5",
+            "fixture_date": "2025-11-25 17:45:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 166,
+            "home_team_id": 61,
+            "away_team_id": 70,
+            "round": "League Stage - 5",
+            "fixture_date": "2025-11-25 17:45:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 167,
+            "home_team_id": 5,
+            "away_team_id": 34,
+            "round": "League Stage - 5",
+            "fixture_date": "2025-11-25 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 168,
+            "home_team_id": 6,
+            "away_team_id": 13,
+            "round": "League Stage - 5",
+            "fixture_date": "2025-11-25 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 169,
+            "home_team_id": 7,
+            "away_team_id": 1,
+            "round": "League Stage - 5",
+            "fixture_date": "2025-11-25 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 170,
+            "home_team_id": 12,
+            "away_team_id": 37,
+            "round": "League Stage - 5",
+            "fixture_date": "2025-11-25 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 171,
+            "home_team_id": 24,
+            "away_team_id": 31,
+            "round": "League Stage - 5",
+            "fixture_date": "2025-11-25 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 172,
+            "home_team_id": 30,
+            "away_team_id": 41,
+            "round": "League Stage - 5",
+            "fixture_date": "2025-11-25 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 173,
+            "home_team_id": 43,
+            "away_team_id": 36,
+            "round": "League Stage - 5",
+            "fixture_date": "2025-11-25 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 174,
+            "home_team_id": 29,
+            "away_team_id": 64,
+            "round": "League Stage - 5",
+            "fixture_date": "2025-11-26 17:45:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 175,
+            "home_team_id": 75,
+            "away_team_id": 10,
+            "round": "League Stage - 5",
+            "fixture_date": "2025-11-26 17:45:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 176,
+            "home_team_id": 2,
+            "away_team_id": 16,
+            "round": "League Stage - 5",
+            "fixture_date": "2025-11-26 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 177,
+            "home_team_id": 3,
+            "away_team_id": 11,
+            "round": "League Stage - 5",
+            "fixture_date": "2025-11-26 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 178,
+            "home_team_id": 9,
+            "away_team_id": 4,
+            "round": "League Stage - 5",
+            "fixture_date": "2025-11-26 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 179,
+            "home_team_id": 14,
+            "away_team_id": 32,
+            "round": "League Stage - 5",
+            "fixture_date": "2025-11-26 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 180,
+            "home_team_id": 19,
+            "away_team_id": 47,
+            "round": "League Stage - 5",
+            "fixture_date": "2025-11-26 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 181,
+            "home_team_id": 35,
+            "away_team_id": 33,
+            "round": "League Stage - 5",
+            "fixture_date": "2025-11-26 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 182,
+            "home_team_id": 40,
+            "away_team_id": 38,
+            "round": "League Stage - 5",
+            "fixture_date": "2025-11-26 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 183,
+            "home_team_id": 64,
+            "away_team_id": 40,
+            "round": "League Stage - 6",
+            "fixture_date": "2025-12-09 15:30:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 184,
+            "home_team_id": 11,
+            "away_team_id": 19,
+            "round": "League Stage - 6",
+            "fixture_date": "2025-12-09 17:45:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 185,
+            "home_team_id": 4,
+            "away_team_id": 43,
+            "round": "League Stage - 6",
+            "fixture_date": "2025-12-09 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 186,
+            "home_team_id": 10,
+            "away_team_id": 61,
+            "round": "League Stage - 6",
+            "fixture_date": "2025-12-09 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 187,
+            "home_team_id": 16,
+            "away_team_id": 35,
+            "round": "League Stage - 6",
+            "fixture_date": "2025-12-09 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 188,
+            "home_team_id": 32,
+            "away_team_id": 5,
+            "round": "League Stage - 6",
+            "fixture_date": "2025-12-09 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 189,
+            "home_team_id": 33,
+            "away_team_id": 2,
+            "round": "League Stage - 6",
+            "fixture_date": "2025-12-09 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 190,
+            "home_team_id": 34,
+            "away_team_id": 14,
+            "round": "League Stage - 6",
+            "fixture_date": "2025-12-09 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 191,
+            "home_team_id": 70,
+            "away_team_id": 7,
+            "round": "League Stage - 6",
+            "fixture_date": "2025-12-09 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 192,
+            "home_team_id": 37,
+            "away_team_id": 29,
+            "round": "League Stage - 6",
+            "fixture_date": "2025-12-10 17:45:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 193,
+            "home_team_id": 41,
+            "away_team_id": 15,
+            "round": "League Stage - 6",
+            "fixture_date": "2025-12-10 17:45:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 194,
+            "home_team_id": 12,
+            "away_team_id": 24,
+            "round": "League Stage - 6",
+            "fixture_date": "2025-12-10 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 195,
+            "home_team_id": 13,
+            "away_team_id": 1,
+            "round": "League Stage - 6",
+            "fixture_date": "2025-12-10 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 196,
+            "home_team_id": 18,
+            "away_team_id": 30,
+            "round": "League Stage - 6",
+            "fixture_date": "2025-12-10 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 197,
+            "home_team_id": 31,
+            "away_team_id": 75,
+            "round": "League Stage - 6",
+            "fixture_date": "2025-12-10 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 198,
+            "home_team_id": 36,
+            "away_team_id": 9,
+            "round": "League Stage - 6",
+            "fixture_date": "2025-12-10 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 199,
+            "home_team_id": 38,
+            "away_team_id": 6,
+            "round": "League Stage - 6",
+            "fixture_date": "2025-12-10 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 200,
+            "home_team_id": 47,
+            "away_team_id": 3,
+            "round": "League Stage - 6",
+            "fixture_date": "2025-12-10 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 201,
+            "home_team_id": 64,
+            "away_team_id": 47,
+            "round": "League Stage - 7",
+            "fixture_date": "2026-01-20 15:30:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 202,
+            "home_team_id": 24,
+            "away_team_id": 6,
+            "round": "League Stage - 7",
+            "fixture_date": "2026-01-20 17:45:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 203,
+            "home_team_id": 4,
+            "away_team_id": 12,
+            "round": "League Stage - 7",
+            "fixture_date": "2026-01-20 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 204,
+            "home_team_id": 19,
+            "away_team_id": 9,
+            "round": "League Stage - 7",
+            "fixture_date": "2026-01-20 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 205,
+            "home_team_id": 29,
+            "away_team_id": 30,
+            "round": "League Stage - 7",
+            "fixture_date": "2026-01-20 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 206,
+            "home_team_id": 33,
+            "away_team_id": 3,
+            "round": "League Stage - 7",
+            "fixture_date": "2026-01-20 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 207,
+            "home_team_id": 37,
+            "away_team_id": 15,
+            "round": "League Stage - 7",
+            "fixture_date": "2026-01-20 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 208,
+            "home_team_id": 38,
+            "away_team_id": 10,
+            "round": "League Stage - 7",
+            "fixture_date": "2026-01-20 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 209,
+            "home_team_id": 40,
+            "away_team_id": 13,
+            "round": "League Stage - 7",
+            "fixture_date": "2026-01-20 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 210,
+            "home_team_id": 41,
+            "away_team_id": 14,
+            "round": "League Stage - 7",
+            "fixture_date": "2026-01-21 17:45:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 211,
+            "home_team_id": 61,
+            "away_team_id": 35,
+            "round": "League Stage - 7",
+            "fixture_date": "2026-01-21 17:45:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 212,
+            "home_team_id": 1,
+            "away_team_id": 16,
+            "round": "League Stage - 7",
+            "fixture_date": "2026-01-21 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 213,
+            "home_team_id": 5,
+            "away_team_id": 75,
+            "round": "League Stage - 7",
+            "fixture_date": "2026-01-21 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 214,
+            "home_team_id": 7,
+            "away_team_id": 2,
+            "round": "League Stage - 7",
+            "fixture_date": "2026-01-21 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 215,
+            "home_team_id": 11,
+            "away_team_id": 70,
+            "round": "League Stage - 7",
+            "fixture_date": "2026-01-21 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 216,
+            "home_team_id": 31,
+            "away_team_id": 18,
+            "round": "League Stage - 7",
+            "fixture_date": "2026-01-21 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 217,
+            "home_team_id": 32,
+            "away_team_id": 36,
+            "round": "League Stage - 7",
+            "fixture_date": "2026-01-21 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 218,
+            "home_team_id": 43,
+            "away_team_id": 34,
+            "round": "League Stage - 7",
+            "fixture_date": "2026-01-21 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 219,
+            "home_team_id": 2,
+            "away_team_id": 41,
+            "round": "League Stage - 8",
+            "fixture_date": "2026-01-28 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 220,
+            "home_team_id": 3,
+            "away_team_id": 64,
+            "round": "League Stage - 8",
+            "fixture_date": "2026-01-28 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 221,
+            "home_team_id": 6,
+            "away_team_id": 61,
+            "round": "League Stage - 8",
+            "fixture_date": "2026-01-28 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 222,
+            "home_team_id": 9,
+            "away_team_id": 1,
+            "round": "League Stage - 8",
+            "fixture_date": "2026-01-28 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 223,
+            "home_team_id": 10,
+            "away_team_id": 31,
+            "round": "League Stage - 8",
+            "fixture_date": "2026-01-28 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 224,
+            "home_team_id": 12,
+            "away_team_id": 33,
+            "round": "League Stage - 8",
+            "fixture_date": "2026-01-28 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 225,
+            "home_team_id": 13,
+            "away_team_id": 37,
+            "round": "League Stage - 8",
+            "fixture_date": "2026-01-28 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 226,
+            "home_team_id": 14,
+            "away_team_id": 4,
+            "round": "League Stage - 8",
+            "fixture_date": "2026-01-28 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 227,
+            "home_team_id": 15,
+            "away_team_id": 40,
+            "round": "League Stage - 8",
+            "fixture_date": "2026-01-28 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 228,
+            "home_team_id": 16,
+            "away_team_id": 11,
+            "round": "League Stage - 8",
+            "fixture_date": "2026-01-28 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 229,
+            "home_team_id": 18,
+            "away_team_id": 38,
+            "round": "League Stage - 8",
+            "fixture_date": "2026-01-28 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 230,
+            "home_team_id": 30,
+            "away_team_id": 5,
+            "round": "League Stage - 8",
+            "fixture_date": "2026-01-28 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 231,
+            "home_team_id": 34,
+            "away_team_id": 29,
+            "round": "League Stage - 8",
+            "fixture_date": "2026-01-28 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 232,
+            "home_team_id": 35,
+            "away_team_id": 24,
+            "round": "League Stage - 8",
+            "fixture_date": "2026-01-28 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 233,
+            "home_team_id": 36,
+            "away_team_id": 19,
+            "round": "League Stage - 8",
+            "fixture_date": "2026-01-28 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 234,
+            "home_team_id": 47,
+            "away_team_id": 7,
+            "round": "League Stage - 8",
+            "fixture_date": "2026-01-28 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 235,
+            "home_team_id": 70,
+            "away_team_id": 32,
+            "round": "League Stage - 8",
+            "fixture_date": "2026-01-28 20:00:00",
+            "match_type": "single_leg"
+          },
+          {
+            "fixture_id": 236,
+            "home_team_id": 75,
+            "away_team_id": 43,
+            "round": "League Stage - 8",
+            "fixture_date": "2026-01-28 20:00:00",
+            "match_type": "single_leg"
+          }
+        ]
+      },
+      "F2": {
+        "phase_id": "F2",
+        "phase_name": "Play-off",
+        "order": 2,
+        "phase_type": "playoff",
+        "match_type": "two_legs",
+        "seeding_method": "draw",
+        "ties": [
+          {
+            "tie_id": "PO1",
+            "name": "Play-off 1",
+            "order": 1,
+            "draw_type": "draw",
+            "match_type": "two_legs",
+            "teams": [
+              21,
+              47
+            ],
+            "standings": [
+              {
+                "position": 1,
+                "team": 21,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              },
+              {
+                "position": 2,
+                "team": 47,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              }
+            ],
+            "legs": [
+              {
+                "leg": 1,
+                "fixture_id": 79,
+                "home_team_id": 21,
+                "away_team_id": 47
+              },
+              {
+                "leg": 2,
+                "fixture_id": 92,
+                "home_team_id": 47,
+                "away_team_id": 21
+              }
+            ],
+            "winner_slot": "F2A"
+          },
+          {
+            "tie_id": "PO2",
+            "name": "Play-off 2",
+            "order": 2,
+            "draw_type": "draw",
+            "match_type": "two_legs",
+            "teams": [
+              55,
+              75
+            ],
+            "standings": [
+              {
+                "position": 1,
+                "team": 55,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              },
+              {
+                "position": 2,
+                "team": 75,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              }
+            ],
+            "legs": [
+              {
+                "leg": 1,
+                "fixture_id": 80,
+                "home_team_id": 55,
+                "away_team_id": 75
+              },
+              {
+                "leg": 2,
+                "fixture_id": 88,
+                "home_team_id": 75,
+                "away_team_id": 55
+              }
+            ],
+            "winner_slot": "F2B"
+          },
+          {
+            "tie_id": "PO3",
+            "name": "Play-off 3",
+            "order": 3,
+            "draw_type": "draw",
+            "match_type": "two_legs",
+            "teams": [
+              41,
+              62
+            ],
+            "standings": [
+              {
+                "position": 1,
+                "team": 41,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              },
+              {
+                "position": 2,
+                "team": 62,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              }
+            ],
+            "legs": [
+              {
+                "leg": 1,
+                "fixture_id": 81,
+                "home_team_id": 62,
+                "away_team_id": 41
+              },
+              {
+                "leg": 2,
+                "fixture_id": 89,
+                "home_team_id": 41,
+                "away_team_id": 62
+              }
+            ],
+            "winner_slot": "F2C"
+          },
+          {
+            "tie_id": "PO4",
+            "name": "Play-off 4",
+            "order": 4,
+            "draw_type": "draw",
+            "match_type": "two_legs",
+            "teams": [
+              20,
+              64
+            ],
+            "standings": [
+              {
+                "position": 1,
+                "team": 20,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              },
+              {
+                "position": 2,
+                "team": 64,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              }
+            ],
+            "legs": [
+              {
+                "leg": 1,
+                "fixture_id": 82,
+                "home_team_id": 20,
+                "away_team_id": 64
+              },
+              {
+                "leg": 2,
+                "fixture_id": 86,
+                "home_team_id": 64,
+                "away_team_id": 20
+              }
+            ],
+            "winner_slot": "F2D"
+          },
+          {
+            "tie_id": "PO5",
+            "name": "Play-off 5",
+            "order": 5,
+            "draw_type": "draw",
+            "match_type": "two_legs",
+            "teams": [
+              24,
+              60
+            ],
+            "standings": [
+              {
+                "position": 1,
+                "team": 24,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              },
+              {
+                "position": 2,
+                "team": 60,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              }
+            ],
+            "legs": [
+              {
+                "leg": 1,
+                "fixture_id": 83,
+                "home_team_id": 24,
+                "away_team_id": 60
+              },
+              {
+                "leg": 2,
+                "fixture_id": 87,
+                "home_team_id": 60,
+                "away_team_id": 24
+              }
+            ],
+            "winner_slot": "F2E"
+          },
+          {
+            "tie_id": "PO6",
+            "name": "Play-off 6",
+            "order": 6,
+            "draw_type": "draw",
+            "match_type": "two_legs",
+            "teams": [
+              29,
+              39
+            ],
+            "standings": [
+              {
+                "position": 1,
+                "team": 29,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              },
+              {
+                "position": 2,
+                "team": 39,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              }
+            ],
+            "legs": [
+              {
+                "leg": 1,
+                "fixture_id": 84,
+                "home_team_id": 39,
+                "away_team_id": 29
+              },
+              {
+                "leg": 2,
+                "fixture_id": 91,
+                "home_team_id": 29,
+                "away_team_id": 39
+              }
+            ],
+            "winner_slot": "F2F"
+          },
+          {
+            "tie_id": "PO7",
+            "name": "Play-off 7",
+            "order": 7,
+            "draw_type": "draw",
+            "match_type": "two_legs",
+            "teams": [
+              18,
+              58
+            ],
+            "standings": [
+              {
+                "position": 1,
+                "team": 18,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              },
+              {
+                "position": 2,
+                "team": 58,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              }
+            ],
+            "legs": [
+              {
+                "leg": 1,
+                "fixture_id": 85,
+                "home_team_id": 58,
+                "away_team_id": 18
+              },
+              {
+                "leg": 2,
+                "fixture_id": 90,
+                "home_team_id": 18,
+                "away_team_id": 58
+              }
+            ],
+            "winner_slot": "F2G"
+          }
+        ]
+      },
+      "F3": {
+        "phase_id": "F3",
+        "phase_name": "Octavos de final",
+        "order": 3,
+        "phase_type": "playoff",
+        "match_type": "two_legs",
+        "seeding_method": "draw",
+        "ties": [
+          {
+            "tie_id": "R161",
+            "name": "Octavos 1",
+            "order": 1,
+            "draw_type": "draw",
+            "match_type": "two_legs",
+            "teams": [
+              2,
+              61
+            ],
+            "standings": [
+              {
+                "position": 1,
+                "team": 2,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              },
+              {
+                "position": 2,
+                "team": 61,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              }
+            ],
+            "legs": [
+              {
+                "leg": 1,
+                "fixture_id": 452,
+                "home_team_id": 61,
+                "away_team_id": 2
+              },
+              {
+                "leg": 2,
+                "fixture_id": 453,
+                "home_team_id": 2,
+                "away_team_id": 61
+              }
+            ],
+            "winner_slot": "F3A"
+          },
+          {
+            "tie_id": "R162",
+            "name": "Octavos 2",
+            "order": 2,
+            "draw_type": "draw",
+            "match_type": "two_legs",
+            "teams": [
+              1,
+              34
+            ],
+            "standings": [
+              {
+                "position": 1,
+                "team": 1,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              },
+              {
+                "position": 2,
+                "team": 34,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              }
+            ],
+            "legs": [
+              {
+                "leg": 1,
+                "fixture_id": 445,
+                "home_team_id": 1,
+                "away_team_id": 34
+              },
+              {
+                "leg": 2,
+                "fixture_id": 460,
+                "home_team_id": 34,
+                "away_team_id": 1
+              }
+            ],
+            "winner_slot": "F3B"
+          },
+          {
+            "tie_id": "R163",
+            "name": "Octavos 3",
+            "order": 3,
+            "draw_type": "draw",
+            "match_type": "two_legs",
+            "teams": [
+              11,
+              32
+            ],
+            "standings": [
+              {
+                "position": 1,
+                "team": 11,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              },
+              {
+                "position": 2,
+                "team": 32,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              }
+            ],
+            "legs": [
+              {
+                "leg": 1,
+                "fixture_id": 449,
+                "home_team_id": 32,
+                "away_team_id": 11
+              },
+              {
+                "leg": 2,
+                "fixture_id": 458,
+                "home_team_id": 11,
+                "away_team_id": 32
+              }
+            ],
+            "winner_slot": "F3C"
+          },
+          {
+            "tie_id": "R164",
+            "name": "Octavos 4",
+            "order": 4,
+            "draw_type": "draw",
+            "match_type": "two_legs",
+            "teams": [
+              4,
+              35
+            ],
+            "standings": [
+              {
+                "position": 1,
+                "team": 4,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              },
+              {
+                "position": 2,
+                "team": 35,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              }
+            ],
+            "legs": [
+              {
+                "leg": 1,
+                "fixture_id": 450,
+                "home_team_id": 35,
+                "away_team_id": 4
+              },
+              {
+                "leg": 2,
+                "fixture_id": 455,
+                "home_team_id": 4,
+                "away_team_id": 35
+              }
+            ],
+            "winner_slot": "F3D"
+          },
+          {
+            "tie_id": "R165",
+            "name": "Octavos 5",
+            "order": 5,
+            "draw_type": "draw",
+            "match_type": "two_legs",
+            "teams": [
+              3,
+              13
+            ],
+            "standings": [
+              {
+                "position": 1,
+                "team": 3,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              },
+              {
+                "position": 2,
+                "team": 13,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              }
+            ],
+            "legs": [
+              {
+                "leg": 1,
+                "fixture_id": 447,
+                "home_team_id": 13,
+                "away_team_id": 3
+              },
+              {
+                "leg": 2,
+                "fixture_id": 454,
+                "home_team_id": 3,
+                "away_team_id": 13
+              }
+            ],
+            "winner_slot": "F3E"
+          },
+          {
+            "tie_id": "R166",
+            "name": "Octavos 6",
+            "order": 6,
+            "draw_type": "draw",
+            "match_type": "two_legs",
+            "teams": [
+              5,
+              9
+            ],
+            "standings": [
+              {
+                "position": 1,
+                "team": 5,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              },
+              {
+                "position": 2,
+                "team": 9,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              }
+            ],
+            "legs": [
+              {
+                "leg": 1,
+                "fixture_id": 446,
+                "home_team_id": 9,
+                "away_team_id": 5
+              },
+              {
+                "leg": 2,
+                "fixture_id": 456,
+                "home_team_id": 5,
+                "away_team_id": 9
+              }
+            ],
+            "winner_slot": "F3F"
+          },
+          {
+            "tie_id": "R167",
+            "name": "Octavos 7",
+            "order": 7,
+            "draw_type": "draw",
+            "match_type": "two_legs",
+            "teams": [
+              19,
+              24
+            ],
+            "standings": [
+              {
+                "position": 1,
+                "team": 19,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              },
+              {
+                "position": 2,
+                "team": 24,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              }
+            ],
+            "legs": [
+              {
+                "leg": 1,
+                "fixture_id": 448,
+                "home_team_id": 24,
+                "away_team_id": 19
+              },
+              {
+                "leg": 2,
+                "fixture_id": 459,
+                "home_team_id": 19,
+                "away_team_id": 24
+              }
+            ],
+            "winner_slot": "F3G"
+          },
+          {
+            "tie_id": "R168",
+            "name": "Octavos 8",
+            "order": 8,
+            "draw_type": "draw",
+            "match_type": "two_legs",
+            "teams": [
+              6,
+              38
+            ],
+            "standings": [
+              {
+                "position": 1,
+                "team": 6,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              },
+              {
+                "position": 2,
+                "team": 38,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              }
+            ],
+            "legs": [
+              {
+                "leg": 1,
+                "fixture_id": 451,
+                "home_team_id": 38,
+                "away_team_id": 6
+              },
+              {
+                "leg": 2,
+                "fixture_id": 457,
+                "home_team_id": 6,
+                "away_team_id": 38
+              }
+            ],
+            "winner_slot": "F3H"
+          }
+        ]
+      },
+      "F4": {
+        "phase_id": "F4",
+        "phase_name": "Cuartos de final",
+        "order": 4,
+        "phase_type": "playoff",
+        "match_type": "two_legs",
+        "seeding_method": "draw",
+        "ties": [
+          {
+            "tie_id": "QF1",
+            "name": "Cuartos 1",
+            "order": 1,
+            "draw_type": "draw",
+            "match_type": "two_legs",
+            "teams": [
+              "F3A",
+              "F3B"
+            ],
+            "standings": [
+              {
+                "position": 1,
+                "team": null,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              },
+              {
+                "position": 2,
+                "team": null,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              }
+            ],
+            "legs": [
+              {
+                "leg": 1,
+                "fixture_id": null,
+                "home_team_id": null,
+                "away_team_id": null
+              },
+              {
+                "leg": 2,
+                "fixture_id": null,
+                "home_team_id": null,
+                "away_team_id": null
+              }
+            ],
+            "winner_slot": "F4A"
+          },
+          {
+            "tie_id": "QF2",
+            "name": "Cuartos 2",
+            "order": 2,
+            "draw_type": "draw",
+            "match_type": "two_legs",
+            "teams": [
+              "F3C",
+              "F3D"
+            ],
+            "standings": [
+              {
+                "position": 1,
+                "team": null,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              },
+              {
+                "position": 2,
+                "team": null,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              }
+            ],
+            "legs": [
+              {
+                "leg": 1,
+                "fixture_id": null,
+                "home_team_id": null,
+                "away_team_id": null
+              },
+              {
+                "leg": 2,
+                "fixture_id": null,
+                "home_team_id": null,
+                "away_team_id": null
+              }
+            ],
+            "winner_slot": "F4B"
+          },
+          {
+            "tie_id": "QF3",
+            "name": "Cuartos 3",
+            "order": 3,
+            "draw_type": "draw",
+            "match_type": "two_legs",
+            "teams": [
+              "F3E",
+              "F3F"
+            ],
+            "standings": [
+              {
+                "position": 1,
+                "team": null,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              },
+              {
+                "position": 2,
+                "team": null,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              }
+            ],
+            "legs": [
+              {
+                "leg": 1,
+                "fixture_id": null,
+                "home_team_id": null,
+                "away_team_id": null
+              },
+              {
+                "leg": 2,
+                "fixture_id": null,
+                "home_team_id": null,
+                "away_team_id": null
+              }
+            ],
+            "winner_slot": "F4C"
+          },
+          {
+            "tie_id": "QF4",
+            "name": "Cuartos 4",
+            "order": 4,
+            "draw_type": "draw",
+            "match_type": "two_legs",
+            "teams": [
+              "F3G",
+              "F3H"
+            ],
+            "standings": [
+              {
+                "position": 1,
+                "team": null,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              },
+              {
+                "position": 2,
+                "team": null,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              }
+            ],
+            "legs": [
+              {
+                "leg": 1,
+                "fixture_id": null,
+                "home_team_id": null,
+                "away_team_id": null
+              },
+              {
+                "leg": 2,
+                "fixture_id": null,
+                "home_team_id": null,
+                "away_team_id": null
+              }
+            ],
+            "winner_slot": "F4D"
+          }
+        ]
+      },
+      "F5": {
+        "phase_id": "F5",
+        "phase_name": "Semifinal",
+        "order": 5,
+        "phase_type": "playoff",
+        "match_type": "two_legs",
+        "seeding_method": "draw",
+        "ties": [
+          {
+            "tie_id": "SF1",
+            "name": "Semifinal 1",
+            "order": 1,
+            "draw_type": "draw",
+            "match_type": "two_legs",
+            "teams": [
+              "F4A",
+              "F4B"
+            ],
+            "standings": [
+              {
+                "position": 1,
+                "team": null,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              },
+              {
+                "position": 2,
+                "team": null,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              }
+            ],
+            "legs": [
+              {
+                "leg": 1,
+                "fixture_id": null,
+                "home_team_id": null,
+                "away_team_id": null
+              },
+              {
+                "leg": 2,
+                "fixture_id": null,
+                "home_team_id": null,
+                "away_team_id": null
+              }
+            ],
+            "winner_slot": "F5A"
+          },
+          {
+            "tie_id": "SF2",
+            "name": "Semifinal 2",
+            "order": 2,
+            "draw_type": "draw",
+            "match_type": "two_legs",
+            "teams": [
+              "F4C",
+              "F4D"
+            ],
+            "standings": [
+              {
+                "position": 1,
+                "team": null,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              },
+              {
+                "position": 2,
+                "team": null,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              }
+            ],
+            "legs": [
+              {
+                "leg": 1,
+                "fixture_id": null,
+                "home_team_id": null,
+                "away_team_id": null
+              },
+              {
+                "leg": 2,
+                "fixture_id": null,
+                "home_team_id": null,
+                "away_team_id": null
+              }
+            ],
+            "winner_slot": "F5B"
+          }
+        ]
+      },
+      "F6": {
+        "phase_id": "F6",
+        "phase_name": "Final",
+        "order": 6,
+        "phase_type": "playoff",
+        "match_type": "single_leg",
+        "seeding_method": "draw",
+        "ties": [
+          {
+            "tie_id": "F1",
+            "name": "Final 1",
+            "order": 1,
+            "draw_type": "draw",
+            "match_type": "single_leg",
+            "teams": [
+              "F5A",
+              "F5B"
+            ],
+            "standings": [
+              {
+                "position": 1,
+                "team": null,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              },
+              {
+                "position": 2,
+                "team": null,
+                "points": null,
+                "matches_played": null,
+                "matches_won": null,
+                "matches_drawn": null,
+                "matches_lost": null,
+                "goals_for": null,
+                "goals_against": null,
+                "home_goals_for": null,
+                "away_goals_for": null
+              }
+            ],
+            "legs": [
+              {
+                "leg": 1,
+                "fixture_id": null,
+                "home_team_id": null,
+                "away_team_id": null
+              }
+            ],
+            "winner_slot": "F6A"
+          }
+        ]
+      }
+    },
+    "classified_team_slots": {
+      "F1R1": null,
+      "F1R2": null,
+      "F1R3": null,
+      "F1R4": null,
+      "F1R5": null,
+      "F1R6": null,
+      "F1R7": null,
+      "F1R8": null,
+      "F2A": null,
+      "F2B": null,
+      "F2C": null,
+      "F2D": null,
+      "F3A": null,
+      "F3B": null,
+      "F4A": null
+    }
+  }
+}

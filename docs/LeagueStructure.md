@@ -23,6 +23,23 @@ Provide one consistent format for:
     "competition_type": "league|cup|hybrid",
     "current_phase": "F1",
     "notes": "Short text with global rules.",
+    "classified_team_slots": {
+      "F1R1": null,
+      "F1R2": null,
+      "F1R3": null,
+      "F1R4": null,
+      "F1R5": null,
+      "F1R6": null,
+      "F1R7": null,
+      "F1R8": null,
+      "F2A": null,
+      "F2B": null,
+      "F2C": null,
+      "F2D": null,
+      "F3A": null,
+      "F3B": null,
+      "F4A": null
+    },
     "phases": {
       "F1": {
         "phase_id": "F1",
@@ -70,21 +87,12 @@ Provide one consistent format for:
         "phase_type": "playoff",
         "match_type": "two_legs",
         "seeding_method": "draw|ranking|fixed_bracket",
-        "classified_team_slots": {
-          "F1R1": null,
-          "F1R2": null,
-          "F1R3": null,
-          "F1R4": null,
-          "F1R5": null,
-          "F1R6": null,
-          "F1R7": null,
-          "F1R8": null
-        },
         "ties": [
           {
             "tie_id": "F2A",
             "name": "Quarterfinal 1",
             "teams": ["F1R1", "F1R8"],
+            "winner_slot": "F2A",
             "standings": [
               {
                 "position": 1,
@@ -156,6 +164,57 @@ Standard standings row:
 }
 ```
 
+## Classification Slots And Progression
+
+Use `classified_team_slots` to keep deterministic slots for winners/qualifiers across phases.
+
+Guidelines:
+
+- Slots are defined at `season_structure.classified_team_slots` (global pool).
+- `qualification.output_slots` in group phases maps table positions into slots.
+- Each playoff tie should include `winner_slot` to record the winner into a slot.
+- Next phase `teams` should reference the previous phase slots (e.g. `"teams": ["F2A", "F2B"]`).
+
+Example progression:
+
+- F1 (group) outputs `F1R1..F1R8`
+- F2 (playoff) ties write winners into `F2A..F2D`
+- F3 ties use `F2A..F2D` as inputs and write winners into `F3A..F3B`
+- F4 final uses `F3A` vs `F3B`
+
+This keeps pairing stable and allows the sync service to fill teams and results incrementally.
+
+## Match Phases And Round Labels
+
+When using existing fixtures, keep round names consistent with source data.
+If round labels differ from phase names, document it in `notes` and keep a mapping in code.
+
+Example for UCL:
+
+- Phase name: "Octavos de final"
+- Round label in fixtures: "Round of 16" (or older: "Round of 32")
+
+## Data Needed To Generate A New Tournament JSON
+
+When requesting a new JSON for a league/season, provide:
+
+1) League identity:
+   - `league_id` (local)
+   - `provider_league_id`
+   - `season` (year)
+2) Competition rules:
+   - Phases and order (F1, F2, F3...)
+   - Phase types (group vs playoff)
+   - Match type per phase (single_leg or two_legs)
+   - Qualification rules (positions or manual)
+   - Seeding rules and bracket rules (if any)
+3) Known fixtures (optional but ideal):
+   - `fixture_id`, `home_team_id`, `away_team_id`, `round`, `fixture_date`
+4) Expected slot mapping:
+   - Output slots for group phases
+   - Winner slots for playoff ties
+   - How each phase feeds into the next
+
 ## Organization And Qualification
 
 - `group_mode`:
@@ -189,13 +248,14 @@ Mandatory rules:
 2) Return phases as an object (not an array), keyed by F1, F2, F3...
 3) Include current_phase in season_structure.
 4) Every phase must include: phase_id, phase_name, order, phase_type, match_type.
-5) If phase_type=group: include group_mode, qualification, matches, and standings.
-6) If phase_type=playoff: include seeding_method, ties, matches per leg, and standings per tie.
-7) If teams/fixtures are unknown, use null (do not invent IDs).
-8) If home/away leg rules depend on ranking, write them in notes/description.
-9) Keep stable naming and ordering (F2A, F2B, F3A...).
-10) For multi_group, each group must include its own standings rows.
-11) Return only valid JSON.
+5) Always include season_structure.classified_team_slots.
+6) If phase_type=group: include group_mode, qualification, matches, and standings.
+7) If phase_type=playoff: include seeding_method, ties, matches per leg, standings per tie, and winner_slot for each tie.
+8) If teams/fixtures are unknown, use null (do not invent IDs).
+9) If home/away leg rules depend on ranking, write them in notes/description.
+10) Keep stable naming and ordering (F2A, F2B, F3A...).
+11) For multi_group, each group must include its own standings rows.
+12) Return only valid JSON.
 
 Tournament context:
 <paste exact competition rules here>

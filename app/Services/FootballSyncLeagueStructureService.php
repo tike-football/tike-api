@@ -685,6 +685,27 @@ class FootballSyncLeagueStructureService
             }
         }
 
+        // Explicit round aliases for competitions with non-matching labels.
+        $aliases = [
+            'play-off' => ['playoff', 'play-offs', 'play off'],
+            'octavo' => ['round of 16', 'round of 32'],
+            'round of 16' => ['round of 32'],
+            'league stage' => ['league stage'],
+        ];
+
+        foreach ($aliases as $key => $aliasList) {
+            if (
+                ($phaseNormalized !== '' && str_contains($phaseNormalized, $key))
+                || ($tieNormalized !== '' && str_contains($tieNormalized, $key))
+            ) {
+                foreach ($aliasList as $alias) {
+                    if (str_contains($roundNormalized, $alias)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
         return false;
     }
 
