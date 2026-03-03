@@ -15,7 +15,7 @@
         "match_type": "two_legs",
         "matches": [
           {
-            "fixture_id": 1498269,
+            "fixture_id": 254,
             "home_team_id": 100,
             "away_team_id": 101,
             "round": "Regular Season - 1",
@@ -23,7 +23,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1498266,
+            "fixture_id": 255,
             "home_team_id": 99,
             "away_team_id": 96,
             "round": "Regular Season - 1",
@@ -31,7 +31,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1498261,
+            "fixture_id": 256,
             "home_team_id": 94,
             "away_team_id": 90,
             "round": "Regular Season - 1",
@@ -39,7 +39,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1498262,
+            "fixture_id": 257,
             "home_team_id": 93,
             "away_team_id": 88,
             "round": "Regular Season - 1",
@@ -47,7 +47,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1498263,
+            "fixture_id": 258,
             "home_team_id": 87,
             "away_team_id": 83,
             "round": "Regular Season - 1",
@@ -55,7 +55,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1498265,
+            "fixture_id": 259,
             "home_team_id": 84,
             "away_team_id": 86,
             "round": "Regular Season - 1",
@@ -63,7 +63,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1498267,
+            "fixture_id": 260,
             "home_team_id": 89,
             "away_team_id": 85,
             "round": "Regular Season - 1",
@@ -71,7 +71,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1498268,
+            "fixture_id": 261,
             "home_team_id": 91,
             "away_team_id": 97,
             "round": "Regular Season - 1",
@@ -79,7 +79,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1498270,
+            "fixture_id": 262,
             "home_team_id": 95,
             "away_team_id": 98,
             "round": "Regular Season - 1",
@@ -87,7 +87,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1498264,
+            "fixture_id": 263,
             "home_team_id": 102,
             "away_team_id": 92,
             "round": "Regular Season - 1",
@@ -95,7 +95,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505937,
+            "fixture_id": 264,
             "home_team_id": 90,
             "away_team_id": 102,
             "round": "Regular Season - 2",
@@ -103,7 +103,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505938,
+            "fixture_id": 265,
             "home_team_id": 97,
             "away_team_id": 96,
             "round": "Regular Season - 2",
@@ -111,7 +111,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505939,
+            "fixture_id": 266,
             "home_team_id": 100,
             "away_team_id": 99,
             "round": "Regular Season - 2",
@@ -119,7 +119,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505940,
+            "fixture_id": 267,
             "home_team_id": 101,
             "away_team_id": 87,
             "round": "Regular Season - 2",
@@ -127,7 +127,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505941,
+            "fixture_id": 268,
             "home_team_id": 85,
             "away_team_id": 86,
             "round": "Regular Season - 2",
@@ -135,7 +135,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505942,
+            "fixture_id": 269,
             "home_team_id": 88,
             "away_team_id": 94,
             "round": "Regular Season - 2",
@@ -143,7 +143,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505943,
+            "fixture_id": 270,
             "home_team_id": 98,
             "away_team_id": 84,
             "round": "Regular Season - 2",
@@ -151,7 +151,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505944,
+            "fixture_id": 271,
             "home_team_id": 83,
             "away_team_id": 91,
             "round": "Regular Season - 2",
@@ -159,7 +159,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505945,
+            "fixture_id": 272,
             "home_team_id": 92,
             "away_team_id": 95,
             "round": "Regular Season - 2",
@@ -167,7 +167,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505947,
+            "fixture_id": 273,
             "home_team_id": 102,
             "away_team_id": 87,
             "round": "Regular Season - 3",
@@ -175,7 +175,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505948,
+            "fixture_id": 274,
             "home_team_id": 99,
             "away_team_id": 101,
             "round": "Regular Season - 3",
@@ -183,7 +183,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505949,
+            "fixture_id": 275,
             "home_team_id": 86,
             "away_team_id": 97,
             "round": "Regular Season - 3",
@@ -191,7 +191,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505950,
+            "fixture_id": 276,
             "home_team_id": 96,
             "away_team_id": 88,
             "round": "Regular Season - 3",
@@ -199,7 +199,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505951,
+            "fixture_id": 277,
             "home_team_id": 95,
             "away_team_id": 100,
             "round": "Regular Season - 3",
@@ -207,7 +207,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505952,
+            "fixture_id": 278,
             "home_team_id": 84,
             "away_team_id": 83,
             "round": "Regular Season - 3",
@@ -215,7 +215,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505953,
+            "fixture_id": 279,
             "home_team_id": 98,
             "away_team_id": 85,
             "round": "Regular Season - 3",
@@ -223,7 +223,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505954,
+            "fixture_id": 280,
             "home_team_id": 89,
             "away_team_id": 90,
             "round": "Regular Season - 3",
@@ -231,7 +231,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505955,
+            "fixture_id": 281,
             "home_team_id": 94,
             "away_team_id": 92,
             "round": "Regular Season - 3",
@@ -239,7 +239,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505956,
+            "fixture_id": 329,
             "home_team_id": 91,
             "away_team_id": 93,
             "round": "Regular Season - 3",
@@ -247,7 +247,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505957,
+            "fixture_id": 282,
             "home_team_id": 102,
             "away_team_id": 99,
             "round": "Regular Season - 4",
@@ -255,7 +255,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505958,
+            "fixture_id": 283,
             "home_team_id": 88,
             "away_team_id": 95,
             "round": "Regular Season - 4",
@@ -263,7 +263,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505960,
+            "fixture_id": 284,
             "home_team_id": 87,
             "away_team_id": 96,
             "round": "Regular Season - 4",
@@ -271,7 +271,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505961,
+            "fixture_id": 285,
             "home_team_id": 85,
             "away_team_id": 84,
             "round": "Regular Season - 4",
@@ -279,7 +279,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505962,
+            "fixture_id": 286,
             "home_team_id": 92,
             "away_team_id": 89,
             "round": "Regular Season - 4",
@@ -287,7 +287,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505963,
+            "fixture_id": 287,
             "home_team_id": 101,
             "away_team_id": 98,
             "round": "Regular Season - 4",
@@ -295,7 +295,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505959,
+            "fixture_id": 288,
             "home_team_id": 83,
             "away_team_id": 86,
             "round": "Regular Season - 4",
@@ -303,7 +303,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505964,
+            "fixture_id": 289,
             "home_team_id": 90,
             "away_team_id": 97,
             "round": "Regular Season - 4",
@@ -311,7 +311,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505965,
+            "fixture_id": 290,
             "home_team_id": 100,
             "away_team_id": 91,
             "round": "Regular Season - 4",
@@ -319,7 +319,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505966,
+            "fixture_id": 291,
             "home_team_id": 93,
             "away_team_id": 94,
             "round": "Regular Season - 4",
@@ -327,7 +327,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505967,
+            "fixture_id": 292,
             "home_team_id": 84,
             "away_team_id": 87,
             "round": "Regular Season - 5",
@@ -335,7 +335,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505968,
+            "fixture_id": 293,
             "home_team_id": 86,
             "away_team_id": 90,
             "round": "Regular Season - 5",
@@ -343,7 +343,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505969,
+            "fixture_id": 294,
             "home_team_id": 98,
             "away_team_id": 102,
             "round": "Regular Season - 5",
@@ -351,7 +351,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505970,
+            "fixture_id": 295,
             "home_team_id": 97,
             "away_team_id": 101,
             "round": "Regular Season - 5",
@@ -359,7 +359,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506011,
+            "fixture_id": 296,
             "home_team_id": 99,
             "away_team_id": 95,
             "round": "Regular Season - 9",
@@ -367,7 +367,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505972,
+            "fixture_id": 297,
             "home_team_id": 91,
             "away_team_id": 88,
             "round": "Regular Season - 5",
@@ -375,7 +375,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505973,
+            "fixture_id": 330,
             "home_team_id": 99,
             "away_team_id": 94,
             "round": "Regular Season - 5",
@@ -383,7 +383,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505974,
+            "fixture_id": 298,
             "home_team_id": 96,
             "away_team_id": 92,
             "round": "Regular Season - 5",
@@ -391,7 +391,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505975,
+            "fixture_id": 299,
             "home_team_id": 85,
             "away_team_id": 83,
             "round": "Regular Season - 5",
@@ -399,7 +399,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505976,
+            "fixture_id": 300,
             "home_team_id": 89,
             "away_team_id": 100,
             "round": "Regular Season - 5",
@@ -407,7 +407,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505977,
+            "fixture_id": 301,
             "home_team_id": 102,
             "away_team_id": 86,
             "round": "Regular Season - 6",
@@ -415,7 +415,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505978,
+            "fixture_id": 302,
             "home_team_id": 101,
             "away_team_id": 84,
             "round": "Regular Season - 6",
@@ -423,7 +423,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505979,
+            "fixture_id": 303,
             "home_team_id": 87,
             "away_team_id": 97,
             "round": "Regular Season - 6",
@@ -431,7 +431,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505981,
+            "fixture_id": 304,
             "home_team_id": 83,
             "away_team_id": 98,
             "round": "Regular Season - 6",
@@ -439,7 +439,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505980,
+            "fixture_id": 305,
             "home_team_id": 90,
             "away_team_id": 85,
             "round": "Regular Season - 6",
@@ -447,7 +447,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505983,
+            "fixture_id": 306,
             "home_team_id": 88,
             "away_team_id": 89,
             "round": "Regular Season - 6",
@@ -455,7 +455,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505984,
+            "fixture_id": 307,
             "home_team_id": 92,
             "away_team_id": 91,
             "round": "Regular Season - 6",
@@ -463,7 +463,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505985,
+            "fixture_id": 308,
             "home_team_id": 93,
             "away_team_id": 99,
             "round": "Regular Season - 6",
@@ -471,7 +471,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505986,
+            "fixture_id": 309,
             "home_team_id": 94,
             "away_team_id": 95,
             "round": "Regular Season - 6",
@@ -479,7 +479,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505987,
+            "fixture_id": 310,
             "home_team_id": 83,
             "away_team_id": 101,
             "round": "Regular Season - 7",
@@ -487,7 +487,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505988,
+            "fixture_id": 311,
             "home_team_id": 86,
             "away_team_id": 100,
             "round": "Regular Season - 7",
@@ -495,7 +495,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505989,
+            "fixture_id": 312,
             "home_team_id": 84,
             "away_team_id": 90,
             "round": "Regular Season - 7",
@@ -503,7 +503,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505990,
+            "fixture_id": 331,
             "home_team_id": 98,
             "away_team_id": 87,
             "round": "Regular Season - 7",
@@ -511,7 +511,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505991,
+            "fixture_id": 313,
             "home_team_id": 97,
             "away_team_id": 92,
             "round": "Regular Season - 7",
@@ -519,7 +519,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505992,
+            "fixture_id": 314,
             "home_team_id": 85,
             "away_team_id": 93,
             "round": "Regular Season - 7",
@@ -527,7 +527,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505993,
+            "fixture_id": 315,
             "home_team_id": 99,
             "away_team_id": 88,
             "round": "Regular Season - 7",
@@ -535,7 +535,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505996,
+            "fixture_id": 316,
             "home_team_id": 96,
             "away_team_id": 102,
             "round": "Regular Season - 7",
@@ -543,7 +543,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505994,
+            "fixture_id": 317,
             "home_team_id": 89,
             "away_team_id": 95,
             "round": "Regular Season - 7",
@@ -551,7 +551,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505995,
+            "fixture_id": 318,
             "home_team_id": 91,
             "away_team_id": 94,
             "round": "Regular Season - 7",
@@ -559,7 +559,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505997,
+            "fixture_id": 319,
             "home_team_id": 101,
             "away_team_id": 86,
             "round": "Regular Season - 8",
@@ -567,7 +567,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506005,
+            "fixture_id": 320,
             "home_team_id": 100,
             "away_team_id": 84,
             "round": "Regular Season - 8",
@@ -575,7 +575,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505999,
+            "fixture_id": 321,
             "home_team_id": 92,
             "away_team_id": 99,
             "round": "Regular Season - 8",
@@ -583,7 +583,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506000,
+            "fixture_id": 322,
             "home_team_id": 87,
             "away_team_id": 85,
             "round": "Regular Season - 8",
@@ -591,7 +591,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506001,
+            "fixture_id": 323,
             "home_team_id": 93,
             "away_team_id": 96,
             "round": "Regular Season - 8",
@@ -599,7 +599,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506002,
+            "fixture_id": 324,
             "home_team_id": 90,
             "away_team_id": 83,
             "round": "Regular Season - 8",
@@ -607,7 +607,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506003,
+            "fixture_id": 325,
             "home_team_id": 95,
             "away_team_id": 91,
             "round": "Regular Season - 8",
@@ -615,7 +615,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506004,
+            "fixture_id": 326,
             "home_team_id": 88,
             "away_team_id": 98,
             "round": "Regular Season - 8",
@@ -623,7 +623,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505998,
+            "fixture_id": 327,
             "home_team_id": 94,
             "away_team_id": 89,
             "round": "Regular Season - 8",
@@ -631,7 +631,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506006,
+            "fixture_id": 328,
             "home_team_id": 102,
             "away_team_id": 97,
             "round": "Regular Season - 8",
@@ -639,7 +639,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505971,
+            "fixture_id": 253,
             "home_team_id": 95,
             "away_team_id": 93,
             "round": "Regular Season - 5",
@@ -647,7 +647,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506007,
+            "fixture_id": 332,
             "home_team_id": 83,
             "away_team_id": 100,
             "round": "Regular Season - 9",
@@ -655,7 +655,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506009,
+            "fixture_id": 333,
             "home_team_id": 92,
             "away_team_id": 88,
             "round": "Regular Season - 9",
@@ -663,7 +663,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506010,
+            "fixture_id": 334,
             "home_team_id": 96,
             "away_team_id": 94,
             "round": "Regular Season - 9",
@@ -671,7 +671,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506008,
+            "fixture_id": 335,
             "home_team_id": 89,
             "away_team_id": 91,
             "round": "Regular Season - 9",
@@ -679,7 +679,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506012,
+            "fixture_id": 336,
             "home_team_id": 86,
             "away_team_id": 87,
             "round": "Regular Season - 9",
@@ -687,7 +687,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506013,
+            "fixture_id": 337,
             "home_team_id": 84,
             "away_team_id": 102,
             "round": "Regular Season - 9",
@@ -695,7 +695,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506014,
+            "fixture_id": 338,
             "home_team_id": 98,
             "away_team_id": 90,
             "round": "Regular Season - 9",
@@ -703,7 +703,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506084,
+            "fixture_id": 339,
             "home_team_id": 85,
             "away_team_id": 99,
             "round": "Regular Season - 16",
@@ -711,7 +711,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506016,
+            "fixture_id": 340,
             "home_team_id": 97,
             "away_team_id": 93,
             "round": "Regular Season - 9",
@@ -719,7 +719,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506022,
+            "fixture_id": 341,
             "home_team_id": 99,
             "away_team_id": 89,
             "round": "Regular Season - 10",
@@ -727,7 +727,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506018,
+            "fixture_id": 344,
             "home_team_id": 87,
             "away_team_id": 100,
             "round": "Regular Season - 10",
@@ -735,7 +735,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506020,
+            "fixture_id": 345,
             "home_team_id": 97,
             "away_team_id": 95,
             "round": "Regular Season - 10",
@@ -743,7 +743,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506023,
+            "fixture_id": 343,
             "home_team_id": 86,
             "away_team_id": 88,
             "round": "Regular Season - 10",
@@ -751,7 +751,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506026,
+            "fixture_id": 342,
             "home_team_id": 83,
             "away_team_id": 102,
             "round": "Regular Season - 10",
@@ -759,7 +759,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506025,
+            "fixture_id": 346,
             "home_team_id": 101,
             "away_team_id": 90,
             "round": "Regular Season - 10",
@@ -767,7 +767,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506024,
+            "fixture_id": 347,
             "home_team_id": 91,
             "away_team_id": 96,
             "round": "Regular Season - 10",
@@ -775,7 +775,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506019,
+            "fixture_id": 348,
             "home_team_id": 85,
             "away_team_id": 92,
             "round": "Regular Season - 10",
@@ -783,7 +783,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506017,
+            "fixture_id": 349,
             "home_team_id": 98,
             "away_team_id": 93,
             "round": "Regular Season - 10",
@@ -791,7 +791,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506078,
+            "fixture_id": 350,
             "home_team_id": 101,
             "away_team_id": 89,
             "round": "Regular Season - 16",
@@ -799,7 +799,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506021,
+            "fixture_id": 351,
             "home_team_id": 84,
             "away_team_id": 94,
             "round": "Regular Season - 10",
@@ -807,7 +807,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506027,
+            "fixture_id": 352,
             "home_team_id": 92,
             "away_team_id": 84,
             "round": "Regular Season - 11",
@@ -815,7 +815,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506028,
+            "fixture_id": 353,
             "home_team_id": 93,
             "away_team_id": 101,
             "round": "Regular Season - 11",
@@ -823,7 +823,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506029,
+            "fixture_id": 354,
             "home_team_id": 90,
             "away_team_id": 87,
             "round": "Regular Season - 11",
@@ -831,7 +831,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506030,
+            "fixture_id": 355,
             "home_team_id": 102,
             "away_team_id": 85,
             "round": "Regular Season - 11",
@@ -839,7 +839,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506031,
+            "fixture_id": 356,
             "home_team_id": 88,
             "away_team_id": 83,
             "round": "Regular Season - 11",
@@ -847,7 +847,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506032,
+            "fixture_id": 357,
             "home_team_id": 95,
             "away_team_id": 96,
             "round": "Regular Season - 11",
@@ -855,7 +855,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506033,
+            "fixture_id": 358,
             "home_team_id": 100,
             "away_team_id": 98,
             "round": "Regular Season - 11",
@@ -863,7 +863,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506034,
+            "fixture_id": 359,
             "home_team_id": 94,
             "away_team_id": 97,
             "round": "Regular Season - 11",
@@ -871,7 +871,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506035,
+            "fixture_id": 360,
             "home_team_id": 89,
             "away_team_id": 86,
             "round": "Regular Season - 11",
@@ -879,7 +879,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506036,
+            "fixture_id": 361,
             "home_team_id": 91,
             "away_team_id": 99,
             "round": "Regular Season - 11",
@@ -887,7 +887,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506037,
+            "fixture_id": 362,
             "home_team_id": 101,
             "away_team_id": 102,
             "round": "Regular Season - 12",
@@ -895,7 +895,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506038,
+            "fixture_id": 363,
             "home_team_id": 87,
             "away_team_id": 92,
             "round": "Regular Season - 12",
@@ -903,7 +903,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506039,
+            "fixture_id": 364,
             "home_team_id": 83,
             "away_team_id": 93,
             "round": "Regular Season - 12",
@@ -911,7 +911,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506040,
+            "fixture_id": 365,
             "home_team_id": 84,
             "away_team_id": 88,
             "round": "Regular Season - 12",
@@ -919,7 +919,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506041,
+            "fixture_id": 366,
             "home_team_id": 90,
             "away_team_id": 100,
             "round": "Regular Season - 12",
@@ -927,7 +927,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506042,
+            "fixture_id": 367,
             "home_team_id": 85,
             "away_team_id": 95,
             "round": "Regular Season - 12",
@@ -935,7 +935,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506043,
+            "fixture_id": 368,
             "home_team_id": 96,
             "away_team_id": 89,
             "round": "Regular Season - 12",
@@ -943,7 +943,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506044,
+            "fixture_id": 369,
             "home_team_id": 97,
             "away_team_id": 99,
             "round": "Regular Season - 12",
@@ -951,7 +951,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506045,
+            "fixture_id": 370,
             "home_team_id": 86,
             "away_team_id": 91,
             "round": "Regular Season - 12",
@@ -959,7 +959,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506046,
+            "fixture_id": 371,
             "home_team_id": 98,
             "away_team_id": 94,
             "round": "Regular Season - 12",
@@ -967,7 +967,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506047,
+            "fixture_id": 372,
             "home_team_id": 92,
             "away_team_id": 83,
             "round": "Regular Season - 13",
@@ -975,7 +975,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506050,
+            "fixture_id": 373,
             "home_team_id": 93,
             "away_team_id": 90,
             "round": "Regular Season - 13",
@@ -983,7 +983,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506048,
+            "fixture_id": 374,
             "home_team_id": 96,
             "away_team_id": 85,
             "round": "Regular Season - 13",
@@ -991,7 +991,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506049,
+            "fixture_id": 375,
             "home_team_id": 100,
             "away_team_id": 102,
             "round": "Regular Season - 13",
@@ -999,7 +999,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506051,
+            "fixture_id": 376,
             "home_team_id": 88,
             "away_team_id": 97,
             "round": "Regular Season - 13",
@@ -1007,7 +1007,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506052,
+            "fixture_id": 377,
             "home_team_id": 95,
             "away_team_id": 86,
             "round": "Regular Season - 13",
@@ -1015,7 +1015,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506053,
+            "fixture_id": 378,
             "home_team_id": 89,
             "away_team_id": 98,
             "round": "Regular Season - 13",
@@ -1023,7 +1023,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506054,
+            "fixture_id": 379,
             "home_team_id": 91,
             "away_team_id": 87,
             "round": "Regular Season - 13",
@@ -1031,7 +1031,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506055,
+            "fixture_id": 380,
             "home_team_id": 99,
             "away_team_id": 84,
             "round": "Regular Season - 13",
@@ -1039,7 +1039,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506056,
+            "fixture_id": 381,
             "home_team_id": 94,
             "away_team_id": 101,
             "round": "Regular Season - 13",
@@ -1047,7 +1047,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506057,
+            "fixture_id": 382,
             "home_team_id": 98,
             "away_team_id": 96,
             "round": "Regular Season - 14",
@@ -1055,7 +1055,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506058,
+            "fixture_id": 383,
             "home_team_id": 87,
             "away_team_id": 95,
             "round": "Regular Season - 14",
@@ -1063,7 +1063,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506059,
+            "fixture_id": 384,
             "home_team_id": 102,
             "away_team_id": 88,
             "round": "Regular Season - 14",
@@ -1071,7 +1071,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506060,
+            "fixture_id": 385,
             "home_team_id": 97,
             "away_team_id": 89,
             "round": "Regular Season - 14",
@@ -1079,7 +1079,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506061,
+            "fixture_id": 386,
             "home_team_id": 85,
             "away_team_id": 100,
             "round": "Regular Season - 14",
@@ -1087,7 +1087,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506062,
+            "fixture_id": 387,
             "home_team_id": 90,
             "away_team_id": 91,
             "round": "Regular Season - 14",
@@ -1095,7 +1095,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506063,
+            "fixture_id": 388,
             "home_team_id": 84,
             "away_team_id": 93,
             "round": "Regular Season - 14",
@@ -1103,7 +1103,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506065,
+            "fixture_id": 389,
             "home_team_id": 101,
             "away_team_id": 92,
             "round": "Regular Season - 14",
@@ -1111,7 +1111,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506064,
+            "fixture_id": 390,
             "home_team_id": 86,
             "away_team_id": 94,
             "round": "Regular Season - 14",
@@ -1119,7 +1119,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506066,
+            "fixture_id": 391,
             "home_team_id": 83,
             "away_team_id": 99,
             "round": "Regular Season - 14",
@@ -1127,7 +1127,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506067,
+            "fixture_id": 392,
             "home_team_id": 97,
             "away_team_id": 98,
             "round": "Regular Season - 15",
@@ -1135,7 +1135,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506068,
+            "fixture_id": 393,
             "home_team_id": 96,
             "away_team_id": 84,
             "round": "Regular Season - 15",
@@ -1143,7 +1143,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506069,
+            "fixture_id": 394,
             "home_team_id": 95,
             "away_team_id": 101,
             "round": "Regular Season - 15",
@@ -1151,7 +1151,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506070,
+            "fixture_id": 395,
             "home_team_id": 93,
             "away_team_id": 102,
             "round": "Regular Season - 15",
@@ -1159,7 +1159,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506071,
+            "fixture_id": 396,
             "home_team_id": 88,
             "away_team_id": 100,
             "round": "Regular Season - 15",
@@ -1167,7 +1167,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506072,
+            "fixture_id": 397,
             "home_team_id": 94,
             "away_team_id": 87,
             "round": "Regular Season - 15",
@@ -1175,7 +1175,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506073,
+            "fixture_id": 398,
             "home_team_id": 89,
             "away_team_id": 83,
             "round": "Regular Season - 15",
@@ -1183,7 +1183,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506074,
+            "fixture_id": 399,
             "home_team_id": 92,
             "away_team_id": 86,
             "round": "Regular Season - 15",
@@ -1191,7 +1191,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506075,
+            "fixture_id": 400,
             "home_team_id": 99,
             "away_team_id": 90,
             "round": "Regular Season - 15",
@@ -1199,7 +1199,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506076,
+            "fixture_id": 401,
             "home_team_id": 91,
             "away_team_id": 85,
             "round": "Regular Season - 15",
@@ -1207,7 +1207,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506077,
+            "fixture_id": 402,
             "home_team_id": 102,
             "away_team_id": 94,
             "round": "Regular Season - 16",
@@ -1215,7 +1215,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506097,
+            "fixture_id": 403,
             "home_team_id": 83,
             "away_team_id": 97,
             "round": "Regular Season - 18",
@@ -1223,7 +1223,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505982,
+            "fixture_id": 404,
             "home_team_id": 100,
             "away_team_id": 96,
             "round": "Regular Season - 6",
@@ -1231,7 +1231,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1505946,
+            "fixture_id": 405,
             "home_team_id": 93,
             "away_team_id": 89,
             "round": "Regular Season - 2",
@@ -1239,7 +1239,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506079,
+            "fixture_id": 406,
             "home_team_id": 100,
             "away_team_id": 92,
             "round": "Regular Season - 16",
@@ -1247,7 +1247,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506080,
+            "fixture_id": 407,
             "home_team_id": 84,
             "away_team_id": 97,
             "round": "Regular Season - 16",
@@ -1255,7 +1255,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506081,
+            "fixture_id": 408,
             "home_team_id": 83,
             "away_team_id": 95,
             "round": "Regular Season - 16",
@@ -1263,7 +1263,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506082,
+            "fixture_id": 409,
             "home_team_id": 86,
             "away_team_id": 93,
             "round": "Regular Season - 16",
@@ -1271,7 +1271,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506083,
+            "fixture_id": 410,
             "home_team_id": 98,
             "away_team_id": 91,
             "round": "Regular Season - 16",
@@ -1279,7 +1279,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506015,
+            "fixture_id": 411,
             "home_team_id": 85,
             "away_team_id": 101,
             "round": "Regular Season - 9",
@@ -1287,7 +1287,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506085,
+            "fixture_id": 412,
             "home_team_id": 87,
             "away_team_id": 88,
             "round": "Regular Season - 16",
@@ -1295,7 +1295,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506086,
+            "fixture_id": 413,
             "home_team_id": 90,
             "away_team_id": 96,
             "round": "Regular Season - 16",
@@ -1303,7 +1303,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506087,
+            "fixture_id": 414,
             "home_team_id": 89,
             "away_team_id": 84,
             "round": "Regular Season - 17",
@@ -1311,7 +1311,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506088,
+            "fixture_id": 415,
             "home_team_id": 88,
             "away_team_id": 85,
             "round": "Regular Season - 17",
@@ -1319,7 +1319,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506089,
+            "fixture_id": 416,
             "home_team_id": 97,
             "away_team_id": 100,
             "round": "Regular Season - 17",
@@ -1327,7 +1327,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506090,
+            "fixture_id": 417,
             "home_team_id": 99,
             "away_team_id": 98,
             "round": "Regular Season - 17",
@@ -1335,7 +1335,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506091,
+            "fixture_id": 418,
             "home_team_id": 95,
             "away_team_id": 102,
             "round": "Regular Season - 17",
@@ -1343,7 +1343,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506092,
+            "fixture_id": 419,
             "home_team_id": 94,
             "away_team_id": 83,
             "round": "Regular Season - 17",
@@ -1351,7 +1351,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506093,
+            "fixture_id": 420,
             "home_team_id": 91,
             "away_team_id": 101,
             "round": "Regular Season - 17",
@@ -1359,7 +1359,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506094,
+            "fixture_id": 421,
             "home_team_id": 96,
             "away_team_id": 86,
             "round": "Regular Season - 17",
@@ -1367,7 +1367,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506095,
+            "fixture_id": 422,
             "home_team_id": 92,
             "away_team_id": 90,
             "round": "Regular Season - 17",
@@ -1375,7 +1375,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506096,
+            "fixture_id": 423,
             "home_team_id": 93,
             "away_team_id": 87,
             "round": "Regular Season - 17",
@@ -1383,7 +1383,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506098,
+            "fixture_id": 424,
             "home_team_id": 102,
             "away_team_id": 91,
             "round": "Regular Season - 18",
@@ -1391,7 +1391,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506099,
+            "fixture_id": 425,
             "home_team_id": 84,
             "away_team_id": 95,
             "round": "Regular Season - 18",
@@ -1399,7 +1399,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506100,
+            "fixture_id": 426,
             "home_team_id": 87,
             "away_team_id": 89,
             "round": "Regular Season - 18",
@@ -1407,7 +1407,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506101,
+            "fixture_id": 427,
             "home_team_id": 86,
             "away_team_id": 99,
             "round": "Regular Season - 18",
@@ -1415,7 +1415,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506102,
+            "fixture_id": 428,
             "home_team_id": 85,
             "away_team_id": 94,
             "round": "Regular Season - 18",
@@ -1423,7 +1423,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506103,
+            "fixture_id": 429,
             "home_team_id": 100,
             "away_team_id": 93,
             "round": "Regular Season - 18",
@@ -1431,7 +1431,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506104,
+            "fixture_id": 430,
             "home_team_id": 98,
             "away_team_id": 92,
             "round": "Regular Season - 18",
@@ -1439,7 +1439,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506105,
+            "fixture_id": 431,
             "home_team_id": 101,
             "away_team_id": 96,
             "round": "Regular Season - 18",
@@ -1447,7 +1447,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506106,
+            "fixture_id": 432,
             "home_team_id": 90,
             "away_team_id": 88,
             "round": "Regular Season - 18",
@@ -1455,7 +1455,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506107,
+            "fixture_id": 440,
             "home_team_id": 96,
             "away_team_id": 83,
             "round": "Regular Season - 19",
@@ -1463,7 +1463,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506108,
+            "fixture_id": 438,
             "home_team_id": 94,
             "away_team_id": 100,
             "round": "Regular Season - 19",
@@ -1471,7 +1471,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506109,
+            "fixture_id": 434,
             "home_team_id": 88,
             "away_team_id": 101,
             "round": "Regular Season - 19",
@@ -1479,7 +1479,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506110,
+            "fixture_id": 441,
             "home_team_id": 97,
             "away_team_id": 85,
             "round": "Regular Season - 19",
@@ -1487,7 +1487,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506111,
+            "fixture_id": 442,
             "home_team_id": 99,
             "away_team_id": 87,
             "round": "Regular Season - 19",
@@ -1495,7 +1495,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506112,
+            "fixture_id": 433,
             "home_team_id": 86,
             "away_team_id": 98,
             "round": "Regular Season - 19",
@@ -1503,7 +1503,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506113,
+            "fixture_id": 435,
             "home_team_id": 89,
             "away_team_id": 102,
             "round": "Regular Season - 19",
@@ -1511,7 +1511,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506114,
+            "fixture_id": 436,
             "home_team_id": 91,
             "away_team_id": 84,
             "round": "Regular Season - 19",
@@ -1519,7 +1519,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506115,
+            "fixture_id": 437,
             "home_team_id": 92,
             "away_team_id": 93,
             "round": "Regular Season - 19",
@@ -1527,7 +1527,7 @@
             "match_type": "two_legs"
           },
           {
-            "fixture_id": 1506116,
+            "fixture_id": 439,
             "home_team_id": 95,
             "away_team_id": 90,
             "round": "Regular Season - 19",
@@ -1561,7 +1561,7 @@
             "F1R8"
           ],
           "slot_assignment": "draw_or_manual",
-          "slot_assignment_description": "Los equipos clasificados se cargan en F1R1..F1R8 seg\u00fan sorteo o carga manual."
+          "slot_assignment_description": "Los equipos clasificados se cargan en F1R1..F1R8 según sorteo o carga manual."
         },
         "standings": [
           {
