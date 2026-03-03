@@ -144,6 +144,29 @@ class AuthControllerTest extends TestCase
         $response->assertStatus(403);
     }
 
+    public function test_refresh_token_requires_api_key(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        Passport::actingAs($user, ['user:refresh-token']);
+
+        $response = $this->postJson('/api/v1/auth/refresh-token');
+
+        $response->assertStatus(401)
+            ->assertJson([
+                'message' => 'API key is required.',
+            ]);
+    }
+
+    public function test_refresh_token_requires_bearer_token(): void
+    {
+        $response = $this->postJsonWithApiKey('/api/v1/auth/refresh-token');
+
+        $response->assertStatus(401)
+            ->assertJson([
+                'message' => 'Unauthenticated.',
+            ]);
+    }
+
     public function test_refresh_token_returns_new_tokens(): void
     {
         Client::create([
