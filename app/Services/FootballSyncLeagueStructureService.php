@@ -59,25 +59,7 @@ class FootballSyncLeagueStructureService
             ->where('league_id', $leagueModel->id)
             ->where('season', $season)
             ->get()
-            ->keyBy('provider_fixture_id');
-
-        $localTeamIds = $fixtures
-            ->flatMap(fn (Fixture $fixture) => [$fixture->home_team_id, $fixture->away_team_id])
-            ->filter(fn ($id) => $id !== null)
-            ->unique()
-            ->values();
-
-        $teamProviderMap = Team::query()
-            ->whereIn('id', $localTeamIds)
-            ->pluck('provider_team_id', 'id')
-            ->map(fn ($value) => $value !== null ? (int) $value : null)
-            ->all();
-        $teamLocalMap = [];
-        foreach ($teamProviderMap as $localId => $providerId) {
-            if ($providerId !== null) {
-                $teamLocalMap[$providerId] = (int) $localId;
-            }
-        }
+            ->keyBy('id');
 
         $phaseOrder = $this->sortedPhaseKeys($phases);
         $slotAssignments = [];
@@ -103,10 +85,8 @@ class FootballSyncLeagueStructureService
             $phase = $this->syncPlayoffPhaseStandings(
                 $phase,
                 $fixtures,
-                $teamProviderMap,
-                $teamLocalMap,
-                    $slotAssignments
-                );
+                $slotAssignments
+            );
             }
 
             if (isset($phase['classified_team_slots']) && is_array($phase['classified_team_slots'])) {
@@ -126,7 +106,6 @@ class FootballSyncLeagueStructureService
                 $winnerTeam = $this->resolveTieWinnerTeam(
                     $tie,
                     $fixtures,
-                    $teamProviderMap,
                     $slotAssignments
                 );
                 if (
@@ -193,15 +172,12 @@ class FootballSyncLeagueStructureService
     /**
      * @param array<string, mixed> $phase
      * @param Collection<int, Fixture> $fixtures
-     * @param array<int, int|null> $teamProviderMap
      * @param array<string, int> $slotAssignments
      * @return array<string, mixed>
      */
     private function syncPlayoffPhaseStandings(
         array $phase,
         Collection $fixtures,
-        array $teamProviderMap,
-        array $teamLocalMap,
         array $slotAssignments
     ): array {
         if (!isset($phase['ties']) || !is_array($phase['ties'])) {
@@ -225,13 +201,11 @@ class FootballSyncLeagueStructureService
                 $tie,
                 $phase,
                 $fixtures,
-                $teamProviderMap,
-                $teamLocalMap,
                 $resolvedTeams
             );
 
             if (isset($tie['standings']) && is_array($tie['standings'])) {
-                $computedStats = $this->computeTieStandingsStats($tie, $fixtures, $teamProviderMap, $resolvedTeams);
+                $computedStats = $this->computeTieStandingsStats($tie, $fixtures, $resolvedTeams);
                 $tie['standings'] = $this->applyComputedStatsToStandingsArray($tie['standings'], $computedStats);
             }
 
@@ -351,7 +325,7 @@ class FootballSyncLeagueStructureService
             $row['position'] = $source !== null ? (int) ($source->rank_position ?? $defaultPosition) : $defaultPosition;
         }
         if (array_key_exists('team', $row)) {
-            $row['team'] = $source?->team?->provider_team_id !== null ? (int) $source->team->provider_team_id : ($row['team'] ?? null);
+            $row['team'] = $source?->team?->id !== null ? (int) $source->team->id : ($row['team'] ?? null);
         }
         if (array_key_exists('points', $row)) {
             $row['points'] = $source?->points;
@@ -434,14 +408,12 @@ class FootballSyncLeagueStructureService
     /**
      * @param array<string, mixed> $tie
      * @param Collection<int, Fixture> $fixtures
-     * @param array<int, int|null> $teamProviderMap
      * @param array<int, int|string|null> $resolvedTeams
      * @return array<int, array<string, mixed>>
      */
     private function computeTieStandingsStats(
         array $tie,
         Collection $fixtures,
-        array $teamProviderMap,
         array $resolvedTeams
     ): array {
         $stats = [];
@@ -456,29 +428,28 @@ class FootballSyncLeagueStructureService
                 continue;
             }
 
-            $providerFixtureId = $leg['fixture_id'] ?? null;
-            if (!is_int($providerFixtureId)) {
+            $fixtureId = $leg['fixture_id'] ?? null;
+            if (!is_int($fixtureId)) {
                 continue;
             }
 
             /** @var Fixture|null $fixture */
-            $fixture = $fixtures->get($providerFixtureId);
+            $fixture = $fixtures->get($fixtureId);
             if ($fixture === null) {
                 continue;
             }
 
-            $homeProviderTeamId = $teamProviderMap[$fixture->home_team_id] ?? null;
-            $awayProviderTeamId = $teamProviderMap[$fixture->away_team_id] ?? null;
-
-            if (!is_int($homeProviderTeamId) || !is_int($awayProviderTeamId)) {
+            $homeTeamId = $fixture->home_team_id;
+            $awayTeamId = $fixture->away_team_id;
+            if (!is_int($homeTeamId) || !is_int($awayTeamId)) {
                 continue;
             }
 
-            if (!isset($stats[$homeProviderTeamId])) {
-                $stats[$homeProviderTeamId] = $this->emptyStatsRow($homeProviderTeamId);
+            if (!isset($stats[$homeTeamId])) {
+                $stats[$homeTeamId] = $this->emptyStatsRow($homeTeamId);
             }
-            if (!isset($stats[$awayProviderTeamId])) {
-                $stats[$awayProviderTeamId] = $this->emptyStatsRow($awayProviderTeamId);
+            if (!isset($stats[$awayTeamId])) {
+                $stats[$awayTeamId] = $this->emptyStatsRow($awayTeamId);
             }
 
             $homeGoals = $fixture->home_goals;
@@ -488,30 +459,30 @@ class FootballSyncLeagueStructureService
                 continue;
             }
 
-            $stats[$homeProviderTeamId]['matches_played'] += 1;
-            $stats[$awayProviderTeamId]['matches_played'] += 1;
+            $stats[$homeTeamId]['matches_played'] += 1;
+            $stats[$awayTeamId]['matches_played'] += 1;
 
-            $stats[$homeProviderTeamId]['goals_for'] += $homeGoals;
-            $stats[$homeProviderTeamId]['goals_against'] += $awayGoals;
-            $stats[$awayProviderTeamId]['goals_for'] += $awayGoals;
-            $stats[$awayProviderTeamId]['goals_against'] += $homeGoals;
+            $stats[$homeTeamId]['goals_for'] += $homeGoals;
+            $stats[$homeTeamId]['goals_against'] += $awayGoals;
+            $stats[$awayTeamId]['goals_for'] += $awayGoals;
+            $stats[$awayTeamId]['goals_against'] += $homeGoals;
 
-            $stats[$homeProviderTeamId]['home_goals_for'] += $homeGoals;
-            $stats[$awayProviderTeamId]['away_goals_for'] += $awayGoals;
+            $stats[$homeTeamId]['home_goals_for'] += $homeGoals;
+            $stats[$awayTeamId]['away_goals_for'] += $awayGoals;
 
             if ($homeGoals > $awayGoals) {
-                $stats[$homeProviderTeamId]['matches_won'] += 1;
-                $stats[$awayProviderTeamId]['matches_lost'] += 1;
-                $stats[$homeProviderTeamId]['points'] += 3;
+                $stats[$homeTeamId]['matches_won'] += 1;
+                $stats[$awayTeamId]['matches_lost'] += 1;
+                $stats[$homeTeamId]['points'] += 3;
             } elseif ($homeGoals < $awayGoals) {
-                $stats[$awayProviderTeamId]['matches_won'] += 1;
-                $stats[$homeProviderTeamId]['matches_lost'] += 1;
-                $stats[$awayProviderTeamId]['points'] += 3;
+                $stats[$awayTeamId]['matches_won'] += 1;
+                $stats[$homeTeamId]['matches_lost'] += 1;
+                $stats[$awayTeamId]['points'] += 3;
             } else {
-                $stats[$homeProviderTeamId]['matches_drawn'] += 1;
-                $stats[$awayProviderTeamId]['matches_drawn'] += 1;
-                $stats[$homeProviderTeamId]['points'] += 1;
-                $stats[$awayProviderTeamId]['points'] += 1;
+                $stats[$homeTeamId]['matches_drawn'] += 1;
+                $stats[$awayTeamId]['matches_drawn'] += 1;
+                $stats[$homeTeamId]['points'] += 1;
+                $stats[$awayTeamId]['points'] += 1;
             }
         }
 
@@ -586,7 +557,6 @@ class FootballSyncLeagueStructureService
      * @param array<string, mixed> $tie
      * @param array<string, mixed> $phase
      * @param Collection<int, Fixture> $fixtures
-     * @param array<int, int> $teamLocalMap
      * @param array<int, int|string|null> $resolvedTeams
      * @return array<string, mixed>
      */
@@ -594,8 +564,6 @@ class FootballSyncLeagueStructureService
         array $tie,
         array $phase,
         Collection $fixtures,
-        array $teamProviderMap,
-        array $teamLocalMap,
         array $resolvedTeams
     ): array {
         $legsKey = isset($tie['legs']) && is_array($tie['legs']) ? 'legs' : (
@@ -612,11 +580,8 @@ class FootballSyncLeagueStructureService
             return $tie;
         }
 
-        $localTeamA = $teamLocalMap[$resolvedTeamIds[0]] ?? null;
-        $localTeamB = $teamLocalMap[$resolvedTeamIds[1]] ?? null;
-        if (!is_int($localTeamA) || !is_int($localTeamB)) {
-            return $tie;
-        }
+        $localTeamA = $resolvedTeamIds[0];
+        $localTeamB = $resolvedTeamIds[1];
 
         $phaseName = (string) ($phase['phase_name'] ?? '');
         $tieName = (string) ($tie['name'] ?? '');
@@ -636,7 +601,7 @@ class FootballSyncLeagueStructureService
             })
             ->sortBy(fn (Fixture $fixture): array => [
                 (string) ($fixture->fixture_date?->format('Y-m-d H:i:s') ?? ''),
-                (int) $fixture->provider_fixture_id,
+                (int) $fixture->id,
             ])
             ->values();
 
@@ -661,13 +626,13 @@ class FootballSyncLeagueStructureService
             }
 
             if (array_key_exists('fixture_id', $leg)) {
-                $leg['fixture_id'] = (int) $fixture->provider_fixture_id;
+                $leg['fixture_id'] = (int) $fixture->id;
             }
             if (array_key_exists('home_team_id', $leg)) {
-                $leg['home_team_id'] = $teamProviderMap[$fixture->home_team_id] ?? $leg['home_team_id'];
+                $leg['home_team_id'] = $fixture->home_team_id ?? $leg['home_team_id'];
             }
             if (array_key_exists('away_team_id', $leg)) {
-                $leg['away_team_id'] = $teamProviderMap[$fixture->away_team_id] ?? $leg['away_team_id'];
+                $leg['away_team_id'] = $fixture->away_team_id ?? $leg['away_team_id'];
             }
 
             $legs[$index] = $leg;
@@ -851,13 +816,11 @@ class FootballSyncLeagueStructureService
     /**
      * @param array<string, mixed> $tie
      * @param Collection<int, Fixture> $fixtures
-     * @param array<int, int|null> $teamProviderMap
      * @param array<string, int> $slotAssignments
      */
     private function resolveTieWinnerTeam(
         array $tie,
         Collection $fixtures,
-        array $teamProviderMap,
         array $slotAssignments
     ): ?int {
         $resolvedTeams = [];
@@ -897,9 +860,9 @@ class FootballSyncLeagueStructureService
                 return null;
             }
 
-            $homeProvider = $teamProviderMap[$fixture->home_team_id] ?? null;
-            $awayProvider = $teamProviderMap[$fixture->away_team_id] ?? null;
-            if (!is_int($homeProvider) || !is_int($awayProvider)) {
+            $homeTeamId = $fixture->home_team_id;
+            $awayTeamId = $fixture->away_team_id;
+            if (!is_int($homeTeamId) || !is_int($awayTeamId)) {
                 return null;
             }
 
@@ -907,11 +870,11 @@ class FootballSyncLeagueStructureService
                 return null;
             }
 
-            if (isset($aggregate[$homeProvider])) {
-                $aggregate[$homeProvider] += (int) $fixture->home_goals;
+            if (isset($aggregate[$homeTeamId])) {
+                $aggregate[$homeTeamId] += (int) $fixture->home_goals;
             }
-            if (isset($aggregate[$awayProvider])) {
-                $aggregate[$awayProvider] += (int) $fixture->away_goals;
+            if (isset($aggregate[$awayTeamId])) {
+                $aggregate[$awayTeamId] += (int) $fixture->away_goals;
             }
         }
 
@@ -936,13 +899,13 @@ class FootballSyncLeagueStructureService
             return false;
         }
 
-        foreach ($fixtureIds as $providerFixtureId) {
-            if (!is_int($providerFixtureId)) {
+        foreach ($fixtureIds as $fixtureId) {
+            if (!is_int($fixtureId)) {
                 return false;
             }
 
             /** @var Fixture|null $fixture */
-            $fixture = $fixtures->get($providerFixtureId);
+            $fixture = $fixtures->get($fixtureId);
             if ($fixture === null) {
                 return false;
             }
