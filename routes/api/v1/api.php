@@ -43,6 +43,9 @@ Route::middleware(['api.key'])->group(function (): void {
 Route::middleware(['api.key', 'auth:api'])->prefix('auth')->group(function (): void {
     Route::post('verify-email', [AuthController::class, 'verifyEmail'])
         ->middleware(['scope:user:verify']);
+
+    Route::post('refresh-token', [AuthController::class, 'refreshToken'])
+        ->middleware(['scope:user:refresh-token']);
     
     Route::prefix('password')->group(function (): void {
         Route::patch('/', [AuthController::class, 'updatePassword'])

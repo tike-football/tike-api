@@ -48,11 +48,19 @@ class AuthController extends Controller
             }
 
             $scopes = $user->getRoleScopes();
-            $token = $user->createToken('token-name', $scopes)->accessToken;
+            $accessTokenResult = $user->createToken('access-token', $scopes);
+            $accessTokenResult->token->expires_at = now()->addDay();
+            $accessTokenResult->token->save();
+
+            $refreshScopes = config('roles.refreshed_user.scopes', ['user:refresh-token']);
+            $refreshTokenResult = $user->createToken('refresh-token', $refreshScopes);
+            $refreshTokenResult->token->expires_at = now()->addDays(30);
+            $refreshTokenResult->token->save();
 
             return response()->json(
                 [
-                    'access_token' => $token,
+                    'access_token' => $accessTokenResult->accessToken,
+                    'refresh_token' => $refreshTokenResult->accessToken,
                 ],
                 200
             );
@@ -62,6 +70,52 @@ class AuthController extends Controller
                 'message' => 'Validation failed.',
                 'errors' => $e->errors()
             ], 422);
+        }
+    }
+
+    /**
+     * Refresh access token using refresh token scope.
+     */
+    public function refreshToken(Request $request): JsonResponse
+    {
+        try {
+            $user = $request->user();
+            if ($user === null) {
+                return response()->json([
+                    'message' => 'Unauthenticated.',
+                ], 401);
+            }
+
+            $currentToken = $user->token();
+            if ($currentToken) {
+                $currentToken->revoke();
+            }
+
+            $scopes = $user->getRoleScopes();
+            $accessTokenResult = $user->createToken('access-token', $scopes);
+            $accessTokenResult->token->expires_at = now()->addDay();
+            $accessTokenResult->token->save();
+
+            $refreshScopes = config('roles.refreshed_user.scopes', ['user:refresh-token']);
+            $refreshTokenResult = $user->createToken('refresh-token', $refreshScopes);
+            $refreshTokenResult->token->expires_at = now()->addDays(30);
+            $refreshTokenResult->token->save();
+
+            return response()->json([
+                'access_token' => $accessTokenResult->accessToken,
+                'refresh_token' => $refreshTokenResult->accessToken,
+            ], 200);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error(__METHOD__ . ' error: ' . $e->getMessage(), [
+                'user_id' => $request->user()?->id,
+                'exception_message' => $e->getMessage(),
+                'exception_trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'message' => 'An error occurred while refreshing the token.',
+                'error' => 'Token refresh failed. Please try again.'
+            ], 500);
         }
     }
 

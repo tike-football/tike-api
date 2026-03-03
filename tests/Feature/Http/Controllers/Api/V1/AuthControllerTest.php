@@ -67,7 +67,7 @@ class AuthControllerTest extends TestCase
         ]);
 
         $response->assertStatus(200)
-            ->assertJsonStructure(['access_token']);
+            ->assertJsonStructure(['access_token', 'refresh_token']);
     }
 
     public function test_unverified_user_cannot_get_token(): void
@@ -132,5 +132,58 @@ class AuthControllerTest extends TestCase
 
         $this->assertEquals($adminScopes, $adminUser->getRoleScopes());
         $this->assertEquals($userScopes, $regularUser->getRoleScopes());
+    }
+
+    public function test_refresh_token_requires_scope(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        Passport::actingAs($user, ['different:scope']);
+
+        $response = $this->postJsonWithApiKey('/api/v1/auth/refresh-token');
+
+        $response->assertStatus(403);
+    }
+
+    public function test_refresh_token_requires_api_key(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        Passport::actingAs($user, ['user:refresh-token']);
+
+        $response = $this->postJson('/api/v1/auth/refresh-token');
+
+        $response->assertStatus(401)
+            ->assertJson([
+                'message' => 'API key is required.',
+            ]);
+    }
+
+    public function test_refresh_token_requires_bearer_token(): void
+    {
+        $response = $this->postJsonWithApiKey('/api/v1/auth/refresh-token');
+
+        $response->assertStatus(401)
+            ->assertJson([
+                'message' => 'Unauthenticated.',
+            ]);
+    }
+
+    public function test_refresh_token_returns_new_tokens(): void
+    {
+        Client::create([
+            'name' => 'Personal Access Client',
+            'secret' => Str::random(40),
+            'provider' => null,
+            'redirect_uris' => [],
+            'grant_types' => ['personal_access'],
+            'revoked' => false,
+        ]);
+
+        $user = User::factory()->create(['role' => 'user']);
+        Passport::actingAs($user, ['user:refresh-token']);
+
+        $response = $this->postJsonWithApiKey('/api/v1/auth/refresh-token');
+
+        $response->assertStatus(200)
+            ->assertJsonStructure(['access_token', 'refresh_token']);
     }
 }

@@ -25,4 +25,9 @@ return [
             'user:recover-password'
         ],
     ],
+    'refreshed_user' => [
+        'scopes' => [
+            'user:refresh-token'
+        ],
+    ],
 ];
