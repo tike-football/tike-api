@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\FootballCacheServiceController;
 use App\Http\Controllers\Api\V1\FootballDataController;
 use App\Http\Controllers\Api\V1\FootballDataServiceController;
 use App\Http\Controllers\Api\V1\UserController;
+use App\Http\Controllers\Api\V1\UtilController;
 use Illuminate\Support\Facades\Route;
 
 // Health check - No API key required (for monitoring)
@@ -59,6 +60,13 @@ Route::middleware(['api.key', 'auth:api'])->prefix('auth')->group(function (): v
 Route::middleware(['api.key', 'auth:api'])->prefix('user')->group(function (): void {
     Route::get('/', [UserController::class, 'get'])
         ->middleware(['scope:user:get']);
+});
+
+// Util endpoints - Require API key, authentication and util scope
+Route::middleware(['api.key', 'auth:api'])->prefix('util')->group(function (): void {
+    Route::middleware(['scope:util:get'])->controller(UtilController::class)->group(function (): void {
+        Route::get('get-available-avatars', 'getAvailableAvatars');
+    });
 });
 
 // Football data endpoints - Require API key, authentication and read scope
