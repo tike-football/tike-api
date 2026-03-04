@@ -8,7 +8,8 @@ return [
             'user:get',
             'football-data:sync',
             'football-data:cache',
-            'football-data:get'
+            'football-data:get',
+            'util:get'
         ],
     ],
     'user' => [
@@ -16,7 +17,8 @@ return [
             'test:test',
             'user:update-password',
             'user:get',
-            'football-data:get'
+            'football-data:get',
+            'util:get'
         ],
     ],
     'unverified_user' => [
