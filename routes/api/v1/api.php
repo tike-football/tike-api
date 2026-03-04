@@ -60,6 +60,9 @@ Route::middleware(['api.key', 'auth:api'])->prefix('auth')->group(function (): v
 Route::middleware(['api.key', 'auth:api'])->prefix('user')->group(function (): void {
     Route::get('/', [UserController::class, 'get'])
         ->middleware(['scope:user:get']);
+
+    Route::patch('avatar', [UserController::class, 'updateAvatar'])
+        ->middleware(['scope:user:update']);
 });
 
 // Util endpoints - Require API key, authentication and util scope

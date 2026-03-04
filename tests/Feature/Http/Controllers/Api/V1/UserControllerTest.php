@@ -4,6 +4,7 @@ namespace Tests\Feature\Http\Controllers\Api\V1;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Passport\Passport;
 use Tests\TestCase;
 use Tests\Traits\WithApiKey;
@@ -143,5 +144,100 @@ class UserControllerTest extends TestCase
         $avatarUrl = $response->json('user.avatar_url');
         $this->assertNotNull($avatarUrl);
         $this->assertStringContainsString('/users/avatars/system/default01.png', $avatarUrl);
+    }
+
+    public function test_update_avatar_requires_api_key(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        Passport::actingAs($user, ['user:update']);
+
+        $response = $this->patchJson('/api/v1/user/avatar', [
+            'avatar_path' => 'system/default02.png',
+        ]);
+
+        $response->assertStatus(401)
+            ->assertJson([
+                'message' => 'API key is required.',
+            ]);
+    }
+
+    public function test_update_avatar_requires_bearer_token(): void
+    {
+        $response = $this->patchJsonWithApiKey('/api/v1/user/avatar', [
+            'avatar_path' => 'system/default02.png',
+        ]);
+
+        $response->assertStatus(401)
+            ->assertJson([
+                'message' => 'Unauthenticated.',
+            ]);
+    }
+
+    public function test_update_avatar_requires_scope(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        Passport::actingAs($user, ['different:scope']);
+
+        $response = $this->patchJsonWithApiKey('/api/v1/user/avatar', [
+            'avatar_path' => 'system/default02.png',
+        ]);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_update_avatar_validates_format(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        Passport::actingAs($user, ['user:update']);
+
+        $response = $this->patchJsonWithApiKey('/api/v1/user/avatar', [
+            'avatar_path' => 'invalid/path/to/file.png',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['avatar_path']);
+    }
+
+    public function test_update_avatar_updates_avatar_path_when_valid(): void
+    {
+        $user = User::factory()->create([
+            'role' => 'user',
+            'avatar_path' => 'system/default01.png',
+        ]);
+        Passport::actingAs($user, ['user:update']);
+
+        $response = $this->patchJsonWithApiKey('/api/v1/user/avatar', [
+            'avatar_path' => 'system/default02.png',
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('user.avatar_path', 'system/default02.png');
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'avatar_path' => 'system/default02.png',
+        ]);
+    }
+
+    public function test_update_avatar_rejects_missing_s3_object(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        Passport::actingAs($user, ['user:update']);
+
+        config()->set('filesystems.folders.user_avatars.driver', 's3');
+
+        Storage::shouldReceive('disk')
+            ->with('s3')
+            ->andReturnSelf();
+        Storage::shouldReceive('exists')
+            ->once()
+            ->andReturn(false);
+
+        $response = $this->patchJsonWithApiKey('/api/v1/user/avatar', [
+            'avatar_path' => 'system/default02.png',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['avatar_path']);
     }
 }
