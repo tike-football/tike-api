@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\User\UpdateAvatarRequest;
 use App\Http\Resources\Api\V1\User\UserResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -31,6 +32,35 @@ class UserController extends Controller
             return response()->json([
                 'message' => 'An error occurred while retrieving the user profile.',
                 'error' => 'User profile retrieval failed. Please try again.',
+            ], 500);
+        }
+    }
+
+    /**
+     * Update authenticated user's avatar path.
+     */
+    public function updateAvatar(UpdateAvatarRequest $request): JsonResponse
+    {
+        try {
+            $user = $request->user();
+            $user->avatar_path = (string) $request->validated('avatar_path');
+            $user->save();
+
+            $user->loadMissing('settings');
+
+            return response()->json([
+                'user' => UserResponse::make($user)->resolve(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error(__METHOD__ . ' error: ' . $e->getMessage(), [
+                'user_id' => $request->user()->id ?? null,
+                'exception_message' => $e->getMessage(),
+                'exception_trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'message' => 'An error occurred while updating the avatar.',
+                'error' => 'Avatar update failed. Please try again.',
             ], 500);
         }
     }
