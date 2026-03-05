@@ -326,6 +326,7 @@ class UserControllerTest extends TestCase
 
         config()->set('filesystems.folders.user_avatars.driver', 'local');
         Storage::fake('local');
+        $root = trim((string) config('filesystems.folders.user_avatars.root', 'users/avatars/'), '/');
 
         $paths = [];
         $baseTime = Carbon::create(2026, 3, 5, 12, 0, 0);
@@ -354,5 +355,16 @@ class UserControllerTest extends TestCase
         $this->assertContains($paths[1], $remaining);
         $this->assertContains($paths[2], $remaining);
         $this->assertContains($paths[3], $remaining);
+
+        $storedFiles = Storage::disk('local')->allFiles();
+        $this->assertCount(3, $storedFiles);
+
+        $deletedStoragePath = $root . '/' . ltrim($paths[0], '/');
+        Storage::disk('local')->assertMissing($deletedStoragePath);
+
+        foreach (array_slice($paths, 1) as $path) {
+            $storagePath = $root . '/' . ltrim($path, '/');
+            Storage::disk('local')->assertExists($storagePath);
+        }
     }
 }

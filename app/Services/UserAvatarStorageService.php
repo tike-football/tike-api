@@ -9,6 +9,16 @@ use RuntimeException;
 
 class UserAvatarStorageService
 {
+    public function delete(string $avatarPath): void
+    {
+        $folderConfig = config('filesystems.folders.user_avatars', []);
+        $disk = $folderConfig['driver'] ?? config('filesystems.default', 'local');
+        $root = trim((string) ($folderConfig['root'] ?? 'users/avatars/'), '/');
+        $storagePath = $root . '/' . ltrim($avatarPath, '/');
+
+        Storage::disk($disk)->delete($storagePath);
+    }
+
     public function store(User $user, UploadedFile $file): string
     {
         $folderConfig = config('filesystems.folders.user_avatars', []);

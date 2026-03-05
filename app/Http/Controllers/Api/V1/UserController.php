@@ -101,11 +101,16 @@ class UserController extends Controller
                 ->orderByDesc('created_at')
                 ->skip(3)
                 ->take(1000)
-                ->pluck('id')
+                ->pluck('avatar_path', 'id')
                 ->all();
 
             if ($oldIds !== []) {
-                UserAvatar::query()->whereIn('id', $oldIds)->delete();
+                UserAvatar::query()->whereIn('id', array_keys($oldIds))->delete();
+                foreach ($oldIds as $oldPath) {
+                    if (is_string($oldPath) && $oldPath !== '') {
+                        $storageService->delete($oldPath);
+                    }
+                }
             }
 
             $user->loadMissing('settings');
