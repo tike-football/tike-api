@@ -734,11 +734,20 @@ class FootballSyncLeagueStructureService
             return null;
         }
 
-        $nullGroupStanding = $standings->first(
-            fn (LeagueStanding $standing): bool => empty((string) $standing->standing_group)
-        );
-        if ($nullGroupStanding !== null) {
-            return $nullGroupStanding;
+        $byLastSynced = $standings
+            ->filter(fn (LeagueStanding $standing): bool => $standing->last_synced_at !== null)
+            ->sortByDesc(fn (LeagueStanding $standing): int => (int) $standing->last_synced_at->getTimestamp())
+            ->first();
+        if ($byLastSynced !== null) {
+            return $byLastSynced;
+        }
+
+        $byUpdatedAt = $standings
+            ->filter(fn (LeagueStanding $standing): bool => $standing->updated_at !== null)
+            ->sortByDesc(fn (LeagueStanding $standing): int => (int) $standing->updated_at->getTimestamp())
+            ->first();
+        if ($byUpdatedAt !== null) {
+            return $byUpdatedAt;
         }
 
         return $standings
