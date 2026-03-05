@@ -100,6 +100,7 @@ class UserController extends Controller
                 ->where('user_id', $user->id)
                 ->orderByDesc('created_at')
                 ->skip(3)
+                ->take(1000)
                 ->pluck('id')
                 ->all();
 

@@ -249,7 +249,7 @@ class UserControllerTest extends TestCase
         $user = User::factory()->create(['role' => 'user']);
         Passport::actingAs($user, ['user:update']);
 
-        $response = $this->postJson('/api/v1/user/avatar/upload', [
+        $response = $this->post('/api/v1/user/avatar/upload', [
             'avatar' => UploadedFile::fake()->image('avatar.png'),
         ]);
 
@@ -261,9 +261,9 @@ class UserControllerTest extends TestCase
 
     public function test_upload_avatar_requires_bearer_token(): void
     {
-        $response = $this->postJsonWithApiKey('/api/v1/user/avatar/upload', [
+        $response = $this->post('/api/v1/user/avatar/upload', [
             'avatar' => UploadedFile::fake()->image('avatar.png'),
-        ]);
+        ], $this->withApiKeyHeader());
 
         $response->assertStatus(401)
             ->assertJson([
@@ -276,9 +276,9 @@ class UserControllerTest extends TestCase
         $user = User::factory()->create(['role' => 'user']);
         Passport::actingAs($user, ['different:scope']);
 
-        $response = $this->postJsonWithApiKey('/api/v1/user/avatar/upload', [
+        $response = $this->post('/api/v1/user/avatar/upload', [
             'avatar' => UploadedFile::fake()->image('avatar.png'),
-        ]);
+        ], $this->withApiKeyHeader());
 
         $response->assertStatus(403);
     }
@@ -291,9 +291,9 @@ class UserControllerTest extends TestCase
         config()->set('filesystems.folders.user_avatars.driver', 'local');
         Storage::fake('local');
 
-        $response = $this->postJsonWithApiKey('/api/v1/user/avatar/upload', [
+        $response = $this->post('/api/v1/user/avatar/upload', [
             'avatar' => UploadedFile::fake()->image('avatar.png'),
-        ]);
+        ], $this->withApiKeyHeader());
 
         $response->assertStatus(200)
             ->assertJsonStructure([
@@ -333,9 +333,9 @@ class UserControllerTest extends TestCase
         for ($i = 0; $i < 4; $i++) {
             Carbon::setTestNow($baseTime->copy()->addMinutes($i));
 
-            $response = $this->postJsonWithApiKey('/api/v1/user/avatar/upload', [
+            $response = $this->post('/api/v1/user/avatar/upload', [
                 'avatar' => UploadedFile::fake()->image("avatar{$i}.png"),
-            ]);
+            ], $this->withApiKeyHeader());
 
             $response->assertStatus(200);
             $paths[] = (string) $response->json('user.avatar_path');
