@@ -3,8 +3,11 @@
 namespace Tests\Feature\Http\Controllers\Api\V1;
 
 use App\Models\User;
+use App\Models\UserAvatar;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\UploadedFile;
 use Laravel\Passport\Passport;
 use Tests\TestCase;
 use Tests\Traits\WithApiKey;
@@ -239,5 +242,117 @@ class UserControllerTest extends TestCase
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['avatar_path']);
+    }
+
+    public function test_upload_avatar_requires_api_key(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        Passport::actingAs($user, ['user:update']);
+
+        $response = $this->postJson('/api/v1/user/avatar/upload', [
+            'avatar' => UploadedFile::fake()->image('avatar.png'),
+        ]);
+
+        $response->assertStatus(401)
+            ->assertJson([
+                'message' => 'API key is required.',
+            ]);
+    }
+
+    public function test_upload_avatar_requires_bearer_token(): void
+    {
+        $response = $this->postJsonWithApiKey('/api/v1/user/avatar/upload', [
+            'avatar' => UploadedFile::fake()->image('avatar.png'),
+        ]);
+
+        $response->assertStatus(401)
+            ->assertJson([
+                'message' => 'Unauthenticated.',
+            ]);
+    }
+
+    public function test_upload_avatar_requires_scope(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        Passport::actingAs($user, ['different:scope']);
+
+        $response = $this->postJsonWithApiKey('/api/v1/user/avatar/upload', [
+            'avatar' => UploadedFile::fake()->image('avatar.png'),
+        ]);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_upload_avatar_stores_path_and_creates_user_avatar(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        Passport::actingAs($user, ['user:update']);
+
+        config()->set('filesystems.folders.user_avatars.driver', 'local');
+        Storage::fake('local');
+
+        $response = $this->postJsonWithApiKey('/api/v1/user/avatar/upload', [
+            'avatar' => UploadedFile::fake()->image('avatar.png'),
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'user' => [
+                    'id',
+                    'avatar_path',
+                    'avatar_url',
+                ],
+            ]);
+
+        $avatarPath = (string) $response->json('user.avatar_path');
+        $this->assertStringStartsWith('users/avatar' . $user->id, $avatarPath);
+        $this->assertStringEndsWith('.png', $avatarPath);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'avatar_path' => $avatarPath,
+        ]);
+
+        $this->assertDatabaseHas('user_avatars', [
+            'user_id' => $user->id,
+            'avatar_path' => $avatarPath,
+        ]);
+    }
+
+    public function test_upload_avatar_keeps_only_latest_three_records(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        Passport::actingAs($user, ['user:update']);
+
+        config()->set('filesystems.folders.user_avatars.driver', 'local');
+        Storage::fake('local');
+
+        $paths = [];
+        $baseTime = Carbon::create(2026, 3, 5, 12, 0, 0);
+
+        for ($i = 0; $i < 4; $i++) {
+            Carbon::setTestNow($baseTime->copy()->addMinutes($i));
+
+            $response = $this->postJsonWithApiKey('/api/v1/user/avatar/upload', [
+                'avatar' => UploadedFile::fake()->image("avatar{$i}.png"),
+            ]);
+
+            $response->assertStatus(200);
+            $paths[] = (string) $response->json('user.avatar_path');
+        }
+
+        Carbon::setTestNow();
+
+        $this->assertSame(3, UserAvatar::query()->where('user_id', $user->id)->count());
+
+        $remaining = UserAvatar::query()
+            ->where('user_id', $user->id)
+            ->pluck('avatar_path')
+            ->all();
+
+        $this->assertNotContains($paths[0], $remaining);
+        $this->assertContains($paths[1], $remaining);
+        $this->assertContains($paths[2], $remaining);
+        $this->assertContains($paths[3], $remaining);
     }
 }
