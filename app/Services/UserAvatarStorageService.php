@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use RuntimeException;
 
@@ -16,7 +17,13 @@ class UserAvatarStorageService
         $root = trim((string) ($folderConfig['root'] ?? 'users/avatars/'), '/');
         $storagePath = $root . '/' . ltrim($avatarPath, '/');
 
-        Storage::disk($disk)->delete($storagePath);
+        $deleted = Storage::disk($disk)->delete($storagePath);
+
+        Log::info('User avatar deleted from storage', [
+            'disk' => $disk,
+            'storage_path' => $storagePath,
+            'deleted' => $deleted,
+        ]);
     }
 
     public function store(User $user, UploadedFile $file): string
