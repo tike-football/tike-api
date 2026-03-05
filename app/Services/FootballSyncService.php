@@ -102,7 +102,6 @@ class FootballSyncService
                     'start' => isset($season['start']) ? (string) $season['start'] : null,
                     'end' => isset($season['end']) ? (string) $season['end'] : null,
                     'current' => (bool) ($season['current'] ?? false),
-                    'structure' => null,
                 ]
             );
         }
