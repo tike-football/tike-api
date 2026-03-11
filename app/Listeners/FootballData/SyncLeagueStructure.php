@@ -24,7 +24,7 @@ class SyncLeagueStructure implements ShouldQueue
      */
     public function withDelay(FixtureFinished $event): DateTimeInterface|DateInterval|int|null
     {
-        return now()->addMinutes(30);
+        return now()->addMinutes(6);
     }
 
     public function handle(FixtureFinished $event): void
