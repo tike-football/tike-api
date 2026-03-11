@@ -75,4 +75,16 @@ class UserTest extends TestCase
         $this->assertEquals($adminScopes, $adminUser->getRoleScopes());
         $this->assertEquals($userScopes, $regularUser->getRoleScopes());
     }
+
+    public function test_fake_user_factory_state_generates_expected_active_user_shape(): void
+    {
+        $user = User::factory()->fakeUser(25)->create();
+
+        $this->assertSame('fakeuser25@test.com', $user->email);
+        $this->assertSame('+1', $user->country_code);
+        $this->assertSame('7000000025', $user->phone_number);
+        $this->assertSame('+17000000025', $user->full_phone_number);
+        $this->assertSame('user', $user->role);
+        $this->assertNotNull($user->email_verified_at);
+    }
 }
