@@ -8,6 +8,7 @@ return [
             'user:get',
             'user:update',
             'friend:search',
+            'friend:add',
             'football-data:sync',
             'football-data:cache',
             'football-data:get',
@@ -21,6 +22,7 @@ return [
             'user:get',
             'user:update',
             'friend:search',
+            'friend:add',
             'football-data:get',
             'util:get'
         ],

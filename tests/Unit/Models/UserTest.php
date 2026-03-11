@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Models;
 
+use App\Models\Friend;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -86,5 +87,55 @@ class UserTest extends TestCase
         $this->assertSame('+17000000025', $user->full_phone_number);
         $this->assertSame('user', $user->role);
         $this->assertNotNull($user->email_verified_at);
+    }
+
+    public function test_user_can_detect_sent_friend_request(): void
+    {
+        $user = User::factory()->create();
+        $otherUser = User::factory()->create();
+
+        Friend::query()->create([
+            'user_id' => $user->id,
+            'friend_id' => $otherUser->id,
+        ]);
+
+        $this->assertTrue($user->hasSentFriendRequestTo($otherUser->id));
+        $this->assertFalse($user->hasReceivedFriendRequestFrom($otherUser->id));
+        $this->assertFalse($user->isFriendWith($otherUser->id));
+    }
+
+    public function test_user_can_detect_received_friend_request(): void
+    {
+        $user = User::factory()->create();
+        $otherUser = User::factory()->create();
+
+        Friend::query()->create([
+            'user_id' => $otherUser->id,
+            'friend_id' => $user->id,
+        ]);
+
+        $this->assertFalse($user->hasSentFriendRequestTo($otherUser->id));
+        $this->assertTrue($user->hasReceivedFriendRequestFrom($otherUser->id));
+        $this->assertFalse($user->isFriendWith($otherUser->id));
+    }
+
+    public function test_user_can_detect_friendship_when_both_requests_exist(): void
+    {
+        $user = User::factory()->create();
+        $otherUser = User::factory()->create();
+
+        Friend::query()->create([
+            'user_id' => $user->id,
+            'friend_id' => $otherUser->id,
+        ]);
+
+        Friend::query()->create([
+            'user_id' => $otherUser->id,
+            'friend_id' => $user->id,
+        ]);
+
+        $this->assertTrue($user->hasSentFriendRequestTo($otherUser->id));
+        $this->assertTrue($user->hasReceivedFriendRequestFrom($otherUser->id));
+        $this->assertTrue($user->isFriendWith($otherUser->id));
     }
 }

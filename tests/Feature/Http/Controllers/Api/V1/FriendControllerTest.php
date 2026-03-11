@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers\Api\V1;
 
+use App\Models\Friend;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Passport\Passport;
@@ -11,6 +12,144 @@ use Tests\Traits\WithApiKey;
 class FriendControllerTest extends TestCase
 {
     use RefreshDatabase, WithApiKey;
+
+    public function test_add_requires_api_key(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        $friend = User::factory()->create();
+        Passport::actingAs($user, ['friend:add']);
+
+        $response = $this->postJson('/api/v1/friend/add/' . $friend->id);
+
+        $response->assertStatus(401)
+            ->assertJson([
+                'message' => 'API key is required.',
+            ]);
+    }
+
+    public function test_add_requires_bearer_token(): void
+    {
+        $friend = User::factory()->create();
+
+        $response = $this->postJsonWithApiKey('/api/v1/friend/add/' . $friend->id);
+
+        $response->assertStatus(401)
+            ->assertJson([
+                'message' => 'Unauthenticated.',
+            ]);
+    }
+
+    public function test_add_requires_scope(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        $friend = User::factory()->create();
+        Passport::actingAs($user, ['different:scope']);
+
+        $response = $this->postJsonWithApiKey('/api/v1/friend/add/' . $friend->id);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_add_returns_friend_request_sent_when_other_user_has_not_added_back(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        $friend = User::factory()->create();
+        Passport::actingAs($user, ['friend:add']);
+
+        $response = $this->postJsonWithApiKey('/api/v1/friend/add/' . $friend->id);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'message' => 'Friend request sent.',
+            ]);
+
+        $this->assertDatabaseHas('friends', [
+            'user_id' => $user->id,
+            'friend_id' => $friend->id,
+        ]);
+    }
+
+    public function test_add_returns_friend_added_when_other_user_already_added_auth_user(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        $friend = User::factory()->create();
+        Passport::actingAs($user, ['friend:add']);
+
+        Friend::query()->create([
+            'user_id' => $friend->id,
+            'friend_id' => $user->id,
+        ]);
+
+        $response = $this->postJsonWithApiKey('/api/v1/friend/add/' . $friend->id);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'message' => 'Friend added.',
+            ]);
+
+        $this->assertDatabaseHas('friends', [
+            'user_id' => $user->id,
+            'friend_id' => $friend->id,
+        ]);
+    }
+
+    public function test_add_returns_request_already_sent_when_request_exists_from_auth_user(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        $friend = User::factory()->create();
+        Passport::actingAs($user, ['friend:add']);
+
+        Friend::query()->create([
+            'user_id' => $user->id,
+            'friend_id' => $friend->id,
+        ]);
+
+        $response = $this->postJsonWithApiKey('/api/v1/friend/add/' . $friend->id);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'message' => 'Friend request has already been sent.',
+            ]);
+
+        $this->assertSame(1, Friend::query()
+            ->where('user_id', $user->id)
+            ->where('friend_id', $friend->id)
+            ->count());
+    }
+
+    public function test_add_returns_already_friends_when_both_records_exist(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        $friend = User::factory()->create();
+        Passport::actingAs($user, ['friend:add']);
+
+        Friend::query()->create([
+            'user_id' => $user->id,
+            'friend_id' => $friend->id,
+        ]);
+
+        Friend::query()->create([
+            'user_id' => $friend->id,
+            'friend_id' => $user->id,
+        ]);
+
+        $response = $this->postJsonWithApiKey('/api/v1/friend/add/' . $friend->id);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'message' => 'You are already friends.',
+            ]);
+
+        $this->assertSame(1, Friend::query()
+            ->where('user_id', $user->id)
+            ->where('friend_id', $friend->id)
+            ->count());
+
+        $this->assertSame(1, Friend::query()
+            ->where('user_id', $friend->id)
+            ->where('friend_id', $user->id)
+            ->count());
+    }
 
     public function test_search_requires_api_key(): void
     {

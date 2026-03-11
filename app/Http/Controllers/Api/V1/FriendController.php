@@ -11,6 +11,68 @@ use Illuminate\Support\Str;
 
 class FriendController extends Controller
 {
+    public function add(int $userId): JsonResponse
+    {
+        try {
+            $authUser = request()->user();
+
+            if ($authUser === null) {
+                return response()->json([
+                    'message' => 'Unauthenticated.',
+                ], 401);
+            }
+
+            if ($authUser->id === $userId) {
+                return response()->json([
+                    'message' => 'You cannot add yourself as a friend.',
+                ], 422);
+            }
+
+            $friendUser = User::query()->find($userId);
+
+            if ($friendUser === null) {
+                return response()->json([
+                    'message' => 'User not found.',
+                ], 404);
+            }
+
+            if ($authUser->isFriendWith($friendUser->id)) {
+                return response()->json([
+                    'message' => 'You are already friends.',
+                ]);
+            }
+
+            if ($authUser->hasSentFriendRequestTo($friendUser->id)) {
+                return response()->json([
+                    'message' => 'Friend request has already been sent.',
+                ]);
+            }
+
+            $authUser->outgoingFriendRequests()->create([
+                'user_id' => $authUser->id,
+                'friend_id' => $friendUser->id,
+            ]);
+
+            return response()->json([
+                'message' => $authUser->hasReceivedFriendRequestFrom($friendUser->id)
+                    ? 'Friend added.'
+                    : 'Friend request sent.',
+            ]);
+        } catch (\Throwable $e) {
+            Log::error(__METHOD__ . ' error: ' . $e->getMessage(), [
+                'target_user_id' => $userId,
+                'auth_user_id' => request()->user()?->id,
+                'exception_message' => $e->getMessage(),
+                'exception_trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'message' => 'An error occurred while adding a friend.',
+                'error' => 'Friend add failed. Please try again.',
+            ], 500);
+        }
+    }
+
     public function search(string $term): JsonResponse
     {
         try {
