@@ -25,7 +25,7 @@ class FixtureFinishedEventTest extends TestCase
         );
     }
 
-    public function test_sync_league_structure_listener_uses_football_data_queue_and_has_30_minutes_delay(): void
+    public function test_sync_league_structure_listener_uses_football_data_queue_and_has_6_minutes_delay(): void
     {
         $league = League::create([
             'provider' => 'api_football',
@@ -41,8 +41,8 @@ class FixtureFinishedEventTest extends TestCase
 
         $this->assertSame('football-data', $listener->queue);
         $this->assertInstanceOf(\DateTimeInterface::class, $delay);
-        $this->assertGreaterThanOrEqual(29.9, $minutes);
-        $this->assertLessThanOrEqual(30.1, $minutes);
+        $this->assertGreaterThanOrEqual(5.9, $minutes);
+        $this->assertLessThanOrEqual(6.1, $minutes);
     }
 
     public function test_sync_league_structure_listener_calls_service(): void
