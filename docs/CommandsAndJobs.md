@@ -201,3 +201,27 @@ At infrastructure level, keep a scheduler runner alive (recommended):
 ```bash
 php artisan schedule:work
 ```
+
+## User Utility Commands
+
+### 1. Create fake users
+
+Command:
+
+```bash
+php artisan users:create-fake {count}
+```
+
+Example:
+
+```bash
+php artisan users:create-fake 50
+```
+
+What it does:
+
+- Creates the requested number of fake users
+- Uses emails in format `fakeuserN@test.com`
+- Generates unique phone numbers and `full_phone_number`
+- Leaves users verified (`email_verified_at` filled)
+- Stores them with role `user`

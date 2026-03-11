@@ -68,6 +68,41 @@ class User extends Authenticatable implements OAuthenticatable
         return $this->hasMany(Setting::class);
     }
 
+    public function friends(): HasMany
+    {
+        return $this->hasMany(Friend::class);
+    }
+
+    public function outgoingFriendRequests(): HasMany
+    {
+        return $this->hasMany(Friend::class, 'user_id');
+    }
+
+    public function incomingFriendRequests(): HasMany
+    {
+        return $this->hasMany(Friend::class, 'friend_id');
+    }
+
+    public function hasSentFriendRequestTo(int $userId): bool
+    {
+        return $this->outgoingFriendRequests()
+            ->where('friend_id', $userId)
+            ->exists();
+    }
+
+    public function hasReceivedFriendRequestFrom(int $userId): bool
+    {
+        return $this->incomingFriendRequests()
+            ->where('user_id', $userId)
+            ->exists();
+    }
+
+    public function isFriendWith(int $userId): bool
+    {
+        return $this->hasSentFriendRequestTo($userId)
+            && $this->hasReceivedFriendRequestFrom($userId);
+    }
+
     /**
      * Get a specific setting value for the user.
      *

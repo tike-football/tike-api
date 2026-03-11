@@ -17,6 +17,11 @@ class UserFactory extends Factory
     protected static ?string $password;
 
     /**
+     * Monotonic sequence for fake users when an explicit index is not provided.
+     */
+    protected static int $fakeSequence = 0;
+
+    /**
      * Define the model's default state.
      *
      * @return array<string, mixed>
@@ -47,5 +52,34 @@ class UserFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
         ]);
+    }
+
+    public function fakeUser(?int $sequence = null): static
+    {
+        return $this->state(function (array $attributes) use ($sequence): array {
+            $index = $sequence ?? ++static::$fakeSequence;
+            $phoneNumber = $this->buildFakePhoneNumber($index);
+
+            return [
+                'name' => fake()->firstName(),
+                'last_name' => fake()->lastName(),
+                'email' => $this->buildFakeEmail($index),
+                'country_code' => '+1',
+                'phone_number' => $phoneNumber,
+                'full_phone_number' => '+1' . $phoneNumber,
+                'email_verified_at' => now(),
+                'role' => 'user',
+            ];
+        });
+    }
+
+    private function buildFakeEmail(int $index): string
+    {
+        return 'fakeuser' . $index . '@test.com';
+    }
+
+    private function buildFakePhoneNumber(int $index): string
+    {
+        return str_pad((string) (7000000000 + $index), 10, '0', STR_PAD_LEFT);
     }
 }

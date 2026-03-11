@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CountryController;
+use App\Http\Controllers\Api\V1\FriendController;
 use App\Http\Controllers\Api\V1\FootballCacheServiceController;
 use App\Http\Controllers\Api\V1\FootballDataController;
 use App\Http\Controllers\Api\V1\FootballDataServiceController;
@@ -72,6 +73,15 @@ Route::middleware(['api.key', 'auth:api'])->prefix('user')->group(function (): v
 Route::middleware(['api.key', 'auth:api'])->prefix('util')->group(function (): void {
     Route::middleware(['scope:util:get'])->controller(UtilController::class)->group(function (): void {
         Route::get('get-available-avatars', 'getAvailableAvatars');
+    });
+});
+
+Route::middleware(['api.key', 'auth:api'])->prefix('friend')->group(function (): void {
+    Route::post('add/{user_id}', [FriendController::class, 'add'])
+        ->middleware(['scope:friend:add']);
+
+    Route::middleware(['scope:friend:search'])->controller(FriendController::class)->group(function (): void {
+        Route::get('search/{term}', 'search');
     });
 });
 
