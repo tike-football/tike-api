@@ -13,6 +13,95 @@ class FriendControllerTest extends TestCase
 {
     use RefreshDatabase, WithApiKey;
 
+    public function test_index_requires_api_key(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        Passport::actingAs($user, ['friend:get']);
+
+        $response = $this->getJson('/api/v1/friend');
+
+        $response->assertStatus(401)
+            ->assertJson([
+                'message' => 'API key is required.',
+            ]);
+    }
+
+    public function test_index_requires_bearer_token(): void
+    {
+        $response = $this->getJsonWithApiKey('/api/v1/friend');
+
+        $response->assertStatus(401)
+            ->assertJson([
+                'message' => 'Unauthenticated.',
+            ]);
+    }
+
+    public function test_index_requires_scope(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        Passport::actingAs($user, ['different:scope']);
+
+        $response = $this->getJsonWithApiKey('/api/v1/friend');
+
+        $response->assertStatus(403);
+    }
+
+    public function test_index_returns_friends_outgoing_requests_and_incoming_requests(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        Passport::actingAs($user, ['friend:get']);
+
+        $friendUser = User::factory()->create([
+            'name' => 'Carlos',
+            'last_name' => 'Friend',
+        ]);
+
+        $sentRequestUser = User::factory()->create([
+            'name' => 'Luis',
+            'last_name' => 'Sent',
+        ]);
+
+        $receivedRequestUser = User::factory()->create([
+            'name' => 'Mario',
+            'last_name' => 'Received',
+        ]);
+
+        Friend::query()->create([
+            'user_id' => $user->id,
+            'friend_id' => $friendUser->id,
+        ]);
+        Friend::query()->create([
+            'user_id' => $friendUser->id,
+            'friend_id' => $user->id,
+        ]);
+
+        Friend::query()->create([
+            'user_id' => $user->id,
+            'friend_id' => $sentRequestUser->id,
+        ]);
+
+        Friend::query()->create([
+            'user_id' => $receivedRequestUser->id,
+            'friend_id' => $user->id,
+        ]);
+
+        $response = $this->getJsonWithApiKey('/api/v1/friend');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('total_friends', 1)
+            ->assertJsonPath('total_outgoing_friend_requests', 1)
+            ->assertJsonPath('total_incoming_friend_requests', 1)
+            ->assertJsonCount(1, 'friends')
+            ->assertJsonCount(1, 'outgoing_friend_requests')
+            ->assertJsonCount(1, 'incoming_friend_requests')
+            ->assertJsonPath('friends.0.id', $friendUser->id)
+            ->assertJsonPath('outgoing_friend_requests.0.id', $sentRequestUser->id)
+            ->assertJsonPath('incoming_friend_requests.0.id', $receivedRequestUser->id)
+            ->assertJsonMissingPath('friends.0.email')
+            ->assertJsonMissingPath('outgoing_friend_requests.0.email')
+            ->assertJsonMissingPath('incoming_friend_requests.0.email');
+    }
+
     public function test_add_requires_api_key(): void
     {
         $user = User::factory()->create(['role' => 'user']);
