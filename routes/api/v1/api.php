@@ -80,7 +80,8 @@ Route::middleware(['api.key', 'auth:api'])->prefix('friend')->group(function ():
     Route::post('add/{user_id}', [FriendController::class, 'add'])
         ->middleware(['scope:friend:add']);
 
-    Route::middleware(['scope:friend:search'])->controller(FriendController::class)->group(function (): void {
+    Route::middleware(['scope:friend:get'])->controller(FriendController::class)->group(function (): void {
+        Route::get('/', 'index');
         Route::get('search/{term}', 'search');
     });
 });

@@ -11,6 +11,48 @@ use Illuminate\Support\Str;
 
 class FriendController extends Controller
 {
+    public function index(): JsonResponse
+    {
+        try {
+            $authUser = request()->user();
+
+            if ($authUser === null) {
+                return response()->json([
+                    'message' => 'Unauthenticated.',
+                ], 401);
+            }
+
+            $outgoingIds = $authUser->outgoingFriendRequests()
+                ->pluck('friend_id');
+            $incomingIds = $authUser->incomingFriendRequests()
+                ->pluck('user_id');
+
+            $friendIds = $outgoingIds->intersect($incomingIds)->values();
+            $sentRequestIds = $outgoingIds->diff($incomingIds)->values();
+            $receivedRequestIds = $incomingIds->diff($outgoingIds)->values();
+
+            return response()->json([
+                'total_friends' => $friendIds->count(),
+                'total_outgoing_friend_requests' => $sentRequestIds->count(),
+                'total_incoming_friend_requests' => $receivedRequestIds->count(),
+                'friends' => $this->resolveUsersByIds($friendIds->all()),
+                'outgoing_friend_requests' => $this->resolveUsersByIds($sentRequestIds->all()),
+                'incoming_friend_requests' => $this->resolveUsersByIds($receivedRequestIds->all()),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error(__METHOD__ . ' error: ' . $e->getMessage(), [
+                'auth_user_id' => request()->user()?->id,
+                'exception_message' => $e->getMessage(),
+                'exception_trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'message' => 'An error occurred while retrieving friends.',
+                'error' => 'Friend retrieval failed. Please try again.',
+            ], 500);
+        }
+    }
+
     public function add(int $userId): JsonResponse
     {
         try {
@@ -141,5 +183,24 @@ class FriendController extends Controller
                 'error' => 'Friend search failed. Please try again.',
             ], 500);
         }
+    }
+
+    /**
+     * @param list<int> $userIds
+     * @return array<int, array<string, mixed>>
+     */
+    private function resolveUsersByIds(array $userIds): array
+    {
+        if ($userIds === []) {
+            return [];
+        }
+
+        return FriendSearchResponse::collection(
+            User::query()
+                ->whereIn('id', $userIds)
+                ->orderBy('name')
+                ->orderBy('last_name')
+                ->get()
+        )->resolve();
     }
 }
