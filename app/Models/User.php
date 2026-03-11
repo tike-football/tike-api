@@ -68,6 +68,11 @@ class User extends Authenticatable implements OAuthenticatable
         return $this->hasMany(Setting::class);
     }
 
+    public function friends(): HasMany
+    {
+        return $this->hasMany(Friend::class);
+    }
+
     /**
      * Get a specific setting value for the user.
      *
