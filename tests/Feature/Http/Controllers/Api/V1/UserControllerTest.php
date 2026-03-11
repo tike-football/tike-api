@@ -250,7 +250,7 @@ class UserControllerTest extends TestCase
         Passport::actingAs($user, ['user:update']);
 
         $response = $this->post('/api/v1/user/avatar/upload', [
-            'avatar' => UploadedFile::fake()->image('avatar.png'),
+            'avatar' => UploadedFile::fake()->create('avatar.png', 120, 'image/png'),
         ]);
 
         $response->assertStatus(401)
@@ -262,7 +262,7 @@ class UserControllerTest extends TestCase
     public function test_upload_avatar_requires_bearer_token(): void
     {
         $response = $this->post('/api/v1/user/avatar/upload', [
-            'avatar' => UploadedFile::fake()->image('avatar.png'),
+            'avatar' => UploadedFile::fake()->create('avatar.png', 120, 'image/png'),
         ], $this->withApiKeyHeader());
 
         $response->assertStatus(401)
@@ -277,7 +277,7 @@ class UserControllerTest extends TestCase
         Passport::actingAs($user, ['different:scope']);
 
         $response = $this->post('/api/v1/user/avatar/upload', [
-            'avatar' => UploadedFile::fake()->image('avatar.png'),
+            'avatar' => UploadedFile::fake()->create('avatar.png', 120, 'image/png'),
         ], $this->withApiKeyHeader());
 
         $response->assertStatus(403);
@@ -292,7 +292,7 @@ class UserControllerTest extends TestCase
         Storage::fake('local');
 
         $response = $this->post('/api/v1/user/avatar/upload', [
-            'avatar' => UploadedFile::fake()->image('avatar.png'),
+            'avatar' => UploadedFile::fake()->create('avatar.png', 120, 'image/png'),
         ], $this->withApiKeyHeader());
 
         $response->assertStatus(200)
@@ -335,7 +335,7 @@ class UserControllerTest extends TestCase
             Carbon::setTestNow($baseTime->copy()->addMinutes($i));
 
             $response = $this->post('/api/v1/user/avatar/upload', [
-                'avatar' => UploadedFile::fake()->image("avatar{$i}.png"),
+                'avatar' => UploadedFile::fake()->create("avatar{$i}.png", 120, 'image/png'),
             ], $this->withApiKeyHeader());
 
             $response->assertStatus(200);
