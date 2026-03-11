@@ -7,6 +7,7 @@ return [
             'user:update-password',
             'user:get',
             'user:update',
+            'friend:search',
             'football-data:sync',
             'football-data:cache',
             'football-data:get',
@@ -19,6 +20,7 @@ return [
             'user:update-password',
             'user:get',
             'user:update',
+            'friend:search',
             'football-data:get',
             'util:get'
         ],
