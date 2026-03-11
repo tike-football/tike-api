@@ -154,7 +154,7 @@ class FriendControllerTest extends TestCase
     public function test_search_requires_api_key(): void
     {
         $user = User::factory()->create(['role' => 'user']);
-        Passport::actingAs($user, ['friend:search']);
+        Passport::actingAs($user, ['friend:get']);
 
         $response = $this->getJson('/api/v1/friend/search/abel');
 
@@ -187,7 +187,7 @@ class FriendControllerTest extends TestCase
     public function test_search_returns_empty_when_term_is_shorter_than_three_characters(): void
     {
         $user = User::factory()->create(['role' => 'user']);
-        Passport::actingAs($user, ['friend:search']);
+        Passport::actingAs($user, ['friend:get']);
 
         User::factory()->create([
             'name' => 'Abel',
@@ -206,7 +206,7 @@ class FriendControllerTest extends TestCase
     public function test_search_returns_exact_verified_email_match_only(): void
     {
         $user = User::factory()->create(['role' => 'user']);
-        Passport::actingAs($user, ['friend:search']);
+        Passport::actingAs($user, ['friend:get']);
 
         $target = User::factory()->create([
             'name' => 'Abel',
@@ -234,7 +234,7 @@ class FriendControllerTest extends TestCase
     public function test_search_returns_exact_verified_phone_match_only(): void
     {
         $user = User::factory()->create(['role' => 'user']);
-        Passport::actingAs($user, ['friend:search']);
+        Passport::actingAs($user, ['friend:get']);
 
         $target = User::factory()->create([
             'name' => 'Abel',
@@ -261,7 +261,7 @@ class FriendControllerTest extends TestCase
     public function test_search_returns_partial_matches_by_name_or_last_name_only_for_verified_users(): void
     {
         $user = User::factory()->create(['role' => 'user']);
-        Passport::actingAs($user, ['friend:search']);
+        Passport::actingAs($user, ['friend:get']);
 
         $matchByName = User::factory()->create([
             'name' => 'Carlos',
@@ -294,7 +294,7 @@ class FriendControllerTest extends TestCase
     public function test_search_limits_partial_results_to_ten_users(): void
     {
         $user = User::factory()->create(['role' => 'user']);
-        Passport::actingAs($user, ['friend:search']);
+        Passport::actingAs($user, ['friend:get']);
 
         User::factory()->count(12)->create([
             'name' => 'Mario',
@@ -311,7 +311,7 @@ class FriendControllerTest extends TestCase
     public function test_search_matches_concatenated_name_and_last_name_case_insensitive(): void
     {
         $user = User::factory()->create(['role' => 'user']);
-        Passport::actingAs($user, ['friend:search']);
+        Passport::actingAs($user, ['friend:get']);
 
         $target = User::factory()->create([
             'name' => 'Abel',
