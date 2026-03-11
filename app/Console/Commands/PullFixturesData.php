@@ -111,7 +111,9 @@ class PullFixturesData extends Command
                 }
 
                 if ($shouldDispatchStandingsSync) {
-                    PullStandingsData::dispatch($leagueId, $season)->onQueue('football-data');
+                    PullStandingsData::dispatch($leagueId, $season)
+                    ->onQueue('football-data')
+                    ->delay(now()->addMinute(2));
                     $this->line("Queued PullStandingsData for league {$leagueId} (season {$season}).");
                 }
 
