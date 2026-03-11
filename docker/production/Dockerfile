@@ -45,6 +45,7 @@ RUN composer dump-autoload --optimize --no-dev \
     && php artisan package:discover --ansi \
     && mkdir -p /var/www/html/storage/logs /run/nginx /var/lib/nginx/tmp /var/log/supervisor \
     && chown -R tike:tike /var/www/html/storage /var/www/html/bootstrap/cache /var/log/supervisor \
+    && chmod -R ug+rwX /var/www/html/storage /var/www/html/bootstrap/cache \
     && chown -R nginx:nginx /run/nginx /var/lib/nginx
 
 COPY docker/production/nginx.conf /etc/nginx/nginx.conf
