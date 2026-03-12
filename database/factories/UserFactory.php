@@ -28,13 +28,13 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
-        $countryCode = fake()->randomElement(['+1', '+52', '+34', '+44', '+49', '+33']);
-        $phoneNumber = fake()->numerify('##########');
+        $countryCode = $this->faker->randomElement(['+1', '+52', '+34', '+44', '+49', '+33']);
+        $phoneNumber = $this->faker->numerify('##########');
         
         return [
-            'name' => fake()->firstName(),
-            'last_name' => fake()->lastName(),
-            'email' => fake()->unique()->safeEmail(),
+            'name' => $this->faker->firstName(),
+            'last_name' => $this->faker->lastName(),
+            'email' => $this->faker->unique()->safeEmail(),
             'country_code' => $countryCode,
             'phone_number' => $phoneNumber,
             'full_phone_number' => $countryCode . $phoneNumber,
@@ -61,15 +61,15 @@ class UserFactory extends Factory
             $phoneNumber = $this->buildFakePhoneNumber($index);
 
             return [
-                'name' => fake()->firstName(),
-                'last_name' => fake()->lastName(),
+                'name' => $this->faker->firstName(),
+                'last_name' => $this->faker->lastName(),
                 'email' => $this->buildFakeEmail($index),
                 'country_code' => '+1',
                 'phone_number' => $phoneNumber,
                 'full_phone_number' => '+1' . $phoneNumber,
                 'email_verified_at' => now(),
                 'role' => 'user',
-                'avatar_path' => fake()->randomElement([
+                'avatar_path' => $this->faker->randomElement([
                     'system/default01.png',
                     'system/default02.png',
                     'system/default03.png',
