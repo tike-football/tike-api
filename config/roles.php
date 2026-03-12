@@ -12,7 +12,8 @@ return [
             'football-data:sync',
             'football-data:cache',
             'football-data:get',
-            'util:get'
+            'util:get',
+            'admin:run-commands'
         ],
     ],
     'user' => [

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\AdminCommandController;
 use App\Http\Controllers\Api\V1\CountryController;
 use App\Http\Controllers\Api\V1\FriendController;
 use App\Http\Controllers\Api\V1\FootballCacheServiceController;
@@ -96,6 +97,10 @@ Route::middleware(['api.key', 'auth:api'])->prefix('football-data')->group(funct
 
 // Admin football data endpoints - Require API key, authentication and sync scope
 Route::middleware(['api.key', 'auth:api'])->prefix('admin')->group(function (): void {
+    Route::prefix('command')->middleware(['scope:admin:run-commands'])->controller(AdminCommandController::class)->group(function (): void {
+        Route::post('create-fake-users/{count}', 'createFakeUsers');
+    });
+
     Route::prefix('football-data')->group(function (): void {
         Route::middleware(['scope:football-data:sync'])->controller(FootballDataServiceController::class)->group(function (): void {
             Route::post('sync-league', 'syncLeague');
