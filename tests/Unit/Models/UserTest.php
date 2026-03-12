@@ -87,6 +87,14 @@ class UserTest extends TestCase
         $this->assertSame('+17000000025', $user->full_phone_number);
         $this->assertSame('user', $user->role);
         $this->assertNotNull($user->email_verified_at);
+        $this->assertContains($user->avatar_path, [
+            'system/default01.png',
+            'system/default02.png',
+            'system/default03.png',
+            'system/default04.png',
+            'system/default05.png',
+            'system/default06.png',
+        ]);
     }
 
     public function test_user_can_detect_sent_friend_request(): void

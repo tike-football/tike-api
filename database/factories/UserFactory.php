@@ -69,6 +69,14 @@ class UserFactory extends Factory
                 'full_phone_number' => '+1' . $phoneNumber,
                 'email_verified_at' => now(),
                 'role' => 'user',
+                'avatar_path' => fake()->randomElement([
+                    'system/default01.png',
+                    'system/default02.png',
+                    'system/default03.png',
+                    'system/default04.png',
+                    'system/default05.png',
+                    'system/default06.png',
+                ]),
             ];
         });
     }
