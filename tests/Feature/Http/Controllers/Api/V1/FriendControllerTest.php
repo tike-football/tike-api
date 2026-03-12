@@ -95,8 +95,11 @@ class FriendControllerTest extends TestCase
             ->assertJsonCount(1, 'outgoing_friend_requests')
             ->assertJsonCount(1, 'incoming_friend_requests')
             ->assertJsonPath('friends.0.id', $friendUser->id)
+            ->assertJsonPath('friends.0.avatar_url', url('/storage/users/avatars/system/default01.png'))
             ->assertJsonPath('outgoing_friend_requests.0.id', $sentRequestUser->id)
+            ->assertJsonPath('outgoing_friend_requests.0.avatar_url', url('/storage/users/avatars/system/default01.png'))
             ->assertJsonPath('incoming_friend_requests.0.id', $receivedRequestUser->id)
+            ->assertJsonPath('incoming_friend_requests.0.avatar_url', url('/storage/users/avatars/system/default01.png'))
             ->assertJsonMissingPath('friends.0.email')
             ->assertJsonMissingPath('outgoing_friend_requests.0.email')
             ->assertJsonMissingPath('incoming_friend_requests.0.email');
@@ -316,6 +319,7 @@ class FriendControllerTest extends TestCase
         $response->assertStatus(200)
             ->assertJsonCount(1, 'users')
             ->assertJsonPath('users.0.id', $target->id)
+            ->assertJsonPath('users.0.avatar_url', url('/storage/users/avatars/system/default01.png'))
             ->assertJsonMissingPath('users.0.email')
             ->assertJsonMissingPath('users.0.phone_number');
     }
