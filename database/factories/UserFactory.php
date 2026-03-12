@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use Faker\Factory as FakerFactory;
+use Faker\Generator;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -16,6 +18,8 @@ class UserFactory extends Factory
      */
     protected static ?string $password;
 
+    protected ?Generator $fakerGenerator = null;
+
     /**
      * Monotonic sequence for fake users when an explicit index is not provided.
      */
@@ -28,13 +32,14 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
-        $countryCode = $this->faker->randomElement(['+1', '+52', '+34', '+44', '+49', '+33']);
-        $phoneNumber = $this->faker->numerify('##########');
+        $faker = $this->faker();
+        $countryCode = $faker->randomElement(['+1', '+52', '+34', '+44', '+49', '+33']);
+        $phoneNumber = $faker->numerify('##########');
         
         return [
-            'name' => $this->faker->firstName(),
-            'last_name' => $this->faker->lastName(),
-            'email' => $this->faker->unique()->safeEmail(),
+            'name' => $faker->firstName(),
+            'last_name' => $faker->lastName(),
+            'email' => $faker->unique()->safeEmail(),
             'country_code' => $countryCode,
             'phone_number' => $phoneNumber,
             'full_phone_number' => $countryCode . $phoneNumber,
@@ -57,19 +62,20 @@ class UserFactory extends Factory
     public function fakeUser(?int $sequence = null): static
     {
         return $this->state(function (array $attributes) use ($sequence): array {
+            $faker = $this->faker();
             $index = $sequence ?? ++static::$fakeSequence;
             $phoneNumber = $this->buildFakePhoneNumber($index);
 
             return [
-                'name' => $this->faker->firstName(),
-                'last_name' => $this->faker->lastName(),
+                'name' => $faker->firstName(),
+                'last_name' => $faker->lastName(),
                 'email' => $this->buildFakeEmail($index),
                 'country_code' => '+1',
                 'phone_number' => $phoneNumber,
                 'full_phone_number' => '+1' . $phoneNumber,
                 'email_verified_at' => now(),
                 'role' => 'user',
-                'avatar_path' => $this->faker->randomElement([
+                'avatar_path' => $faker->randomElement([
                     'system/default01.png',
                     'system/default02.png',
                     'system/default03.png',
@@ -89,5 +95,14 @@ class UserFactory extends Factory
     private function buildFakePhoneNumber(int $index): string
     {
         return str_pad((string) (7000000000 + $index), 10, '0', STR_PAD_LEFT);
+    }
+
+    private function faker(): Generator
+    {
+        if ($this->fakerGenerator === null) {
+            $this->fakerGenerator = FakerFactory::create();
+        }
+
+        return $this->fakerGenerator;
     }
 }
