@@ -36,4 +36,27 @@ class CreateFakeUsersCommandTest extends TestCase
 
         $this->assertDatabaseCount('users', 0);
     }
+
+    public function test_create_fake_users_command_skips_existing_fake_email_or_phone_collisions(): void
+    {
+        User::factory()->create([
+            'email' => 'fakeuser1@test.com',
+            'country_code' => '+1',
+            'phone_number' => '7000000001',
+            'full_phone_number' => '+17000000001',
+        ]);
+
+        $this->artisan('users:create-fake 2')
+            ->assertExitCode(0);
+
+        $emails = User::query()
+            ->orderBy('id')
+            ->pluck('email')
+            ->all();
+
+        $this->assertContains('fakeuser1@test.com', $emails);
+        $this->assertContains('fakeuser2@test.com', $emails);
+        $this->assertContains('fakeuser3@test.com', $emails);
+        $this->assertCount(3, $emails);
+    }
 }
