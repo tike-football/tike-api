@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers\Api\V1;
 
+use App\Models\Group;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -121,6 +122,88 @@ class GroupControllerTest extends TestCase
         $this->assertDatabaseHas('group_user', [
             'group_id' => $groupId,
             'user_id' => $user->id,
+            'is_accepted' => true,
+        ]);
+    }
+
+    public function test_add_users_requires_owner(): void
+    {
+        $owner = User::factory()->create(['role' => 'user']);
+        $otherUser = User::factory()->create(['role' => 'user']);
+        $group = Group::query()->create([
+            'owner_id' => $owner->id,
+            'name' => 'Tike Group',
+            'language' => 'es',
+        ]);
+
+        Passport::actingAs($otherUser, ['group:add']);
+
+        $response = $this->postJsonWithApiKey('/api/v1/group/' . $group->id . '/users', [
+            'user_ids' => [$owner->id],
+        ]);
+
+        $response->assertStatus(403)
+            ->assertJson([
+                'message' => 'You cannot add users to this group.',
+            ]);
+    }
+
+    public function test_add_users_validates_user_ids_as_integer_array(): void
+    {
+        $owner = User::factory()->create(['role' => 'user']);
+        $group = Group::query()->create([
+            'owner_id' => $owner->id,
+            'name' => 'Tike Group',
+            'language' => 'es',
+        ]);
+
+        Passport::actingAs($owner, ['group:add']);
+
+        $response = $this->postJsonWithApiKey('/api/v1/group/' . $group->id . '/users', [
+            'user_ids' => ['abc'],
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'message' => 'Each user id must be an integer.',
+            ]);
+    }
+
+    public function test_add_users_adds_users_and_returns_errors(): void
+    {
+        $owner = User::factory()->create(['role' => 'user']);
+        $userToAdd = User::factory()->create(['role' => 'user']);
+        $existingUser = User::factory()->create(['role' => 'user']);
+        $missingUserId = 999999;
+
+        $group = Group::query()->create([
+            'owner_id' => $owner->id,
+            'name' => 'Tike Group',
+            'language' => 'es',
+        ]);
+
+        $group->users()->attach($owner->id, ['is_accepted' => true]);
+        $group->users()->attach($existingUser->id, ['is_accepted' => true]);
+
+        Passport::actingAs($owner, ['group:add']);
+
+        $response = $this->postJsonWithApiKey('/api/v1/group/' . $group->id . '/users', [
+            'user_ids' => [$userToAdd->id, $existingUser->id, $missingUserId],
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'message' => 'Users processed successfully.',
+                'added_user_ids' => [$userToAdd->id],
+            ])
+            ->assertJsonPath('errors.0.id', $existingUser->id)
+            ->assertJsonPath('errors.0.error', 'User already belongs to the group.')
+            ->assertJsonPath('errors.1.id', $missingUserId)
+            ->assertJsonPath('errors.1.error', 'User does not exist.');
+
+        $this->assertDatabaseHas('group_user', [
+            'group_id' => $group->id,
+            'user_id' => $userToAdd->id,
             'is_accepted' => true,
         ]);
     }

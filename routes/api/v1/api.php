@@ -89,8 +89,10 @@ Route::middleware(['api.key', 'auth:api'])->prefix('friend')->group(function ():
 });
 
 Route::middleware(['api.key', 'auth:api'])->prefix('group')->group(function (): void {
-    Route::post('/', [GroupController::class, 'store'])
-        ->middleware(['scope:group:add']);
+    Route::middleware(['scope:group:add'])->controller(GroupController::class)->group(function (): void {
+        Route::post('/', 'store');
+        Route::post('{group_id}/users', 'addUsers');
+    });
 });
 
 // Football data endpoints - Require API key, authentication and read scope
