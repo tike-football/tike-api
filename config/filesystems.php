@@ -83,6 +83,10 @@ return [
             'driver' => env('FILESYSTEM_DISK', 'local'),
             'root' => env('FOLDER_USERS_AVATARS', 'users/avatars/'),
         ],
+         'group_images' => [
+            'driver' => env('FILESYSTEM_DISK', 'local'),
+            'root' => env('FOLDER_GROUPS_IMAGES', 'groups/images/'),
+         ],
     ]
 
 ];
