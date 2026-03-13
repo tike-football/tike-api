@@ -92,6 +92,7 @@ Route::middleware(['api.key', 'auth:api'])->prefix('group')->group(function (): 
     Route::middleware(['scope:group:add'])->controller(GroupController::class)->group(function (): void {
         Route::get('{group_id}/users', 'users');
         Route::post('/', 'store');
+        Route::post('{group_id}/image/upload', 'uploadImage');
         Route::post('{group_id}/users', 'addUsers');
     });
 });

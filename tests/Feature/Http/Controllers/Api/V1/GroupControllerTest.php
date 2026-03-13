@@ -7,6 +7,8 @@ use App\Models\Group;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Passport\Passport;
 use Tests\TestCase;
 use Tests\Traits\WithApiKey;
@@ -14,6 +16,16 @@ use Tests\Traits\WithApiKey;
 class GroupControllerTest extends TestCase
 {
     use RefreshDatabase, WithApiKey;
+
+    private function fakePngUpload(string $name = 'group.png'): UploadedFile
+    {
+        $png = base64_decode(
+            'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4////fwAJ+wP9KobjigAAAABJRU5ErkJggg==',
+            true
+        );
+
+        return UploadedFile::fake()->createWithContent($name, $png === false ? '' : $png);
+    }
 
     public function test_store_requires_api_key(): void
     {
@@ -104,11 +116,14 @@ class GroupControllerTest extends TestCase
             ->assertJsonPath('group.owner_id', $user->id)
             ->assertJsonPath('group.name', 'Tike Group')
             ->assertJsonPath('group.description', 'General chat')
+            ->assertJsonPath('group.image_path', null)
+            ->assertJsonPath('group.image_url', null)
             ->assertJsonPath('group.language', 'en')
             ->assertJsonPath('group.is_active', true)
             ->assertJsonPath('group.allows_comments', false)
             ->assertJsonPath('group.accepts_join_requests', true)
-            ->assertJsonPath('group.requires_join_approval', false);
+            ->assertJsonPath('group.requires_join_approval', false)
+            ->assertJsonPath('group.total_users', 1);
 
         $groupId = $response->json('group.id');
 
@@ -290,11 +305,13 @@ class GroupControllerTest extends TestCase
             ->assertJsonPath('group.name', 'Tike Group')
             ->assertJsonPath('group.description', null)
             ->assertJsonPath('group.image_path', null)
+            ->assertJsonPath('group.image_url', null)
             ->assertJsonPath('group.is_active', true)
             ->assertJsonPath('group.allows_comments', false)
             ->assertJsonPath('group.accepts_join_requests', true)
             ->assertJsonPath('group.requires_join_approval', false)
             ->assertJsonPath('group.language', 'es')
+            ->assertJsonPath('group.total_users', 4)
             ->assertJsonPath('total_users', 4)
             ->assertJsonCount(4, 'users')
             ->assertJsonFragment([
@@ -322,5 +339,79 @@ class GroupControllerTest extends TestCase
                 'last_name' => 'Mills',
                 'status' => 'incoming_friend_request',
             ]);
+    }
+
+    public function test_upload_image_requires_group_owner(): void
+    {
+        Storage::fake('local');
+
+        $owner = User::factory()->create(['role' => 'user']);
+        $otherUser = User::factory()->create(['role' => 'user']);
+        $group = Group::query()->create([
+            'owner_id' => $owner->id,
+            'name' => 'Tike Group',
+            'language' => 'es',
+        ]);
+
+        $group->users()->attach($owner->id, ['is_accepted' => true]);
+
+        Passport::actingAs($otherUser, ['group:add']);
+
+        $response = $this->withHeaders($this->withApiKeyHeader())
+            ->post('/api/v1/group/' . $group->id . '/image/upload', [
+                'image' => $this->fakePngUpload(),
+            ]);
+
+        $response->assertStatus(403)
+            ->assertJson([
+                'message' => 'You cannot update the image of this group.',
+            ]);
+    }
+
+    public function test_upload_image_updates_group_image_and_returns_group_response(): void
+    {
+        Storage::fake('local');
+
+        config()->set('filesystems.default', 'local');
+        config()->set('filesystems.folders.group_images.driver', 'local');
+        config()->set('filesystems.folders.group_images.root', 'groups/images/');
+
+        $owner = User::factory()->create(['role' => 'user']);
+        $member = User::factory()->create(['role' => 'user']);
+        $group = Group::query()->create([
+            'owner_id' => $owner->id,
+            'name' => 'Tike Group',
+            'description' => 'General chat',
+            'language' => 'es',
+        ]);
+
+        $group->users()->attach($owner->id, ['is_accepted' => true]);
+        $group->users()->attach($member->id, ['is_accepted' => true]);
+
+        Passport::actingAs($owner, ['group:add']);
+
+        $response = $this->withHeaders($this->withApiKeyHeader())
+            ->post('/api/v1/group/' . $group->id . '/image/upload', [
+                'image' => $this->fakePngUpload(),
+            ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('group.id', $group->id)
+            ->assertJsonPath('group.owner_id', $owner->id)
+            ->assertJsonPath('group.name', 'Tike Group')
+            ->assertJsonPath('group.description', 'General chat')
+            ->assertJsonPath('group.total_users', 2);
+
+        $imagePath = $response->json('group.image_path');
+        $this->assertIsString($imagePath);
+        $this->assertNotSame('', $imagePath);
+        $this->assertStringContainsString($imagePath, (string) $response->json('group.image_url'));
+
+        $this->assertDatabaseHas('groups', [
+            'id' => $group->id,
+            'image_path' => $imagePath,
+        ]);
+
+        Storage::disk('local')->assertExists('groups/images/' . $imagePath);
     }
 }

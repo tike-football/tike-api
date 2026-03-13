@@ -5,9 +5,12 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Group\AddGroupUsersRequest;
 use App\Http\Requests\Group\CreateGroupRequest;
+use App\Http\Requests\Group\UploadGroupImageRequest;
+use App\Http\Resources\Api\V1\Group\GroupResponse;
 use App\Http\Resources\Api\V1\Group\UserListResponse;
 use App\Models\Group;
 use App\Models\User;
+use App\Services\GroupImageStorageService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 
@@ -50,18 +53,7 @@ class GroupController extends Controller
                 ->get();
 
             return response()->json([
-                'group' => [
-                    'id' => $group->id,
-                    'owner_id' => $group->owner_id,
-                    'name' => $group->name,
-                    'description' => $group->description,
-                    'image_path' => $group->image_path,
-                    'is_active' => $group->is_active,
-                    'allows_comments' => $group->allows_comments,
-                    'accepts_join_requests' => $group->accepts_join_requests,
-                    'requires_join_approval' => $group->requires_join_approval,
-                    'language' => $group->language,
-                ],
+                'group' => GroupResponse::make($group)->resolve(),
                 'total_users' => $users->count(),
                 'users' => UserListResponse::collection($users)->resolve(),
             ]);
@@ -105,18 +97,7 @@ class GroupController extends Controller
             $group->refresh();
 
             return response()->json([
-                'group' => [
-                    'id' => $group->id,
-                    'owner_id' => $group->owner_id,
-                    'name' => $group->name,
-                    'description' => $group->description,
-                    'image_path' => $group->image_path,
-                    'is_active' => $group->is_active,
-                    'allows_comments' => $group->allows_comments,
-                    'accepts_join_requests' => $group->accepts_join_requests,
-                    'requires_join_approval' => $group->requires_join_approval,
-                    'language' => $group->language,
-                ],
+                'group' => GroupResponse::make($group)->resolve(),
             ], 201);
         } catch (\Throwable $e) {
             Log::error(__METHOD__ . ' error: ' . $e->getMessage(), [
@@ -210,6 +191,69 @@ class GroupController extends Controller
             return response()->json([
                 'message' => 'An error occurred while adding users to the group.',
                 'error' => 'Add group users failed. Please try again.',
+            ], 500);
+        }
+    }
+
+    public function uploadImage(
+        UploadGroupImageRequest $request,
+        GroupImageStorageService $storageService,
+        int $groupId
+    ): JsonResponse {
+        try {
+            $authUser = $request->user();
+
+            if ($authUser === null) {
+                return response()->json([
+                    'message' => 'Unauthenticated.',
+                ], 401);
+            }
+
+            $group = Group::query()->find($groupId);
+
+            if ($group === null) {
+                return response()->json([
+                    'message' => 'Group not found.',
+                ], 404);
+            }
+
+            if ($group->owner_id !== $authUser->id) {
+                return response()->json([
+                    'message' => 'You cannot update the image of this group.',
+                ], 403);
+            }
+
+            $file = $request->file('image');
+
+            if ($file === null) {
+                return response()->json([
+                    'message' => 'The group image is required.',
+                    'error' => 'Group image upload failed. Please try again.',
+                ], 422);
+            }
+
+            $previousImagePath = $group->image_path;
+            $group->image_path = $storageService->store($group, $file);
+            $group->save();
+
+            if (is_string($previousImagePath) && $previousImagePath !== '' && $previousImagePath !== $group->image_path) {
+                $storageService->delete($previousImagePath);
+            }
+
+            return response()->json([
+                'group' => GroupResponse::make($group)->resolve(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error(__METHOD__ . ' error: ' . $e->getMessage(), [
+                'group_id' => $groupId,
+                'user_id' => $request->user()?->id,
+                'exception_message' => $e->getMessage(),
+                'exception_trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'message' => 'An error occurred while uploading the group image.',
+                'error' => 'Group image upload failed. Please try again.',
             ], 500);
         }
     }
