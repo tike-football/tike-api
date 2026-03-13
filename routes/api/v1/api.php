@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\FriendController;
 use App\Http\Controllers\Api\V1\FootballCacheServiceController;
 use App\Http\Controllers\Api\V1\FootballDataController;
 use App\Http\Controllers\Api\V1\FootballDataServiceController;
+use App\Http\Controllers\Api\V1\GroupController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\UtilController;
 use Illuminate\Support\Facades\Route;
@@ -85,6 +86,11 @@ Route::middleware(['api.key', 'auth:api'])->prefix('friend')->group(function ():
         Route::get('/', 'index');
         Route::get('search/{term}', 'search');
     });
+});
+
+Route::middleware(['api.key', 'auth:api'])->prefix('group')->group(function (): void {
+    Route::post('/', [GroupController::class, 'store'])
+        ->middleware(['scope:group:add']);
 });
 
 // Football data endpoints - Require API key, authentication and read scope
