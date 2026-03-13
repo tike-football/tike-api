@@ -90,6 +90,7 @@ Route::middleware(['api.key', 'auth:api'])->prefix('friend')->group(function ():
 
 Route::middleware(['api.key', 'auth:api'])->prefix('group')->group(function (): void {
     Route::middleware(['scope:group:add'])->controller(GroupController::class)->group(function (): void {
+        Route::get('{group_id}/users', 'users');
         Route::post('/', 'store');
         Route::post('{group_id}/users', 'addUsers');
     });

@@ -10,6 +10,7 @@ return [
             'friend:get',
             'friend:add',
             'group:add',
+            'group:get',
             'football-data:sync',
             'football-data:cache',
             'football-data:get',
@@ -26,6 +27,7 @@ return [
             'friend:get',
             'friend:add',
             'group:add',
+            'group:get',
             'football-data:get',
             'util:get'
         ],

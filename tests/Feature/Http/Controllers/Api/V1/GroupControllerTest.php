@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers\Api\V1;
 
+use App\Models\Friend;
 use App\Models\Group;
 use App\Models\Setting;
 use App\Models\User;
@@ -206,5 +207,120 @@ class GroupControllerTest extends TestCase
             'user_id' => $userToAdd->id,
             'is_accepted' => true,
         ]);
+    }
+
+    public function test_users_requires_group_membership(): void
+    {
+        $owner = User::factory()->create(['role' => 'user']);
+        $outsider = User::factory()->create(['role' => 'user']);
+
+        $group = Group::query()->create([
+            'owner_id' => $owner->id,
+            'name' => 'Tike Group',
+            'language' => 'es',
+        ]);
+
+        $group->users()->attach($owner->id, ['is_accepted' => true]);
+
+        Passport::actingAs($outsider, ['group:add']);
+
+        $response = $this->getJsonWithApiKey('/api/v1/group/' . $group->id . '/users');
+
+        $response->assertStatus(403)
+            ->assertJson([
+                'message' => 'You do not belong to this group.',
+            ]);
+    }
+
+    public function test_users_returns_group_members_with_avatar_and_friend_status(): void
+    {
+        $authUser = User::factory()->create(['role' => 'user']);
+        $friendUser = User::factory()->create([
+            'role' => 'user',
+            'name' => 'Abel',
+            'last_name' => 'Rippin',
+            'avatar_path' => 'system/default02.png',
+        ]);
+        $outgoingUser = User::factory()->create([
+            'role' => 'user',
+            'name' => 'Bruno',
+            'last_name' => 'Stone',
+        ]);
+        $incomingUser = User::factory()->create([
+            'role' => 'user',
+            'name' => 'Carlos',
+            'last_name' => 'Mills',
+        ]);
+
+        $group = Group::query()->create([
+            'owner_id' => $authUser->id,
+            'name' => 'Tike Group',
+            'language' => 'es',
+        ]);
+
+        $group->users()->attach($authUser->id, ['is_accepted' => true]);
+        $group->users()->attach($friendUser->id, ['is_accepted' => true]);
+        $group->users()->attach($outgoingUser->id, ['is_accepted' => true]);
+        $group->users()->attach($incomingUser->id, ['is_accepted' => true]);
+
+        Friend::query()->create([
+            'user_id' => $authUser->id,
+            'friend_id' => $friendUser->id,
+        ]);
+        Friend::query()->create([
+            'user_id' => $friendUser->id,
+            'friend_id' => $authUser->id,
+        ]);
+        Friend::query()->create([
+            'user_id' => $authUser->id,
+            'friend_id' => $outgoingUser->id,
+        ]);
+        Friend::query()->create([
+            'user_id' => $incomingUser->id,
+            'friend_id' => $authUser->id,
+        ]);
+
+        Passport::actingAs($authUser, ['group:add']);
+
+        $response = $this->getJsonWithApiKey('/api/v1/group/' . $group->id . '/users');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('group.id', $group->id)
+            ->assertJsonPath('group.owner_id', $authUser->id)
+            ->assertJsonPath('group.name', 'Tike Group')
+            ->assertJsonPath('group.description', null)
+            ->assertJsonPath('group.image_path', null)
+            ->assertJsonPath('group.is_active', true)
+            ->assertJsonPath('group.allows_comments', false)
+            ->assertJsonPath('group.accepts_join_requests', true)
+            ->assertJsonPath('group.requires_join_approval', false)
+            ->assertJsonPath('group.language', 'es')
+            ->assertJsonPath('total_users', 4)
+            ->assertJsonCount(4, 'users')
+            ->assertJsonFragment([
+                'id' => $friendUser->id,
+                'name' => 'Abel',
+                'last_name' => 'Rippin',
+                'avatar_url' => url('/storage/users/avatars/system/default02.png'),
+                'status' => 'friend',
+            ])
+            ->assertJsonFragment([
+                'id' => $authUser->id,
+                'name' => $authUser->name,
+                'last_name' => $authUser->last_name,
+                'status' => null,
+            ])
+            ->assertJsonFragment([
+                'id' => $outgoingUser->id,
+                'name' => 'Bruno',
+                'last_name' => 'Stone',
+                'status' => 'outgoing_friend_request',
+            ])
+            ->assertJsonFragment([
+                'id' => $incomingUser->id,
+                'name' => 'Carlos',
+                'last_name' => 'Mills',
+                'status' => 'incoming_friend_request',
+            ]);
     }
 }

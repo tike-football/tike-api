@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Group\AddGroupUsersRequest;
 use App\Http\Requests\Group\CreateGroupRequest;
+use App\Http\Resources\Api\V1\Group\UserListResponse;
 use App\Models\Group;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -12,6 +13,73 @@ use Illuminate\Support\Facades\Log;
 
 class GroupController extends Controller
 {
+    public function users(int $groupId): JsonResponse
+    {
+        try {
+            $authUser = request()->user();
+
+            if ($authUser === null) {
+                return response()->json([
+                    'message' => 'Unauthenticated.',
+                ], 401);
+            }
+
+            $group = Group::query()->find($groupId);
+
+            if ($group === null) {
+                return response()->json([
+                    'message' => 'Group not found.',
+                ], 404);
+            }
+
+            $isMember = $group->users()
+                ->where('users.id', $authUser->id)
+                ->wherePivot('is_accepted', true)
+                ->exists();
+
+            if (!$isMember) {
+                return response()->json([
+                    'message' => 'You do not belong to this group.',
+                ], 403);
+            }
+
+            $users = $group->users()
+                ->wherePivot('is_accepted', true)
+                ->orderBy('users.name')
+                ->orderBy('users.last_name')
+                ->get();
+
+            return response()->json([
+                'group' => [
+                    'id' => $group->id,
+                    'owner_id' => $group->owner_id,
+                    'name' => $group->name,
+                    'description' => $group->description,
+                    'image_path' => $group->image_path,
+                    'is_active' => $group->is_active,
+                    'allows_comments' => $group->allows_comments,
+                    'accepts_join_requests' => $group->accepts_join_requests,
+                    'requires_join_approval' => $group->requires_join_approval,
+                    'language' => $group->language,
+                ],
+                'total_users' => $users->count(),
+                'users' => UserListResponse::collection($users)->resolve(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error(__METHOD__ . ' error: ' . $e->getMessage(), [
+                'group_id' => $groupId,
+                'user_id' => request()->user()?->id,
+                'exception_message' => $e->getMessage(),
+                'exception_trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'message' => 'An error occurred while retrieving group users.',
+                'error' => 'Group users retrieval failed. Please try again.',
+            ], 500);
+        }
+    }
+
     public function store(CreateGroupRequest $request): JsonResponse
     {
         try {
