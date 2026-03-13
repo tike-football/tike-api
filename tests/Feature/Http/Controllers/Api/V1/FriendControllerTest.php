@@ -320,6 +320,7 @@ class FriendControllerTest extends TestCase
             ->assertJsonCount(1, 'users')
             ->assertJsonPath('users.0.id', $target->id)
             ->assertJsonPath('users.0.avatar_url', url('/storage/users/avatars/system/default01.png'))
+            ->assertJsonPath('users.0.status', null)
             ->assertJsonMissingPath('users.0.email')
             ->assertJsonMissingPath('users.0.phone_number');
     }
@@ -425,5 +426,78 @@ class FriendControllerTest extends TestCase
             ->assertJsonPath('users.0.id', $target->id)
             ->assertJsonPath('users.0.name', 'Abel')
             ->assertJsonPath('users.0.last_name', 'Rojas');
+    }
+
+    public function test_search_returns_friend_status_when_users_are_friends(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        $target = User::factory()->create([
+            'name' => 'Alex',
+            'last_name' => 'Friend',
+            'email_verified_at' => now(),
+        ]);
+
+        Friend::query()->create([
+            'user_id' => $user->id,
+            'friend_id' => $target->id,
+        ]);
+        Friend::query()->create([
+            'user_id' => $target->id,
+            'friend_id' => $user->id,
+        ]);
+
+        Passport::actingAs($user, ['friend:get']);
+
+        $response = $this->getJsonWithApiKey('/api/v1/friend/search/Alex');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('users.0.id', $target->id)
+            ->assertJsonPath('users.0.status', 'friend');
+    }
+
+    public function test_search_returns_outgoing_friend_request_status(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        $target = User::factory()->create([
+            'name' => 'Alex',
+            'last_name' => 'Outgoing',
+            'email_verified_at' => now(),
+        ]);
+
+        Friend::query()->create([
+            'user_id' => $user->id,
+            'friend_id' => $target->id,
+        ]);
+
+        Passport::actingAs($user, ['friend:get']);
+
+        $response = $this->getJsonWithApiKey('/api/v1/friend/search/Alex');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('users.0.id', $target->id)
+            ->assertJsonPath('users.0.status', 'outgoing_friend_request');
+    }
+
+    public function test_search_returns_incoming_friend_request_status(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        $target = User::factory()->create([
+            'name' => 'Alex',
+            'last_name' => 'Incoming',
+            'email_verified_at' => now(),
+        ]);
+
+        Friend::query()->create([
+            'user_id' => $target->id,
+            'friend_id' => $user->id,
+        ]);
+
+        Passport::actingAs($user, ['friend:get']);
+
+        $response = $this->getJsonWithApiKey('/api/v1/friend/search/Alex');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('users.0.id', $target->id)
+            ->assertJsonPath('users.0.status', 'incoming_friend_request');
     }
 }

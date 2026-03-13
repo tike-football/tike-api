@@ -16,8 +16,10 @@ class FriendSearchResponse extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $authUser = $request->user();
         $avatarPath = !empty($this->avatar_path) ? $this->avatar_path : 'system/default01.png';
         $avatarUrl = null;
+        $status = null;
 
         if (!empty($avatarPath)) {
             $folderConfig = config('filesystems.folders.user_avatars', []);
@@ -54,11 +56,22 @@ class FriendSearchResponse extends JsonResource
             }
         }
 
+        if ($authUser !== null && (int) $authUser->id !== (int) $this->id) {
+            if ($authUser->isFriendWith($this->id)) {
+                $status = 'friend';
+            } elseif ($authUser->hasSentFriendRequestTo($this->id)) {
+                $status = 'outgoing_friend_request';
+            } elseif ($authUser->hasReceivedFriendRequestFrom($this->id)) {
+                $status = 'incoming_friend_request';
+            }
+        }
+
         return [
             'id' => $this->id,
             'name' => $this->name,
             'last_name' => $this->last_name,
             'avatar_url' => $avatarUrl,
+            'status' => $status,
         ];
     }
 }
