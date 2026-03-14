@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\FriendController;
 use App\Http\Controllers\Api\V1\FootballCacheServiceController;
 use App\Http\Controllers\Api\V1\FootballDataController;
 use App\Http\Controllers\Api\V1\FootballDataServiceController;
+use App\Http\Controllers\Api\V1\GroupController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\UtilController;
 use Illuminate\Support\Facades\Route;
@@ -84,6 +85,20 @@ Route::middleware(['api.key', 'auth:api'])->prefix('friend')->group(function ():
     Route::middleware(['scope:friend:get'])->controller(FriendController::class)->group(function (): void {
         Route::get('/', 'index');
         Route::get('search/{term}', 'search');
+    });
+});
+
+Route::middleware(['api.key', 'auth:api'])->prefix('group')->group(function (): void {
+    Route::middleware(['scope:group:get'])->controller(GroupController::class)->group(function (): void {
+        Route::get('/', 'index');
+        Route::get('{group_id}/users', 'users');
+    });
+
+    Route::middleware(['scope:group:add'])->controller(GroupController::class)->group(function (): void {
+        Route::post('/', 'store');
+        Route::patch('{group_id}', 'update');
+        Route::post('{group_id}/image/upload', 'uploadImage');
+        Route::post('{group_id}/users', 'addUsers');
     });
 });
 
