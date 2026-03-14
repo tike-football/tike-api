@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Group\AddGroupUsersRequest;
 use App\Http\Requests\Group\CreateGroupRequest;
+use App\Http\Requests\Group\UpdateGroupRequest;
 use App\Http\Requests\Group\UploadGroupImageRequest;
 use App\Http\Resources\Api\V1\Group\GroupResponse;
 use App\Http\Resources\Api\V1\Group\UserListResponse;
@@ -16,6 +17,52 @@ use Illuminate\Support\Facades\Log;
 
 class GroupController extends Controller
 {
+    public function update(UpdateGroupRequest $request, int $groupId): JsonResponse
+    {
+        try {
+            $authUser = $request->user();
+
+            if ($authUser === null) {
+                return response()->json([
+                    'message' => 'Unauthenticated.',
+                ], 401);
+            }
+
+            $group = Group::query()->find($groupId);
+
+            if ($group === null) {
+                return response()->json([
+                    'message' => 'Group not found.',
+                ], 404);
+            }
+
+            if ($group->owner_id !== $authUser->id) {
+                return response()->json([
+                    'message' => 'You cannot update this group.',
+                ], 403);
+            }
+
+            $group->fill($request->validated());
+            $group->save();
+
+            return response()->json([
+                'group' => GroupResponse::make($group)->resolve(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error(__METHOD__ . ' error: ' . $e->getMessage(), [
+                'group_id' => $groupId,
+                'user_id' => $request->user()?->id,
+                'exception_message' => $e->getMessage(),
+                'exception_trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'message' => 'An error occurred while updating the group.',
+                'error' => 'Group update failed. Please try again.',
+            ], 500);
+        }
+    }
+
     public function users(int $groupId): JsonResponse
     {
         try {

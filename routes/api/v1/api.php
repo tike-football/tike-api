@@ -89,9 +89,13 @@ Route::middleware(['api.key', 'auth:api'])->prefix('friend')->group(function ():
 });
 
 Route::middleware(['api.key', 'auth:api'])->prefix('group')->group(function (): void {
-    Route::middleware(['scope:group:add'])->controller(GroupController::class)->group(function (): void {
+    Route::middleware(['scope:group:get'])->controller(GroupController::class)->group(function (): void {
         Route::get('{group_id}/users', 'users');
+    });
+
+    Route::middleware(['scope:group:add'])->controller(GroupController::class)->group(function (): void {
         Route::post('/', 'store');
+        Route::patch('{group_id}', 'update');
         Route::post('{group_id}/image/upload', 'uploadImage');
         Route::post('{group_id}/users', 'addUsers');
     });

@@ -75,6 +75,26 @@ class GroupControllerTest extends TestCase
         $response->assertStatus(403);
     }
 
+    public function test_update_requires_scope(): void
+    {
+        $user = User::factory()->create([
+            'role' => 'user',
+        ]);
+        $group = Group::query()->create([
+            'owner_id' => $user->id,
+            'name' => 'Tike Group',
+            'language' => 'es',
+        ]);
+
+        Passport::actingAs($user, ['different:scope']);
+
+        $response = $this->patchJsonWithApiKey('/api/v1/group/' . $group->id, [
+            'name' => 'Updated Group',
+        ]);
+
+        $response->assertStatus(403);
+    }
+
     public function test_store_validates_required_name(): void
     {
         $user = User::factory()->create([
@@ -164,6 +184,82 @@ class GroupControllerTest extends TestCase
             ]);
     }
 
+    public function test_update_requires_owner(): void
+    {
+        $owner = User::factory()->create(['role' => 'user']);
+        $otherUser = User::factory()->create(['role' => 'user']);
+        $group = Group::query()->create([
+            'owner_id' => $owner->id,
+            'name' => 'Tike Group',
+            'language' => 'es',
+        ]);
+
+        Passport::actingAs($otherUser, ['group:add']);
+
+        $response = $this->patchJsonWithApiKey('/api/v1/group/' . $group->id, [
+            'name' => 'Updated Group',
+        ]);
+
+        $response->assertStatus(403)
+            ->assertJson([
+                'message' => 'You cannot update this group.',
+            ]);
+    }
+
+    public function test_update_updates_allowed_fields_and_returns_group_response(): void
+    {
+        $owner = User::factory()->create(['role' => 'user']);
+        $member = User::factory()->create(['role' => 'user']);
+        $group = Group::query()->create([
+            'owner_id' => $owner->id,
+            'name' => 'Tike Group',
+            'description' => 'General chat',
+            'image_path' => 'group120260313235319.png',
+            'language' => 'es',
+        ]);
+
+        $group->users()->attach($owner->id, ['is_accepted' => true]);
+        $group->users()->attach($member->id, ['is_accepted' => true]);
+
+        Passport::actingAs($owner, ['group:add']);
+
+        $response = $this->patchJsonWithApiKey('/api/v1/group/' . $group->id, [
+            'name' => 'Updated Group',
+            'description' => 'Updated description',
+            'is_active' => false,
+            'allows_comments' => true,
+            'accepts_join_requests' => false,
+            'requires_join_approval' => true,
+            'language' => 'en',
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('group.id', $group->id)
+            ->assertJsonPath('group.owner_id', $owner->id)
+            ->assertJsonPath('group.name', 'Updated Group')
+            ->assertJsonPath('group.description', 'Updated description')
+            ->assertJsonPath('group.image_path', 'group120260313235319.png')
+            ->assertJsonPath('group.is_active', false)
+            ->assertJsonPath('group.allows_comments', true)
+            ->assertJsonPath('group.accepts_join_requests', false)
+            ->assertJsonPath('group.requires_join_approval', true)
+            ->assertJsonPath('group.language', 'en')
+            ->assertJsonPath('group.total_users', 2);
+
+        $this->assertStringContainsString('group120260313235319.png', (string) $response->json('group.image_url'));
+
+        $this->assertDatabaseHas('groups', [
+            'id' => $group->id,
+            'name' => 'Updated Group',
+            'description' => 'Updated description',
+            'is_active' => false,
+            'allows_comments' => true,
+            'accepts_join_requests' => false,
+            'requires_join_approval' => true,
+            'language' => 'en',
+        ]);
+    }
+
     public function test_add_users_validates_user_ids_as_integer_array(): void
     {
         $owner = User::factory()->create(['role' => 'user']);
@@ -237,7 +333,7 @@ class GroupControllerTest extends TestCase
 
         $group->users()->attach($owner->id, ['is_accepted' => true]);
 
-        Passport::actingAs($outsider, ['group:add']);
+        Passport::actingAs($outsider, ['group:get']);
 
         $response = $this->getJsonWithApiKey('/api/v1/group/' . $group->id . '/users');
 
@@ -295,7 +391,7 @@ class GroupControllerTest extends TestCase
             'friend_id' => $authUser->id,
         ]);
 
-        Passport::actingAs($authUser, ['group:add']);
+        Passport::actingAs($authUser, ['group:get']);
 
         $response = $this->getJsonWithApiKey('/api/v1/group/' . $group->id . '/users');
 
