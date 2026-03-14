@@ -319,6 +319,8 @@ class FootballSyncServiceTest extends TestCase
 
     public function test_sync_fixtures_saves_all_fixtures_for_a_league(): void
     {
+        Event::fake([FixtureFinished::class]);
+
         $league = League::create([
             'provider' => 'api_football',
             'provider_league_id' => 39,

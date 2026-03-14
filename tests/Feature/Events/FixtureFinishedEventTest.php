@@ -3,11 +3,12 @@
 namespace Tests\Feature\Events;
 
 use App\Events\FootballData\FixtureFinished;
+use App\Jobs\PullStandingsData;
+use App\Jobs\SyncLeagueStructureJob;
 use App\Listeners\FootballData\SyncLeagueStructure;
 use App\Models\League;
-use App\Services\FootballSyncLeagueStructureService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
@@ -25,7 +26,7 @@ class FixtureFinishedEventTest extends TestCase
         );
     }
 
-    public function test_sync_league_structure_listener_uses_football_data_queue_and_has_6_minutes_delay(): void
+    public function test_sync_league_structure_listener_queues_jobs_with_expected_queue_and_delays(): void
     {
         $league = League::create([
             'provider' => 'api_football',
@@ -34,37 +35,49 @@ class FixtureFinishedEventTest extends TestCase
             'type' => 'league',
         ]);
 
+        Bus::fake();
+
         $listener = new SyncLeagueStructure();
         $event = new FixtureFinished($league, 2026, 1001);
-        $delay = $listener->withDelay($event);
-        $minutes = now()->diffInMinutes(Carbon::instance($delay));
-
-        $this->assertSame('football-data', $listener->queue);
-        $this->assertInstanceOf(\DateTimeInterface::class, $delay);
-        $this->assertGreaterThanOrEqual(5.9, $minutes);
-        $this->assertLessThanOrEqual(6.1, $minutes);
-    }
-
-    public function test_sync_league_structure_listener_calls_service(): void
-    {
-        $league = League::create([
-            'provider' => 'api_football',
-            'provider_league_id' => 39,
-            'name' => 'Premier League',
-            'type' => 'league',
-        ]);
-
-        $event = new FixtureFinished($league, 2026, 1001);
-        $listener = new SyncLeagueStructure();
-
-        $serviceMock = $this->createMock(FootballSyncLeagueStructureService::class);
-        $serviceMock->expects($this->once())
-            ->method('syncLeagueStructure')
-            ->with($league, 2026)
-            ->willReturn(true);
-
-        $this->app->instance(FootballSyncLeagueStructureService::class, $serviceMock);
 
         $listener->handle($event);
+
+        $this->assertSame('football-data', $listener->queue);
+
+        Bus::assertDispatched(PullStandingsData::class, function (PullStandingsData $job): bool {
+            return $job->leagueId === 39
+                && $job->season === 2026
+                && $job->runNumber === 1
+                && $job->queue === 'football-data'
+                && $job->delay !== null
+                && now()->diffInMinutes($job->delay) <= 2;
+        });
+
+        Bus::assertDispatched(SyncLeagueStructureJob::class, function (SyncLeagueStructureJob $job) use ($league): bool {
+            return $job->league->is($league)
+                && $job->season === 2026
+                && $job->providerFixtureId === 1001
+                && $job->runNumber === 1
+                && $job->queue === 'football-data'
+                && $job->delay !== null
+                && now()->diffInMinutes($job->delay) <= 3;
+        });
+    }
+
+    public function test_sync_league_structure_listener_dispatches_both_jobs_once(): void
+    {
+        $league = League::create([
+            'provider' => 'api_football',
+            'provider_league_id' => 39,
+            'name' => 'Premier League',
+            'type' => 'league',
+        ]);
+
+        Bus::fake();
+
+        (new SyncLeagueStructure())->handle(new FixtureFinished($league, 2026, 1001));
+
+        Bus::assertDispatchedTimes(PullStandingsData::class, 1);
+        Bus::assertDispatchedTimes(SyncLeagueStructureJob::class, 1);
     }
 }
