@@ -90,6 +90,7 @@ Route::middleware(['api.key', 'auth:api'])->prefix('friend')->group(function ():
 
 Route::middleware(['api.key', 'auth:api'])->prefix('group')->group(function (): void {
     Route::middleware(['scope:group:get'])->controller(GroupController::class)->group(function (): void {
+        Route::get('/', 'index');
         Route::get('{group_id}/users', 'users');
     });
 

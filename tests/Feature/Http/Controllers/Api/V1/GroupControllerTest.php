@@ -143,7 +143,8 @@ class GroupControllerTest extends TestCase
             ->assertJsonPath('group.allows_comments', false)
             ->assertJsonPath('group.accepts_join_requests', true)
             ->assertJsonPath('group.requires_join_approval', false)
-            ->assertJsonPath('group.total_users', 1);
+            ->assertJsonPath('group.total_users', 1)
+            ->assertJsonPath('group.is_owner', true);
 
         $groupId = $response->json('group.id');
 
@@ -244,7 +245,8 @@ class GroupControllerTest extends TestCase
             ->assertJsonPath('group.accepts_join_requests', false)
             ->assertJsonPath('group.requires_join_approval', true)
             ->assertJsonPath('group.language', 'en')
-            ->assertJsonPath('group.total_users', 2);
+            ->assertJsonPath('group.total_users', 2)
+            ->assertJsonPath('group.is_owner', true);
 
         $this->assertStringContainsString('group120260313235319.png', (string) $response->json('group.image_url'));
 
@@ -408,6 +410,7 @@ class GroupControllerTest extends TestCase
             ->assertJsonPath('group.requires_join_approval', false)
             ->assertJsonPath('group.language', 'es')
             ->assertJsonPath('group.total_users', 4)
+            ->assertJsonPath('group.is_owner', true)
             ->assertJsonPath('total_users', 4)
             ->assertJsonCount(4, 'users')
             ->assertJsonFragment([
@@ -435,6 +438,81 @@ class GroupControllerTest extends TestCase
                 'last_name' => 'Mills',
                 'status' => 'incoming_friend_request',
             ]);
+    }
+
+    public function test_index_requires_group_get_scope(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        Passport::actingAs($user, ['different:scope']);
+
+        $response = $this->getJsonWithApiKey('/api/v1/group');
+
+        $response->assertStatus(403);
+    }
+
+    public function test_index_returns_groups_where_authenticated_user_is_accepted_member(): void
+    {
+        $authUser = User::factory()->create(['role' => 'user']);
+        $otherOwner = User::factory()->create(['role' => 'user']);
+
+        $ownedGroup = Group::query()->create([
+            'owner_id' => $authUser->id,
+            'name' => 'Owned Group',
+            'description' => 'Owned description',
+            'image_path' => 'owned.png',
+            'language' => 'es',
+        ]);
+
+        $memberGroup = Group::query()->create([
+            'owner_id' => $otherOwner->id,
+            'name' => 'Member Group',
+            'description' => 'Member description',
+            'image_path' => 'member.png',
+            'language' => 'en',
+        ]);
+
+        $pendingGroup = Group::query()->create([
+            'owner_id' => $otherOwner->id,
+            'name' => 'Pending Group',
+            'language' => 'es',
+        ]);
+
+        $ownedGroup->users()->attach($authUser->id, ['is_accepted' => true]);
+        $ownedGroup->users()->attach($otherOwner->id, ['is_accepted' => true]);
+
+        $memberGroup->users()->attach($authUser->id, ['is_accepted' => true]);
+        $memberGroup->users()->attach($otherOwner->id, ['is_accepted' => true]);
+
+        $pendingGroup->users()->attach($authUser->id, ['is_accepted' => false]);
+
+        Passport::actingAs($authUser, ['group:get']);
+
+        $response = $this->getJsonWithApiKey('/api/v1/group');
+
+        $response->assertStatus(200)
+            ->assertJsonCount(2, 'groups')
+            ->assertJsonFragment([
+                'id' => $memberGroup->id,
+                'name' => 'Member Group',
+                'description' => 'Member description',
+                'image_path' => 'member.png',
+                'language' => 'en',
+                'total_users' => 2,
+                'is_owner' => false,
+            ])
+            ->assertJsonFragment([
+                'id' => $ownedGroup->id,
+                'name' => 'Owned Group',
+                'description' => 'Owned description',
+                'image_path' => 'owned.png',
+                'language' => 'es',
+                'total_users' => 2,
+                'is_owner' => true,
+            ]);
+
+        $response->assertJsonMissing([
+            'id' => $pendingGroup->id,
+        ]);
     }
 
     public function test_upload_image_requires_group_owner(): void

@@ -16,6 +16,7 @@ class GroupResponse extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $authUser = $request->user();
         $imageUrl = null;
 
         if (!empty($this->image_path)) {
@@ -66,6 +67,7 @@ class GroupResponse extends JsonResource
             'requires_join_approval' => $this->requires_join_approval,
             'language' => $this->language,
             'total_users' => $this->users()->where('group_user.is_accepted', true)->count(),
+            'is_owner' => $authUser !== null ? (int) $this->owner_id === (int) $authUser->id : false,
         ];
     }
 }

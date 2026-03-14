@@ -17,6 +17,39 @@ use Illuminate\Support\Facades\Log;
 
 class GroupController extends Controller
 {
+    public function index(): JsonResponse
+    {
+        try {
+            $authUser = request()->user();
+
+            if ($authUser === null) {
+                return response()->json([
+                    'message' => 'Unauthenticated.',
+                ], 401);
+            }
+
+            $groups = $authUser->groups()
+                ->wherePivot('is_accepted', true)
+                ->orderBy('groups.name')
+                ->get();
+
+            return response()->json([
+                'groups' => GroupResponse::collection($groups)->resolve(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error(__METHOD__ . ' error: ' . $e->getMessage(), [
+                'user_id' => request()->user()?->id,
+                'exception_message' => $e->getMessage(),
+                'exception_trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'message' => 'An error occurred while retrieving groups.',
+                'error' => 'Groups retrieval failed. Please try again.',
+            ], 500);
+        }
+    }
+
     public function update(UpdateGroupRequest $request, int $groupId): JsonResponse
     {
         try {
