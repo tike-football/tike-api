@@ -352,6 +352,91 @@ class FriendControllerTest extends TestCase
             ->assertJsonPath('users.0.id', $target->id);
     }
 
+    public function test_search_returns_partial_email_matches(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        Passport::actingAs($user, ['friend:get']);
+
+        $target = User::factory()->create([
+            'name' => 'Abel',
+            'last_name' => 'Mail',
+            'email' => 'abel.rojas@test.com',
+            'email_verified_at' => now(),
+        ]);
+
+        User::factory()->create([
+            'name' => 'Other',
+            'last_name' => 'User',
+            'email' => 'someone@example.com',
+            'email_verified_at' => now(),
+        ]);
+
+        $response = $this->getJsonWithApiKey('/api/v1/friend/search/rojas@test');
+
+        $response->assertStatus(200)
+            ->assertJsonCount(1, 'users')
+            ->assertJsonPath('users.0.id', $target->id);
+    }
+
+    public function test_search_returns_partial_phone_matches(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        Passport::actingAs($user, ['friend:get']);
+
+        $target = User::factory()->create([
+            'name' => 'Abel',
+            'last_name' => 'Phone',
+            'country_code' => '+1',
+            'phone_number' => '5551234567',
+            'full_phone_number' => '+15551234567',
+            'email_verified_at' => now(),
+        ]);
+
+        User::factory()->create([
+            'name' => 'Another',
+            'last_name' => 'Phone',
+            'country_code' => '+57',
+            'phone_number' => '3001112222',
+            'full_phone_number' => '+573001112222',
+            'email_verified_at' => now(),
+        ]);
+
+        $response = $this->getJsonWithApiKey('/api/v1/friend/search/12345');
+
+        $response->assertStatus(200)
+            ->assertJsonCount(1, 'users')
+            ->assertJsonPath('users.0.id', $target->id);
+    }
+
+    public function test_search_does_not_use_partial_phone_matching_for_alphanumeric_terms(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        Passport::actingAs($user, ['friend:get']);
+
+        User::factory()->create([
+            'name' => 'Other',
+            'last_name' => 'Phone',
+            'country_code' => '+1',
+            'phone_number' => '5551234500',
+            'full_phone_number' => '+15551234500',
+            'email' => 'other@test.com',
+            'email_verified_at' => now(),
+        ]);
+
+        $target = User::factory()->create([
+            'name' => 'Visible',
+            'last_name' => 'Email',
+            'email' => 'fakeuser50@test.com',
+            'email_verified_at' => now(),
+        ]);
+
+        $response = $this->getJsonWithApiKey('/api/v1/friend/search/fakeuser50');
+
+        $response->assertStatus(200)
+            ->assertJsonCount(1, 'users')
+            ->assertJsonPath('users.0.id', $target->id);
+    }
+
     public function test_search_returns_partial_matches_by_name_or_last_name_only_for_verified_users(): void
     {
         $user = User::factory()->create(['role' => 'user']);
@@ -383,6 +468,37 @@ class FriendControllerTest extends TestCase
 
         $this->assertContains($matchByName->id, $ids);
         $this->assertContains($matchByLastName->id, $ids);
+    }
+
+    public function test_search_excludes_authenticated_user_and_admin_users(): void
+    {
+        $user = User::factory()->create([
+            'role' => 'user',
+            'name' => 'Abel',
+            'last_name' => 'Owner',
+            'email_verified_at' => now(),
+        ]);
+        Passport::actingAs($user, ['friend:get']);
+
+        User::factory()->create([
+            'role' => 'admin',
+            'name' => 'Abel',
+            'last_name' => 'Admin',
+            'email_verified_at' => now(),
+        ]);
+
+        $visibleUser = User::factory()->create([
+            'role' => 'user',
+            'name' => 'Abel',
+            'last_name' => 'Visible',
+            'email_verified_at' => now(),
+        ]);
+
+        $response = $this->getJsonWithApiKey('/api/v1/friend/search/Abel');
+
+        $response->assertStatus(200)
+            ->assertJsonCount(1, 'users')
+            ->assertJsonPath('users.0.id', $visibleUser->id);
     }
 
     public function test_search_limits_partial_results_to_ten_users(): void

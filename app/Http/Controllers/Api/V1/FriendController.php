@@ -118,6 +118,7 @@ class FriendController extends Controller
     public function search(string $term): JsonResponse
     {
         try {
+            $authUser = request()->user();
             $term = trim($term);
 
             if (mb_strlen($term) < 3) {
@@ -126,7 +127,13 @@ class FriendController extends Controller
                 ]);
             }
 
-            $verifiedUsers = User::query()->whereNotNull('email_verified_at');
+            $verifiedUsers = User::query()
+                ->whereNotNull('email_verified_at')
+                ->where('role', '!=', 'admin');
+
+            if ($authUser !== null) {
+                $verifiedUsers->where('id', '!=', $authUser->id);
+            }
 
             $emailMatch = (clone $verifiedUsers)
                 ->whereRaw('LOWER(email) = ?', [Str::lower($term)])
@@ -139,8 +146,10 @@ class FriendController extends Controller
             }
 
             $normalizedPhone = preg_replace('/\D+/', '', $term) ?? '';
+            $lowerTerm = Str::lower($term);
+            $isNumericSearch = $normalizedPhone !== '' && preg_match('/^\+?\d+$/', $term) === 1;
 
-            if ($normalizedPhone !== '') {
+            if ($isNumericSearch) {
                 $phoneMatch = (clone $verifiedUsers)
                     ->where(function ($query) use ($normalizedPhone): void {
                         $query->where('phone_number', $normalizedPhone)
@@ -155,13 +164,17 @@ class FriendController extends Controller
                 }
             }
 
-            $lowerTerm = Str::lower($term);
-
             $users = (clone $verifiedUsers)
-                ->where(function ($query) use ($lowerTerm): void {
+                ->where(function ($query) use ($lowerTerm, $normalizedPhone, $isNumericSearch): void {
                     $query->whereRaw('LOWER(name) LIKE ?', ['%' . $lowerTerm . '%'])
+                        ->orWhereRaw('LOWER(email) LIKE ?', ['%' . $lowerTerm . '%'])
                         ->orWhereRaw('LOWER(last_name) LIKE ?', ['%' . $lowerTerm . '%'])
                         ->orWhereRaw("LOWER(TRIM(CONCAT(name, ' ', last_name))) LIKE ?", ['%' . $lowerTerm . '%']);
+
+                    if ($isNumericSearch) {
+                        $query->orWhere('phone_number', 'like', '%' . $normalizedPhone . '%')
+                            ->orWhereRaw("REPLACE(full_phone_number, '+', '') LIKE ?", ['%' . $normalizedPhone . '%']);
+                    }
                 })
                 ->orderBy('name')
                 ->orderBy('last_name')
