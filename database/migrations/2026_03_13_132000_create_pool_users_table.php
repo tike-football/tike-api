@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('pool_id')->constrained('pools')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->json('league_structure')->nullable();
             $table->timestamps();
 
             $table->unique(['pool_id', 'user_id']);
