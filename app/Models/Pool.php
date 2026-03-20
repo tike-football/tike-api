@@ -16,6 +16,7 @@ class Pool extends Model
      * @var list<string>
      */
     protected $fillable = [
+        'owner_id',
         'league_id',
         'league_season_id',
         'group_id',
@@ -27,6 +28,7 @@ class Pool extends Model
         'accepts_join_requests',
         'requires_join_approval',
         'code',
+        'is_active',
     ];
 
     /**
@@ -37,9 +39,15 @@ class Pool extends Model
     protected function casts(): array
     {
         return [
+            'is_active' => 'boolean',
             'accepts_join_requests' => 'boolean',
             'requires_join_approval' => 'boolean',
         ];
+    }
+
+    public function owner(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'owner_id');
     }
 
     public function league(): BelongsTo

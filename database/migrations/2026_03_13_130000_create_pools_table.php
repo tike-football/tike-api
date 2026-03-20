@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('pools', function (Blueprint $table): void {
             $table->id();
+            $table->foreignId('owner_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('league_id')->nullable()->constrained('leagues')->nullOnDelete();
             $table->foreignId('league_season_id')->nullable()->constrained('league_seasons')->nullOnDelete();
             $table->foreignId('group_id')->nullable()->constrained('groups')->nullOnDelete();
@@ -24,6 +25,7 @@ return new class extends Migration
             $table->boolean('accepts_join_requests')->default(true);
             $table->boolean('requires_join_approval')->default(false);
             $table->string('code', 100)->nullable();
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
 
             $table->unique('code');
