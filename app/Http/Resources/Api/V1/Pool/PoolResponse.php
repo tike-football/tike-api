@@ -38,12 +38,16 @@ class PoolResponse extends JsonResource
             'accepts_join_requests' => $this->accepts_join_requests,
             'requires_join_approval' => $this->requires_join_approval,
             'code' => $this->code,
+            'status' => $this->status,
             'is_active' => $this->is_active,
         ];
 
         if ((string) $this->scope === 'match') {
-            $fixture = $this->poolFixtures->first()?->fixture;
+            $poolFixture = $this->poolFixtures->first();
+            $fixture = $poolFixture?->fixture;
             $data['match'] = $fixture !== null ? $this->transformFixture($fixture) : null;
+            $data['possible_scores'] = config('pools.possible_scores', []);
+            $data['possible_score_ids'] = $poolFixture?->possible_scores;
         }
 
         return $data;

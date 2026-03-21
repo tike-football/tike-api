@@ -37,6 +37,7 @@ class PoolController extends Controller
                     'scope' => (string) $validated['scope'],
                     'start_phase' => $validated['start_phase'] ?? null,
                     'type' => $validated['type'] ?? null,
+                    'status' => 'draft',
                     'is_active' => false,
                 ];
 

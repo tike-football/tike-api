@@ -130,6 +130,7 @@ class PoolControllerTest extends TestCase
             ->assertJsonPath('pool.name', 'Pool de partido')
             ->assertJsonPath('pool.scope', 'match')
             ->assertJsonPath('pool.type', 'selected_score')
+            ->assertJsonPath('pool.status', 'draft')
             ->assertJsonPath('pool.match.id', $fixture->id)
             ->assertJsonPath('pool.match.league_id', $league->id)
             ->assertJsonPath('pool.match.season', (int) $leagueSeason->year)
@@ -140,6 +141,11 @@ class PoolControllerTest extends TestCase
             ->assertJsonPath('pool.match.away_team_id', $fixture->away_team_id)
             ->assertJsonPath('pool.match.score.home', null)
             ->assertJsonPath('pool.match.score.away', null)
+            ->assertJsonPath('pool.possible_scores.s00.0', 0)
+            ->assertJsonPath('pool.possible_scores.s00.1', 0)
+            ->assertJsonPath('pool.possible_scores.s99.0', 9)
+            ->assertJsonPath('pool.possible_scores.s99.1', 9)
+            ->assertJsonPath('pool.possible_score_ids', null)
             ->assertJsonPath('pool.is_active', false);
 
         $poolId = $response->json('pool.id');
@@ -152,6 +158,7 @@ class PoolControllerTest extends TestCase
             'name' => 'Pool de partido',
             'scope' => 'match',
             'type' => 'selected_score',
+            'status' => 'draft',
             'is_active' => false,
             'accepts_join_requests' => true,
             'requires_join_approval' => false,
@@ -187,6 +194,7 @@ class PoolControllerTest extends TestCase
         $response->assertStatus(201)
             ->assertJsonPath('pool.scope', 'league')
             ->assertJsonPath('pool.type', 'league_general')
+            ->assertJsonPath('pool.status', 'draft')
             ->assertJsonPath('pool.is_active', false);
 
         $poolId = $response->json('pool.id');
