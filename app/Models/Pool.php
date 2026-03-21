@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Pool extends Model
 {
@@ -28,6 +29,9 @@ class Pool extends Model
         'accepts_join_requests',
         'requires_join_approval',
         'code',
+        'status',
+        'cancelled_at',
+        'cancellation_reason',
         'is_active',
     ];
 
@@ -42,6 +46,7 @@ class Pool extends Model
             'is_active' => 'boolean',
             'accepts_join_requests' => 'boolean',
             'requires_join_approval' => 'boolean',
+            'cancelled_at' => 'datetime',
         ];
     }
 
@@ -63,5 +68,10 @@ class Pool extends Model
     public function group(): BelongsTo
     {
         return $this->belongsTo(Group::class);
+    }
+
+    public function poolFixtures(): HasMany
+    {
+        return $this->hasMany(PoolFixture::class);
     }
 }
