@@ -130,6 +130,16 @@ class PoolControllerTest extends TestCase
             ->assertJsonPath('pool.name', 'Pool de partido')
             ->assertJsonPath('pool.scope', 'match')
             ->assertJsonPath('pool.type', 'selected_score')
+            ->assertJsonPath('pool.match.id', $fixture->id)
+            ->assertJsonPath('pool.match.league_id', $league->id)
+            ->assertJsonPath('pool.match.season', (int) $leagueSeason->year)
+            ->assertJsonPath('pool.match.round', 'Regular Season - 1')
+            ->assertJsonPath('pool.match.status', 'upcoming')
+            ->assertJsonPath('pool.match.status_short', 'NS')
+            ->assertJsonPath('pool.match.home_team_id', $fixture->home_team_id)
+            ->assertJsonPath('pool.match.away_team_id', $fixture->away_team_id)
+            ->assertJsonPath('pool.match.score.home', null)
+            ->assertJsonPath('pool.match.score.away', null)
             ->assertJsonPath('pool.is_active', false);
 
         $poolId = $response->json('pool.id');

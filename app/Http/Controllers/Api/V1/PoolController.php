@@ -62,6 +62,12 @@ class PoolController extends Controller
                 return $pool;
             });
 
+            $pool->loadMissing(
+                'poolFixtures.fixture.teamStats.team',
+                'poolFixtures.fixture.homeTeam',
+                'poolFixtures.fixture.awayTeam'
+            );
+
             return response()->json([
                 'pool' => PoolResponse::make($pool)->resolve(),
             ], 201);
