@@ -40,7 +40,7 @@ DB_DATABASE=tike
 DB_USERNAME=tike
 DB_PASSWORD=tike
 
-QUEUE_CONNECTION=database
+QUEUE_CONNECTION=redis
 ```
 
 ### 2. Install Dependencies
@@ -84,13 +84,13 @@ The application uses queues for background processing (e.g., email verification)
 Run the queue worker as a persistent process:
 
 ```bash
-php artisan queue:work --queue=emails --tries=3 --timeout=60
+php artisan queue:work redis --queue=emails --tries=3 --timeout=60
 ```
 
 Run the football-data queue worker as a persistent process:
 
 ```bash
-php artisan queue:work --queue=football-data --tries=3 --timeout=60
+php artisan queue:work redis --queue=football-data --tries=3 --timeout=60
 ```
 
 **Important:** In production, use a process manager like Supervisor to automatically restart the worker.
