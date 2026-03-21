@@ -64,6 +64,7 @@ class PoolController extends Controller
             });
 
             $pool->loadMissing(
+                'group.users',
                 'poolFixtures.fixture.teamStats.team',
                 'poolFixtures.fixture.homeTeam',
                 'poolFixtures.fixture.awayTeam'

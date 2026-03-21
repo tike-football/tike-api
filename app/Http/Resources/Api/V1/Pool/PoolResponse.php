@@ -4,6 +4,8 @@ namespace App\Http\Resources\Api\V1\Pool;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class PoolResponse extends JsonResource
 {
@@ -41,6 +43,18 @@ class PoolResponse extends JsonResource
             'status' => $this->status,
             'is_active' => $this->is_active,
         ];
+
+        if ($this->group !== null) {
+            $data['users'] = $this->group->users
+                ->filter(fn ($user) => (bool) ($user->pivot?->is_accepted ?? false))
+                ->sortBy([
+                    ['name', 'asc'],
+                    ['last_name', 'asc'],
+                ])
+                ->values()
+                ->map(fn ($user) => $this->transformGroupUser($user))
+                ->all();
+        }
 
         if ((string) $this->scope === 'match') {
             $poolFixture = $this->poolFixtures->first();
@@ -99,6 +113,57 @@ class PoolResponse extends JsonResource
             ],
             'team_stats' => $teamStats,
             'players' => $playersByTeam,
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function transformGroupUser(mixed $user): array
+    {
+        $avatarPath = !empty($user->avatar_path) ? $user->avatar_path : 'system/default01.png';
+        $avatarUrl = null;
+
+        if (!empty($avatarPath)) {
+            $folderConfig = config('filesystems.folders.user_avatars', []);
+            $disk = $folderConfig['driver'] ?? config('filesystems.default', 'local');
+            $root = trim((string) ($folderConfig['root'] ?? 'users/avatars/'), '/');
+            $storagePath = $root . '/' . ltrim($avatarPath, '/');
+
+            if ($disk === 's3') {
+                try {
+                    $signedUrlTtlSeconds = (int) config('filesystems.disks.s3.signed_url_ttl_seconds', 7200);
+                    $avatarUrl = Storage::disk('s3')->temporaryUrl(
+                        $storagePath,
+                        now()->addSeconds($signedUrlTtlSeconds)
+                    );
+                } catch (\Throwable $e) {
+                    $configuredUrl = (string) config('filesystems.disks.s3.url', '');
+                    $bucket = (string) config('filesystems.disks.s3.bucket', '');
+                    $region = (string) config('filesystems.disks.s3.region', 'us-east-1');
+
+                    if (!empty($configuredUrl)) {
+                        $baseUrl = rtrim($configuredUrl, '/');
+                    } else {
+                        $baseUrl = sprintf('https://%s.s3.%s.amazonaws.com', $bucket, $region);
+                    }
+
+                    $avatarUrl = $baseUrl . '/' . ltrim($storagePath, '/');
+                }
+            } else {
+                $avatarUrl = Storage::disk($disk)->url($storagePath);
+            }
+
+            if (!Str::startsWith((string) $avatarUrl, ['http://', 'https://'])) {
+                $avatarUrl = rtrim((string) config('app.url', ''), '/') . '/' . ltrim((string) $avatarUrl, '/');
+            }
+        }
+
+        return [
+            'id' => $user->id,
+            'name' => $user->name,
+            'last_name' => $user->last_name,
+            'avatar_url' => $avatarUrl,
         ];
     }
 

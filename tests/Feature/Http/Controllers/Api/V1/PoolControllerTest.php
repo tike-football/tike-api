@@ -3,6 +3,7 @@
 namespace Tests\Feature\Http\Controllers\Api\V1;
 
 use App\Models\Fixture;
+use App\Models\Group;
 use App\Models\League;
 use App\Models\LeagueSeason;
 use App\Models\Pool;
@@ -175,14 +176,29 @@ class PoolControllerTest extends TestCase
     public function test_store_creates_non_match_pool_without_pool_fixture(): void
     {
         $user = User::factory()->create(['role' => 'user']);
+        $member = User::factory()->create([
+            'role' => 'user',
+            'name' => 'Alexandrea',
+            'last_name' => 'Stokes',
+            'avatar_path' => 'system/default01.png',
+        ]);
         $league = $this->createLeague();
         $leagueSeason = $this->createLeagueSeason($league);
+        $group = Group::query()->create([
+            'owner_id' => $user->id,
+            'name' => 'Pool Group',
+            'language' => 'es',
+        ]);
+
+        $group->users()->attach($user->id, ['is_accepted' => true]);
+        $group->users()->attach($member->id, ['is_accepted' => true]);
 
         Passport::actingAs($user, ['pool:add']);
 
         $response = $this->postJsonWithApiKey('/api/v1/pool', [
             'league_id' => $league->id,
             'league_season_id' => $leagueSeason->id,
+            'group_id' => $group->id,
             'name' => 'Pool de liga',
             'description' => str_repeat('Descripcion valida. ', 8),
             'scope' => 'league',
@@ -195,6 +211,11 @@ class PoolControllerTest extends TestCase
             ->assertJsonPath('pool.scope', 'league')
             ->assertJsonPath('pool.type', 'league_general')
             ->assertJsonPath('pool.status', 'draft')
+            ->assertJsonCount(2, 'pool.users')
+            ->assertJsonPath('pool.users.0.id', $member->id)
+            ->assertJsonPath('pool.users.0.name', 'Alexandrea')
+            ->assertJsonPath('pool.users.0.last_name', 'Stokes')
+            ->assertJsonPath('pool.users.0.avatar_url', url('/storage/users/avatars/system/default01.png'))
             ->assertJsonPath('pool.is_active', false);
 
         $poolId = $response->json('pool.id');
