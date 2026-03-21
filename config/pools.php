@@ -1,6 +1,13 @@
 <?php
 
 return [
+    'statuses' => [
+        'draft',
+        'scheduled',
+        'running',
+        'finished',
+        'cancelled',
+    ],
     'scopes' => [
         'match',
         'round',

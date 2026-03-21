@@ -21,6 +21,7 @@ class PoolFixture extends Model
         'allows_repeated_scores',
         'score_repeat_limit',
         'score_selection_type',
+        'possible_scores',
     ];
 
     /**
@@ -33,6 +34,7 @@ class PoolFixture extends Model
         return [
             'allows_repeated_scores' => 'boolean',
             'score_repeat_limit' => 'integer',
+            'possible_scores' => 'array',
         ];
     }
 

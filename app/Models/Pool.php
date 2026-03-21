@@ -29,6 +29,9 @@ class Pool extends Model
         'accepts_join_requests',
         'requires_join_approval',
         'code',
+        'status',
+        'cancelled_at',
+        'cancellation_reason',
         'is_active',
     ];
 
@@ -43,6 +46,7 @@ class Pool extends Model
             'is_active' => 'boolean',
             'accepts_join_requests' => 'boolean',
             'requires_join_approval' => 'boolean',
+            'cancelled_at' => 'datetime',
         ];
     }
 
