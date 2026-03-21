@@ -15,7 +15,8 @@ return [
             'football-data:cache',
             'football-data:get',
             'util:get',
-            'admin:run-commands'
+            'admin:run-commands',
+            'pool:add',
         ],
     ],
     'user' => [
@@ -29,7 +30,8 @@ return [
             'group:add',
             'group:get',
             'football-data:get',
-            'util:get'
+            'util:get',
+            'pool:add',
         ],
     ],
     'unverified_user' => [

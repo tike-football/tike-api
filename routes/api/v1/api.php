@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\FootballCacheServiceController;
 use App\Http\Controllers\Api\V1\FootballDataController;
 use App\Http\Controllers\Api\V1\FootballDataServiceController;
 use App\Http\Controllers\Api\V1\GroupController;
+use App\Http\Controllers\Api\V1\PoolController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\UtilController;
 use Illuminate\Support\Facades\Route;
@@ -99,6 +100,12 @@ Route::middleware(['api.key', 'auth:api'])->prefix('group')->group(function (): 
         Route::patch('{group_id}', 'update');
         Route::post('{group_id}/image/upload', 'uploadImage');
         Route::post('{group_id}/users', 'addUsers');
+    });
+});
+
+Route::middleware(['api.key', 'auth:api'])->prefix('pool')->group(function (): void {
+    Route::middleware(['scope:pool:add'])->controller(PoolController::class)->group(function (): void {
+        Route::post('/', 'store');
     });
 });
 
