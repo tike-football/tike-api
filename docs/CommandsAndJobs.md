@@ -69,10 +69,10 @@ Source event: `LeagueTeamsSynced`
 
 ## Required Worker
 
-Since `QUEUE_CONNECTION=database`, a worker must be running for this queue:
+Since `QUEUE_CONNECTION=redis`, a worker must be running for this queue:
 
 ```bash
-php artisan queue:work --queue=football-data --tries=3 --timeout=60
+php artisan queue:work redis --queue=football-data --tries=3 --timeout=60
 ```
 
 ## Fixture Cache Commands
