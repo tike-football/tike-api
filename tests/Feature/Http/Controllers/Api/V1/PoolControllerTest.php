@@ -104,6 +104,38 @@ class PoolControllerTest extends TestCase
             ]);
     }
 
+    public function test_store_requires_match_fixture_to_be_upcoming_and_start_after_one_hour(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        $league = $this->createLeague();
+        $leagueSeason = $this->createLeagueSeason($league);
+        $fixture = $this->createFixture($league, (int) $leagueSeason->year, [
+            'fixture_date' => now()->addMinutes(30),
+            'timestamp' => now()->addMinutes(30)->timestamp,
+            'status_long' => 'First Half',
+            'status_short' => '1H',
+        ]);
+
+        Passport::actingAs($user, ['pool:add']);
+
+        $response = $this->postJsonWithApiKey('/api/v1/pool', [
+            'league_id' => $league->id,
+            'league_season_id' => $leagueSeason->id,
+            'name' => 'Pool de partido',
+            'description' => str_repeat('Descripcion valida. ', 8),
+            'scope' => 'match',
+            'fixture_id' => $fixture->id,
+            'type' => 'selected_score',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['fixture_id'])
+            ->assertJsonPath(
+                'errors.fixture_id.0',
+                'The fixture must be an upcoming fixture and must not start within the next hour.'
+            );
+    }
+
     public function test_store_creates_inactive_match_pool_and_related_pool_fixture(): void
     {
         $user = User::factory()->create(['role' => 'user']);
@@ -252,7 +284,10 @@ class PoolControllerTest extends TestCase
         ]);
     }
 
-    private function createFixture(League $league, int $season): Fixture
+    /**
+     * @param array<string, mixed> $overrides
+     */
+    private function createFixture(League $league, int $season, array $overrides = []): Fixture
     {
         $homeTeam = Team::query()->create([
             'provider' => 'api_football',
@@ -272,7 +307,7 @@ class PoolControllerTest extends TestCase
             'is_active' => true,
         ]);
 
-        return Fixture::query()->create([
+        return Fixture::query()->create(array_merge([
             'provider' => 'api_football',
             'provider_fixture_id' => fake()->unique()->numberBetween(30000, 39999),
             'league_id' => $league->id,
@@ -286,6 +321,6 @@ class PoolControllerTest extends TestCase
             'home_team_id' => $homeTeam->id,
             'away_team_id' => $awayTeam->id,
             'is_active' => true,
-        ]);
+        ], $overrides));
     }
 }

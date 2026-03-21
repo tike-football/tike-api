@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Pool;
 
+use App\Models\Fixture;
 use App\Models\LeagueSeason;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -73,6 +74,20 @@ class StorePoolRequest extends FormRequest
             if ($scope === 'match') {
                 if (!in_array((string) $type, $allowedTypes, true)) {
                     $validator->errors()->add('type', 'The selected type is invalid for the selected scope.');
+                }
+
+                if ($fixtureId !== null) {
+                    $fixture = Fixture::query()->find($fixtureId);
+                    $startsAt = $fixture?->fixture_date;
+                    $isUpcoming = $fixture !== null && in_array((string) $fixture->status_short, ['NS', 'TBD'], true);
+                    $startsAfterOneHour = $startsAt !== null && $startsAt->greaterThan(now()->addHour());
+
+                    if (!$isUpcoming || !$startsAfterOneHour) {
+                        $validator->errors()->add(
+                            'fixture_id',
+                            'The fixture must be an upcoming fixture and must not start within the next hour.'
+                        );
+                    }
                 }
             }
         });
