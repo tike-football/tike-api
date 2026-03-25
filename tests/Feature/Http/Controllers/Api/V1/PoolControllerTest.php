@@ -51,6 +51,38 @@ class PoolControllerTest extends TestCase
         $response->assertStatus(403);
     }
 
+    public function test_update_requires_scope(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        $pool = Pool::query()->create([
+            'owner_id' => $user->id,
+            'name' => 'Pool',
+            'description' => str_repeat('Descripcion valida. ', 8),
+            'scope' => 'league',
+            'type' => 'league_general',
+            'status' => 'draft',
+        ]);
+
+        Passport::actingAs($user, ['different:scope']);
+
+        $response = $this->postJsonWithApiKey('/api/v1/pool/' . $pool->id, [
+            'pool' => [
+                'name' => 'Updated Pool',
+                'description' => str_repeat('Descripcion valida. ', 8),
+                'scope' => 'league',
+                'type' => 'league_general',
+                'score_repeat_limit' => 0,
+                'accepts_join_requests' => true,
+                'requires_join_approval' => false,
+                'requires_join_code' => false,
+                'is_active' => false,
+                'user_is' => [$user->id],
+            ],
+        ]);
+
+        $response->assertStatus(403);
+    }
+
     public function test_store_validates_required_fields(): void
     {
         $user = User::factory()->create(['role' => 'user']);
@@ -178,7 +210,8 @@ class PoolControllerTest extends TestCase
             ->assertJsonPath('pool.possible_scores.s00.1', 0)
             ->assertJsonPath('pool.possible_scores.s99.0', 9)
             ->assertJsonPath('pool.possible_scores.s99.1', 9)
-            ->assertJsonPath('pool.possible_score_ids', null)
+            ->assertJsonPath('pool.possible_score_ids.0', 's00')
+            ->assertJsonPath('pool.possible_score_ids.99', 's99')
             ->assertJsonPath('pool.is_active', false);
 
         $poolId = $response->json('pool.id');
@@ -260,6 +293,108 @@ class PoolControllerTest extends TestCase
 
         $this->assertDatabaseMissing('pool_fixtures', [
             'pool_id' => $poolId,
+        ]);
+    }
+
+    public function test_update_updates_pool_pool_fixture_pool_users_and_pool_user_fixtures(): void
+    {
+        $owner = User::factory()->create(['role' => 'user']);
+        $firstUser = User::factory()->create([
+            'role' => 'user',
+            'name' => 'Alexandrea',
+            'last_name' => 'Stokes',
+            'avatar_path' => 'system/default01.png',
+        ]);
+        $secondUser = User::factory()->create([
+            'role' => 'user',
+            'name' => 'Bridgette',
+            'last_name' => 'Prohaska',
+            'avatar_path' => 'system/default01.png',
+        ]);
+        $league = $this->createLeague();
+        $leagueSeason = $this->createLeagueSeason($league);
+        $fixture = $this->createFixture($league, (int) $leagueSeason->year);
+        $pool = Pool::query()->create([
+            'owner_id' => $owner->id,
+            'league_id' => $league->id,
+            'league_season_id' => $leagueSeason->id,
+            'name' => 'Pool original',
+            'description' => str_repeat('Descripcion valida. ', 8),
+            'scope' => 'match',
+            'type' => 'selected_score',
+            'status' => 'draft',
+            'is_active' => false,
+        ]);
+
+        \App\Models\PoolFixture::query()->create([
+            'pool_id' => $pool->id,
+            'fixture_id' => $fixture->id,
+            'allows_repeated_scores' => false,
+            'score_repeat_limit' => 0,
+            'score_selection_type' => 'selected_score',
+        ]);
+
+        Passport::actingAs($owner, ['pool:add']);
+
+        $response = $this->postJsonWithApiKey('/api/v1/pool/' . $pool->id, [
+            'pool' => [
+                'name' => 'Pool de prueba',
+                'description' => 'Esta es una descripcion de prueba suficientemente larga para cumplir con la validacion minima de cien caracteres en la creacion de una pool.',
+                'scope' => 'match',
+                'type' => 'random_score',
+                'score_repeat_limit' => 0,
+                'accepts_join_requests' => true,
+                'requires_join_approval' => false,
+                'requires_join_code' => true,
+                'is_active' => false,
+                'user_is' => [$firstUser->id, $secondUser->id],
+                'possible_score_ids' => ['s00', 's01', 's02', 's20'],
+            ],
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('pool.name', 'Pool de prueba')
+            ->assertJsonPath('pool.type', 'random_score')
+            ->assertJsonPath('pool.status', 'scheduled')
+            ->assertJsonPath('pool.accepts_join_requests', true)
+            ->assertJsonPath('pool.requires_join_approval', false)
+            ->assertJsonPath('pool.code', fn ($code) => is_string($code) && strlen($code) === 6)
+            ->assertJsonPath('pool.possible_score_ids.0', 's00')
+            ->assertJsonPath('pool.possible_scores.s00.0', 0)
+            ->assertJsonPath('pool.possible_scores.s20.0', 2)
+            ->assertJsonCount(2, 'pool.users')
+            ->assertJsonPath('pool.users.0.id', $firstUser->id)
+            ->assertJsonPath('pool.users.1.id', $secondUser->id);
+
+        $this->assertDatabaseHas('pools', [
+            'id' => $pool->id,
+            'name' => 'Pool de prueba',
+            'type' => 'random_score',
+            'status' => 'scheduled',
+            'accepts_join_requests' => true,
+            'requires_join_approval' => false,
+            'is_active' => false,
+        ]);
+
+        $this->assertDatabaseHas('pool_fixtures', [
+            'pool_id' => $pool->id,
+            'fixture_id' => $fixture->id,
+            'allows_repeated_scores' => false,
+            'score_repeat_limit' => 0,
+            'score_selection_type' => 'random_score',
+        ]);
+
+        $this->assertSame(2, \App\Models\PoolUser::query()->where('pool_id', $pool->id)->count());
+        $this->assertSame(2, \App\Models\PoolUserFixture::query()->where('pool_id', $pool->id)->count());
+
+        $this->assertDatabaseHas('pool_user_fixtures', [
+            'pool_id' => $pool->id,
+            'user_id' => $firstUser->id,
+            'fixture_id' => $fixture->id,
+            'home_goals' => null,
+            'away_goals' => null,
+            'entry_order' => null,
+            'is_locked' => false,
         ]);
     }
 

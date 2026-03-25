@@ -74,4 +74,14 @@ class Pool extends Model
     {
         return $this->hasMany(PoolFixture::class);
     }
+
+    public function poolUsers(): HasMany
+    {
+        return $this->hasMany(PoolUser::class);
+    }
+
+    public function poolUserFixtures(): HasMany
+    {
+        return $this->hasMany(PoolUserFixture::class);
+    }
 }
