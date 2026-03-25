@@ -44,24 +44,44 @@ class PoolResponse extends JsonResource
             'is_active' => $this->is_active,
         ];
 
-        if ($this->group !== null) {
-            $data['users'] = $this->group->users
-                ->filter(fn ($user) => (bool) ($user->pivot?->is_accepted ?? false))
-                ->sortBy([
-                    ['name', 'asc'],
-                    ['last_name', 'asc'],
-                ])
-                ->values()
-                ->map(fn ($user) => $this->transformGroupUser($user))
-                ->all();
+        $isDraft = (string) $this->status === 'draft';
+
+        if ($isDraft && $this->group !== null) {
+            $users = $this->group->users
+                ->filter(fn ($user) => (bool) ($user->pivot?->is_accepted ?? false));
+        } else {
+            $users = $this->poolUsers
+                ->map(fn ($poolUser) => $poolUser->user)
+                ->filter();
         }
+
+        $data['users'] = $users
+            ->sortBy([
+                ['name', 'asc'],
+                ['last_name', 'asc'],
+            ])
+            ->values()
+            ->map(fn ($user) => $this->transformGroupUser($user))
+            ->all();
 
         if ((string) $this->scope === 'match') {
             $poolFixture = $this->poolFixtures->first();
             $fixture = $poolFixture?->fixture;
+            $configuredPossibleScores = config('pools.possible_scores', []);
+            $possibleScoreIds = $isDraft ? array_keys($configuredPossibleScores) : ($poolFixture?->possible_scores);
+
+            $filteredPossibleScores = $configuredPossibleScores;
+
+            if (!$isDraft && is_array($possibleScoreIds) && $possibleScoreIds !== []) {
+                $filteredPossibleScores = array_intersect_key(
+                    $configuredPossibleScores,
+                    array_flip($possibleScoreIds)
+                );
+            }
+
             $data['match'] = $fixture !== null ? $this->transformFixture($fixture) : null;
-            $data['possible_scores'] = config('pools.possible_scores', []);
-            $data['possible_score_ids'] = $poolFixture?->possible_scores;
+            $data['possible_scores'] = $filteredPossibleScores;
+            $data['possible_score_ids'] = $possibleScoreIds;
         }
 
         return $data;
