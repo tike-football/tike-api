@@ -51,6 +51,7 @@ class PoolResponse extends JsonResource
                 ->filter(fn ($user) => (bool) ($user->pivot?->is_accepted ?? false));
         } else {
             $users = $this->poolUsers
+                ->filter(fn ($poolUser) => (bool) $poolUser->approved)
                 ->map(fn ($poolUser) => $poolUser->user)
                 ->filter();
         }

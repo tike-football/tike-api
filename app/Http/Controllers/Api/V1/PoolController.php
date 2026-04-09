@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Pool\JoinPoolRequest;
 use App\Http\Requests\Pool\StorePoolRequest;
 use App\Http\Requests\Pool\UpdatePoolRequest;
 use App\Http\Resources\Api\V1\Pool\PoolResponse;
@@ -12,7 +13,6 @@ use App\Models\PoolFixture;
 use App\Models\PoolUser;
 use App\Models\PoolUserFixture;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -161,6 +161,7 @@ class PoolController extends Controller
                     PoolUser::query()->create([
                         'pool_id' => $pool->id,
                         'user_id' => $userId,
+                        'approved' => true,
                     ]);
 
                     foreach ($pool->poolFixtures as $poolFixture) {
@@ -217,6 +218,100 @@ class PoolController extends Controller
             return response()->json([
                 'message' => 'An error occurred while updating the pool.',
                 'error' => 'Pool update failed. Please try again.',
+            ], 500);
+        }
+    }
+
+    public function join(JoinPoolRequest $request, int $poolId): JsonResponse
+    {
+        try {
+            $user = $request->user();
+
+            if ($user === null) {
+                return response()->json([
+                    'message' => 'Unauthenticated.',
+                ], 401);
+            }
+
+            $pool = Pool::query()->find($poolId);
+
+            if ($pool === null) {
+                return response()->json([
+                    'message' => 'Pool not found.',
+                ], 404);
+            }
+
+            $existingPoolUser = PoolUser::query()
+                ->where('pool_id', $pool->id)
+                ->where('user_id', $user->id)
+                ->first();
+
+            if ($existingPoolUser !== null) {
+                if ($existingPoolUser->approved) {
+                    return response()->json([
+                        'message' => 'You are already in this pool.',
+                    ], 200);
+                }
+
+                return response()->json([
+                    'message' => 'Your join request is pending approval.',
+                ], 200);
+            }
+
+            if (!$pool->accepts_join_requests) {
+                return response()->json([
+                    'message' => 'This pool is not accepting join requests.',
+                ], 403);
+            }
+
+            $requestCode = $request->validated('code');
+            $requiresApproval = (bool) $pool->requires_join_approval;
+
+            if ($pool->code !== null) {
+                if ($requestCode === null || $requestCode !== $pool->code) {
+                    return response()->json([
+                        'message' => 'The provided join code is invalid.',
+                    ], 422);
+                }
+
+                PoolUser::query()->create([
+                    'pool_id' => $pool->id,
+                    'user_id' => $user->id,
+                    'approved' => true,
+                ]);
+
+                return response()->json([
+                    'message' => 'You have joined the pool successfully.',
+                ], 201);
+            }
+
+            PoolUser::query()->create([
+                'pool_id' => $pool->id,
+                'user_id' => $user->id,
+                'approved' => !$requiresApproval,
+            ]);
+
+            if ($requiresApproval) {
+                return response()->json([
+                    'message' => 'Your join request has been sent and is pending approval.',
+                ], 201);
+            }
+
+            return response()->json([
+                'message' => 'You have joined the pool successfully.',
+            ], 201);
+        } catch (\Throwable $e) {
+            Log::error(__METHOD__ . ' error: ' . $e->getMessage(), [
+                'pool_id' => $poolId,
+                'user_id' => $request->user()?->id,
+                'payload' => $request->except([]),
+                'exception_message' => $e->getMessage(),
+                'exception_trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'message' => 'An error occurred while joining the pool.',
+                'error' => 'Pool join failed. Please try again.',
             ], 500);
         }
     }
