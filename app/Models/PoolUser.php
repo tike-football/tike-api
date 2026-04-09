@@ -18,6 +18,7 @@ class PoolUser extends Model
     protected $fillable = [
         'pool_id',
         'user_id',
+        'approved',
         'league_structure',
     ];
 
@@ -29,6 +30,7 @@ class PoolUser extends Model
     protected function casts(): array
     {
         return [
+            'approved' => 'boolean',
             'league_structure' => 'array',
         ];
     }

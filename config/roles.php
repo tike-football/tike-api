@@ -17,6 +17,7 @@ return [
             'util:get',
             'admin:run-commands',
             'pool:add',
+            'pool:join',
         ],
     ],
     'user' => [
@@ -32,6 +33,7 @@ return [
             'football-data:get',
             'util:get',
             'pool:add',
+            'pool:join',
         ],
     ],
     'unverified_user' => [

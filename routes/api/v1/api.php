@@ -108,6 +108,10 @@ Route::middleware(['api.key', 'auth:api'])->prefix('pool')->group(function (): v
         Route::post('/', 'store');
         Route::post('{pool_id}', 'update');
     });
+
+    Route::middleware(['scope:pool:join'])->controller(PoolController::class)->group(function (): void {
+        Route::post('{pool_id}/join', 'join');
+    });
 });
 
 // Football data endpoints - Require API key, authentication and read scope

@@ -83,6 +83,25 @@ class PoolControllerTest extends TestCase
         $response->assertStatus(403);
     }
 
+    public function test_join_requires_scope(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        $pool = Pool::query()->create([
+            'owner_id' => $user->id,
+            'name' => 'Pool',
+            'description' => str_repeat('Descripcion valida. ', 8),
+            'scope' => 'league',
+            'type' => 'league_general',
+            'status' => 'draft',
+        ]);
+
+        Passport::actingAs($user, ['different:scope']);
+
+        $response = $this->postJsonWithApiKey('/api/v1/pool/' . $pool->id . '/join', []);
+
+        $response->assertStatus(403);
+    }
+
     public function test_store_validates_required_fields(): void
     {
         $user = User::factory()->create(['role' => 'user']);
@@ -396,6 +415,124 @@ class PoolControllerTest extends TestCase
             'entry_order' => null,
             'is_locked' => false,
         ]);
+    }
+
+    public function test_join_adds_user_when_pool_has_matching_code(): void
+    {
+        $owner = User::factory()->create(['role' => 'user']);
+        $joiner = User::factory()->create(['role' => 'user']);
+        $pool = Pool::query()->create([
+            'owner_id' => $owner->id,
+            'name' => 'Pool',
+            'description' => str_repeat('Descripcion valida. ', 8),
+            'scope' => 'league',
+            'type' => 'league_general',
+            'status' => 'scheduled',
+            'code' => 'ABC123',
+        ]);
+
+        Passport::actingAs($joiner, ['pool:join']);
+
+        $response = $this->postJsonWithApiKey('/api/v1/pool/' . $pool->id . '/join', [
+            'code' => 'ABC123',
+        ]);
+
+        $response->assertStatus(201)
+            ->assertJson([
+                'message' => 'You have joined the pool successfully.',
+            ]);
+
+        $this->assertDatabaseHas('pool_users', [
+            'pool_id' => $pool->id,
+            'user_id' => $joiner->id,
+            'approved' => true,
+        ]);
+    }
+
+    public function test_join_returns_error_when_code_does_not_match(): void
+    {
+        $owner = User::factory()->create(['role' => 'user']);
+        $joiner = User::factory()->create(['role' => 'user']);
+        $pool = Pool::query()->create([
+            'owner_id' => $owner->id,
+            'name' => 'Pool',
+            'description' => str_repeat('Descripcion valida. ', 8),
+            'scope' => 'league',
+            'type' => 'league_general',
+            'status' => 'scheduled',
+            'code' => 'ABC123',
+        ]);
+
+        Passport::actingAs($joiner, ['pool:join']);
+
+        $response = $this->postJsonWithApiKey('/api/v1/pool/' . $pool->id . '/join', [
+            'code' => 'ZZZ999',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'message' => 'The provided join code is invalid.',
+            ]);
+    }
+
+    public function test_join_creates_pending_record_when_approval_is_required(): void
+    {
+        $owner = User::factory()->create(['role' => 'user']);
+        $joiner = User::factory()->create(['role' => 'user']);
+        $pool = Pool::query()->create([
+            'owner_id' => $owner->id,
+            'name' => 'Pool',
+            'description' => str_repeat('Descripcion valida. ', 8),
+            'scope' => 'league',
+            'type' => 'league_general',
+            'status' => 'scheduled',
+            'requires_join_approval' => true,
+            'accepts_join_requests' => true,
+        ]);
+
+        Passport::actingAs($joiner, ['pool:join']);
+
+        $response = $this->postJsonWithApiKey('/api/v1/pool/' . $pool->id . '/join', []);
+
+        $response->assertStatus(201)
+            ->assertJson([
+                'message' => 'Your join request has been sent and is pending approval.',
+            ]);
+
+        $this->assertDatabaseHas('pool_users', [
+            'pool_id' => $pool->id,
+            'user_id' => $joiner->id,
+            'approved' => false,
+        ]);
+    }
+
+    public function test_join_returns_message_if_user_is_already_in_pool(): void
+    {
+        $owner = User::factory()->create(['role' => 'user']);
+        $joiner = User::factory()->create(['role' => 'user']);
+        $pool = Pool::query()->create([
+            'owner_id' => $owner->id,
+            'name' => 'Pool',
+            'description' => str_repeat('Descripcion valida. ', 8),
+            'scope' => 'league',
+            'type' => 'league_general',
+            'status' => 'scheduled',
+        ]);
+
+        \App\Models\PoolUser::query()->create([
+            'pool_id' => $pool->id,
+            'user_id' => $joiner->id,
+            'approved' => true,
+        ]);
+
+        Passport::actingAs($joiner, ['pool:join']);
+
+        $response = $this->postJsonWithApiKey('/api/v1/pool/' . $pool->id . '/join', []);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'message' => 'You are already in this pool.',
+            ]);
     }
 
     private function createLeague(): League
