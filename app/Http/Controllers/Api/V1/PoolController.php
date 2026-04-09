@@ -13,6 +13,7 @@ use App\Models\Pool;
 use App\Models\PoolFixture;
 use App\Models\PoolUser;
 use App\Models\PoolUserFixture;
+use App\Services\PoolService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -20,6 +21,11 @@ use Illuminate\Support\Facades\Log;
 
 class PoolController extends Controller
 {
+    public function __construct(
+        private readonly PoolService $poolService
+    ) {
+    }
+
     public function store(StorePoolRequest $request): JsonResponse
     {
         try {
@@ -159,40 +165,7 @@ class PoolController extends Controller
                 PoolUserFixture::query()->where('pool_id', $pool->id)->delete();
 
                 foreach ($userIds as $userId) {
-                    PoolUser::query()->create([
-                        'pool_id' => $pool->id,
-                        'user_id' => $userId,
-                        'approved' => true,
-                    ]);
-
-                    foreach ($pool->poolFixtures as $poolFixture) {
-                        $fixture = $poolFixture->fixture;
-
-                        if ($fixture === null) {
-                            continue;
-                        }
-
-                        PoolUserFixture::query()->create([
-                            'pool_id' => $pool->id,
-                            'user_id' => $userId,
-                            'fixture_id' => $fixture->id,
-                            'league_id' => $fixture->league_id,
-                            'season' => $fixture->season,
-                            'round' => $fixture->round,
-                            'timezone' => $fixture->timezone,
-                            'fixture_date' => $fixture->fixture_date,
-                            'timestamp' => $fixture->timestamp,
-                            'status_long' => $fixture->status_long,
-                            'status_short' => $fixture->status_short,
-                            'home_team_id' => $fixture->home_team_id,
-                            'away_team_id' => $fixture->away_team_id,
-                            'home_goals' => null,
-                            'away_goals' => null,
-                            'finished_at' => $fixture->finished_at,
-                            'entry_order' => null,
-                            'is_locked' => false,
-                        ]);
-                    }
+                    $this->poolService->initializeApprovedUser($pool, $userId);
                 }
             });
 
@@ -276,13 +249,7 @@ class PoolController extends Controller
                 }
 
                 DB::transaction(function () use ($pool, $user): void {
-                    PoolUser::query()->create([
-                        'pool_id' => $pool->id,
-                        'user_id' => $user->id,
-                        'approved' => true,
-                    ]);
-
-                    $this->createPoolUserFixturesForUser($pool->loadMissing('poolFixtures.fixture'), $user->id);
+                    $this->poolService->initializeApprovedUser($pool, $user->id);
                 });
 
                 return response()->json([
@@ -298,7 +265,7 @@ class PoolController extends Controller
                 ]);
 
                 if (!$requiresApproval) {
-                    $this->createPoolUserFixturesForUser($pool->loadMissing('poolFixtures.fixture'), $user->id);
+                    $this->poolService->initializeApprovedUser($pool, $user->id);
                 }
             });
 
@@ -389,10 +356,7 @@ class PoolController extends Controller
             }
 
             DB::transaction(function () use ($poolUser, $pool, $userId): void {
-                $poolUser->approved = true;
-                $poolUser->save();
-
-                $this->createPoolUserFixturesForUser($pool, $userId);
+                $this->poolService->initializeApprovedUser($pool, $userId);
             });
 
             return response()->json([
@@ -423,41 +387,5 @@ class PoolController extends Controller
         } while (Pool::query()->where('code', $code)->exists());
 
         return $code;
-    }
-
-    private function createPoolUserFixturesForUser(Pool $pool, int $userId): void
-    {
-        foreach ($pool->poolFixtures as $poolFixture) {
-            $fixture = $poolFixture->fixture;
-
-            if ($fixture === null) {
-                continue;
-            }
-
-            PoolUserFixture::query()->updateOrCreate(
-                [
-                    'pool_id' => $pool->id,
-                    'user_id' => $userId,
-                    'fixture_id' => $fixture->id,
-                ],
-                [
-                    'league_id' => $fixture->league_id,
-                    'season' => $fixture->season,
-                    'round' => $fixture->round,
-                    'timezone' => $fixture->timezone,
-                    'fixture_date' => $fixture->fixture_date,
-                    'timestamp' => $fixture->timestamp,
-                    'status_long' => $fixture->status_long,
-                    'status_short' => $fixture->status_short,
-                    'home_team_id' => $fixture->home_team_id,
-                    'away_team_id' => $fixture->away_team_id,
-                    'home_goals' => null,
-                    'away_goals' => null,
-                    'finished_at' => $fixture->finished_at,
-                    'entry_order' => null,
-                    'is_locked' => false,
-                ]
-            );
-        }
     }
 }

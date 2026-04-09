@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\PoolService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Event;
@@ -14,7 +15,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(PoolService::class, static fn () => new PoolService());
     }
 
     /**
