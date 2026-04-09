@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Pool\JoinPoolRequest;
+use App\Http\Requests\Pool\ReviewPoolJoinRequest;
 use App\Http\Requests\Pool\StorePoolRequest;
 use App\Http\Requests\Pool\UpdatePoolRequest;
 use App\Http\Resources\Api\V1\Pool\PoolResponse;
@@ -274,22 +275,32 @@ class PoolController extends Controller
                     ], 422);
                 }
 
-                PoolUser::query()->create([
-                    'pool_id' => $pool->id,
-                    'user_id' => $user->id,
-                    'approved' => true,
-                ]);
+                DB::transaction(function () use ($pool, $user): void {
+                    PoolUser::query()->create([
+                        'pool_id' => $pool->id,
+                        'user_id' => $user->id,
+                        'approved' => true,
+                    ]);
+
+                    $this->createPoolUserFixturesForUser($pool->loadMissing('poolFixtures.fixture'), $user->id);
+                });
 
                 return response()->json([
                     'message' => 'You have joined the pool successfully.',
                 ], 201);
             }
 
-            PoolUser::query()->create([
-                'pool_id' => $pool->id,
-                'user_id' => $user->id,
-                'approved' => !$requiresApproval,
-            ]);
+            DB::transaction(function () use ($pool, $user, $requiresApproval): void {
+                PoolUser::query()->create([
+                    'pool_id' => $pool->id,
+                    'user_id' => $user->id,
+                    'approved' => !$requiresApproval,
+                ]);
+
+                if (!$requiresApproval) {
+                    $this->createPoolUserFixturesForUser($pool->loadMissing('poolFixtures.fixture'), $user->id);
+                }
+            });
 
             if ($requiresApproval) {
                 return response()->json([
@@ -316,6 +327,93 @@ class PoolController extends Controller
         }
     }
 
+    public function reviewJoinRequest(ReviewPoolJoinRequest $request, int $poolId): JsonResponse
+    {
+        try {
+            $authUser = $request->user();
+
+            if ($authUser === null) {
+                return response()->json([
+                    'message' => 'Unauthenticated.',
+                ], 401);
+            }
+
+            $pool = Pool::query()->with('poolFixtures.fixture')->find($poolId);
+
+            if ($pool === null) {
+                return response()->json([
+                    'message' => 'Pool not found.',
+                ], 404);
+            }
+
+            if ((int) $pool->owner_id !== (int) $authUser->id) {
+                return response()->json([
+                    'message' => 'You cannot review join requests for this pool.',
+                ], 403);
+            }
+
+            $validated = $request->validated();
+            $userId = (int) $validated['user_id'];
+            $approved = (bool) $validated['approved'];
+
+            $poolUser = PoolUser::query()
+                ->where('pool_id', $pool->id)
+                ->where('user_id', $userId)
+                ->first();
+
+            if ($poolUser === null) {
+                return response()->json([
+                    'message' => 'The user does not have a pending join request for this pool.',
+                ], 404);
+            }
+
+            if ($poolUser->approved) {
+                return response()->json([
+                    'message' => 'The user is already approved in this pool.',
+                ], 200);
+            }
+
+            if (!$approved) {
+                DB::transaction(function () use ($poolUser, $pool, $userId): void {
+                    PoolUserFixture::query()
+                        ->where('pool_id', $pool->id)
+                        ->where('user_id', $userId)
+                        ->delete();
+
+                    $poolUser->delete();
+                });
+
+                return response()->json([
+                    'message' => 'Join request rejected successfully.',
+                ], 200);
+            }
+
+            DB::transaction(function () use ($poolUser, $pool, $userId): void {
+                $poolUser->approved = true;
+                $poolUser->save();
+
+                $this->createPoolUserFixturesForUser($pool, $userId);
+            });
+
+            return response()->json([
+                'message' => 'Join request approved successfully.',
+            ], 200);
+        } catch (\Throwable $e) {
+            Log::error(__METHOD__ . ' error: ' . $e->getMessage(), [
+                'pool_id' => $poolId,
+                'user_id' => $request->user()?->id,
+                'payload' => $request->except([]),
+                'exception_message' => $e->getMessage(),
+                'exception_trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'message' => 'An error occurred while reviewing the join request.',
+                'error' => 'Join request review failed. Please try again.',
+            ], 500);
+        }
+    }
+
     private function generateJoinCode(): string
     {
         do {
@@ -325,5 +423,41 @@ class PoolController extends Controller
         } while (Pool::query()->where('code', $code)->exists());
 
         return $code;
+    }
+
+    private function createPoolUserFixturesForUser(Pool $pool, int $userId): void
+    {
+        foreach ($pool->poolFixtures as $poolFixture) {
+            $fixture = $poolFixture->fixture;
+
+            if ($fixture === null) {
+                continue;
+            }
+
+            PoolUserFixture::query()->updateOrCreate(
+                [
+                    'pool_id' => $pool->id,
+                    'user_id' => $userId,
+                    'fixture_id' => $fixture->id,
+                ],
+                [
+                    'league_id' => $fixture->league_id,
+                    'season' => $fixture->season,
+                    'round' => $fixture->round,
+                    'timezone' => $fixture->timezone,
+                    'fixture_date' => $fixture->fixture_date,
+                    'timestamp' => $fixture->timestamp,
+                    'status_long' => $fixture->status_long,
+                    'status_short' => $fixture->status_short,
+                    'home_team_id' => $fixture->home_team_id,
+                    'away_team_id' => $fixture->away_team_id,
+                    'home_goals' => null,
+                    'away_goals' => null,
+                    'finished_at' => $fixture->finished_at,
+                    'entry_order' => null,
+                    'is_locked' => false,
+                ]
+            );
+        }
     }
 }

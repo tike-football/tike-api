@@ -102,6 +102,35 @@ class PoolControllerTest extends TestCase
         $response->assertStatus(403);
     }
 
+    public function test_review_join_request_requires_scope(): void
+    {
+        $owner = User::factory()->create(['role' => 'user']);
+        $requestUser = User::factory()->create(['role' => 'user']);
+        $pool = Pool::query()->create([
+            'owner_id' => $owner->id,
+            'name' => 'Pool',
+            'description' => str_repeat('Descripcion valida. ', 8),
+            'scope' => 'league',
+            'type' => 'league_general',
+            'status' => 'scheduled',
+        ]);
+
+        \App\Models\PoolUser::query()->create([
+            'pool_id' => $pool->id,
+            'user_id' => $requestUser->id,
+            'approved' => false,
+        ]);
+
+        Passport::actingAs($owner, ['different:scope']);
+
+        $response = $this->postJsonWithApiKey('/api/v1/pool/' . $pool->id . '/review-join-request', [
+            'user_id' => $requestUser->id,
+            'approved' => true,
+        ]);
+
+        $response->assertStatus(403);
+    }
+
     public function test_store_validates_required_fields(): void
     {
         $user = User::factory()->create(['role' => 'user']);
@@ -296,11 +325,14 @@ class PoolControllerTest extends TestCase
             ->assertJsonPath('pool.type', 'league_general')
             ->assertJsonPath('pool.status', 'draft')
             ->assertJsonCount(2, 'pool.users')
-            ->assertJsonPath('pool.users.0.id', $member->id)
-            ->assertJsonPath('pool.users.0.name', 'Alexandrea')
-            ->assertJsonPath('pool.users.0.last_name', 'Stokes')
-            ->assertJsonPath('pool.users.0.avatar_url', url('/storage/users/avatars/system/default01.png'))
             ->assertJsonPath('pool.is_active', false);
+
+        $response->assertJsonFragment([
+            'id' => $member->id,
+            'name' => 'Alexandrea',
+            'last_name' => 'Stokes',
+            'avatar_url' => url('/storage/users/avatars/system/default01.png'),
+        ]);
 
         $poolId = $response->json('pool.id');
 
@@ -421,14 +453,25 @@ class PoolControllerTest extends TestCase
     {
         $owner = User::factory()->create(['role' => 'user']);
         $joiner = User::factory()->create(['role' => 'user']);
+        $league = $this->createLeague();
+        $leagueSeason = $this->createLeagueSeason($league);
+        $fixture = $this->createFixture($league, (int) $leagueSeason->year);
         $pool = Pool::query()->create([
             'owner_id' => $owner->id,
+            'league_id' => $league->id,
+            'league_season_id' => $leagueSeason->id,
             'name' => 'Pool',
             'description' => str_repeat('Descripcion valida. ', 8),
-            'scope' => 'league',
-            'type' => 'league_general',
+            'scope' => 'match',
+            'type' => 'selected_score',
             'status' => 'scheduled',
             'code' => 'ABC123',
+        ]);
+
+        \App\Models\PoolFixture::query()->create([
+            'pool_id' => $pool->id,
+            'fixture_id' => $fixture->id,
+            'score_selection_type' => 'selected_score',
         ]);
 
         Passport::actingAs($joiner, ['pool:join']);
@@ -446,6 +489,13 @@ class PoolControllerTest extends TestCase
             'pool_id' => $pool->id,
             'user_id' => $joiner->id,
             'approved' => true,
+        ]);
+
+        $this->assertDatabaseHas('pool_user_fixtures', [
+            'pool_id' => $pool->id,
+            'user_id' => $joiner->id,
+            'fixture_id' => $fixture->id,
+            'is_locked' => false,
         ]);
     }
 
@@ -533,6 +583,148 @@ class PoolControllerTest extends TestCase
             ->assertJson([
                 'message' => 'You are already in this pool.',
             ]);
+    }
+
+    public function test_join_creates_pool_user_fixtures_when_approval_is_not_required(): void
+    {
+        $owner = User::factory()->create(['role' => 'user']);
+        $joiner = User::factory()->create(['role' => 'user']);
+        $league = $this->createLeague();
+        $leagueSeason = $this->createLeagueSeason($league);
+        $fixture = $this->createFixture($league, (int) $leagueSeason->year);
+        $pool = Pool::query()->create([
+            'owner_id' => $owner->id,
+            'league_id' => $league->id,
+            'league_season_id' => $leagueSeason->id,
+            'name' => 'Pool',
+            'description' => str_repeat('Descripcion valida. ', 8),
+            'scope' => 'match',
+            'type' => 'selected_score',
+            'status' => 'scheduled',
+            'accepts_join_requests' => true,
+            'requires_join_approval' => false,
+        ]);
+
+        \App\Models\PoolFixture::query()->create([
+            'pool_id' => $pool->id,
+            'fixture_id' => $fixture->id,
+            'score_selection_type' => 'selected_score',
+        ]);
+
+        Passport::actingAs($joiner, ['pool:join']);
+
+        $response = $this->postJsonWithApiKey('/api/v1/pool/' . $pool->id . '/join', []);
+
+        $response->assertStatus(201)
+            ->assertJson([
+                'message' => 'You have joined the pool successfully.',
+            ]);
+
+        $this->assertDatabaseHas('pool_users', [
+            'pool_id' => $pool->id,
+            'user_id' => $joiner->id,
+            'approved' => true,
+        ]);
+
+        $this->assertDatabaseHas('pool_user_fixtures', [
+            'pool_id' => $pool->id,
+            'user_id' => $joiner->id,
+            'fixture_id' => $fixture->id,
+            'is_locked' => false,
+        ]);
+    }
+
+    public function test_review_join_request_approves_pending_user_and_creates_pool_user_fixture(): void
+    {
+        $owner = User::factory()->create(['role' => 'user']);
+        $requestUser = User::factory()->create(['role' => 'user']);
+        $league = $this->createLeague();
+        $leagueSeason = $this->createLeagueSeason($league);
+        $fixture = $this->createFixture($league, (int) $leagueSeason->year);
+        $pool = Pool::query()->create([
+            'owner_id' => $owner->id,
+            'league_id' => $league->id,
+            'league_season_id' => $leagueSeason->id,
+            'name' => 'Pool',
+            'description' => str_repeat('Descripcion valida. ', 8),
+            'scope' => 'match',
+            'type' => 'selected_score',
+            'status' => 'scheduled',
+        ]);
+
+        \App\Models\PoolFixture::query()->create([
+            'pool_id' => $pool->id,
+            'fixture_id' => $fixture->id,
+            'score_selection_type' => 'selected_score',
+        ]);
+
+        \App\Models\PoolUser::query()->create([
+            'pool_id' => $pool->id,
+            'user_id' => $requestUser->id,
+            'approved' => false,
+        ]);
+
+        Passport::actingAs($owner, ['pool:add']);
+
+        $response = $this->postJsonWithApiKey('/api/v1/pool/' . $pool->id . '/review-join-request', [
+            'user_id' => $requestUser->id,
+            'approved' => true,
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'message' => 'Join request approved successfully.',
+            ]);
+
+        $this->assertDatabaseHas('pool_users', [
+            'pool_id' => $pool->id,
+            'user_id' => $requestUser->id,
+            'approved' => true,
+        ]);
+
+        $this->assertDatabaseHas('pool_user_fixtures', [
+            'pool_id' => $pool->id,
+            'user_id' => $requestUser->id,
+            'fixture_id' => $fixture->id,
+            'is_locked' => false,
+        ]);
+    }
+
+    public function test_review_join_request_rejects_pending_user_and_deletes_pool_user(): void
+    {
+        $owner = User::factory()->create(['role' => 'user']);
+        $requestUser = User::factory()->create(['role' => 'user']);
+        $pool = Pool::query()->create([
+            'owner_id' => $owner->id,
+            'name' => 'Pool',
+            'description' => str_repeat('Descripcion valida. ', 8),
+            'scope' => 'league',
+            'type' => 'league_general',
+            'status' => 'scheduled',
+        ]);
+
+        \App\Models\PoolUser::query()->create([
+            'pool_id' => $pool->id,
+            'user_id' => $requestUser->id,
+            'approved' => false,
+        ]);
+
+        Passport::actingAs($owner, ['pool:add']);
+
+        $response = $this->postJsonWithApiKey('/api/v1/pool/' . $pool->id . '/review-join-request', [
+            'user_id' => $requestUser->id,
+            'approved' => false,
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'message' => 'Join request rejected successfully.',
+            ]);
+
+        $this->assertDatabaseMissing('pool_users', [
+            'pool_id' => $pool->id,
+            'user_id' => $requestUser->id,
+        ]);
     }
 
     private function createLeague(): League
