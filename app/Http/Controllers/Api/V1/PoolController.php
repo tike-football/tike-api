@@ -7,12 +7,16 @@ use App\Http\Requests\Pool\JoinPoolRequest;
 use App\Http\Requests\Pool\ReviewPoolJoinRequest;
 use App\Http\Requests\Pool\StorePoolRequest;
 use App\Http\Requests\Pool\UpdatePoolRequest;
+use App\Http\Resources\Api\V1\Pool\PoolDetailResponse;
+use App\Http\Resources\Api\V1\Pool\PoolListResponse;
 use App\Http\Resources\Api\V1\Pool\PoolResponse;
 use App\Models\Fixture;
 use App\Models\Pool;
 use App\Models\PoolFixture;
 use App\Models\PoolUser;
 use App\Models\PoolUserFixture;
+use App\Services\PoolService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -20,6 +24,119 @@ use Illuminate\Support\Facades\Log;
 
 class PoolController extends Controller
 {
+    public function __construct(
+        private readonly PoolService $poolService
+    ) {
+    }
+
+    public function index(): JsonResponse
+    {
+        try {
+            $user = request()->user();
+
+            if ($user === null) {
+                return response()->json([
+                    'message' => 'Unauthenticated.',
+                ], 401);
+            }
+
+            $pools = Pool::query()
+                ->with([
+                    'group:id,name',
+                    'league:id,name,country_name',
+                    'leagueSeason:id,league_id,year',
+                    'poolFixtures:id,pool_id,fixture_id',
+                ])
+                ->withCount([
+                    'poolUsers as approved_pool_users_count' => fn ($query) => $query->where('approved', true),
+                    'poolUsers as pending_pool_users_count' => fn ($query) => $query->where('approved', false),
+                ])
+                ->where(function ($query) use ($user): void {
+                    $query->where('owner_id', $user->id)
+                        ->orWhereHas('poolUsers', function ($poolUsersQuery) use ($user): void {
+                            $poolUsersQuery
+                                ->where('user_id', $user->id)
+                                ->where('approved', true);
+                        });
+                })
+                ->orderByDesc('id')
+                ->get();
+
+            return response()->json([
+                'pools' => PoolListResponse::collection($pools)->resolve(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error(__METHOD__ . ' error: ' . $e->getMessage(), [
+                'user_id' => request()->user()?->id,
+                'exception_message' => $e->getMessage(),
+                'exception_trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'message' => 'An error occurred while retrieving pools.',
+                'error' => 'Pools retrieval failed. Please try again.',
+            ], 500);
+        }
+    }
+
+    public function show(int $poolId): JsonResponse
+    {
+        try {
+            $user = request()->user();
+
+            if ($user === null) {
+                return response()->json([
+                    'message' => 'Unauthenticated.',
+                ], 401);
+            }
+
+            $pool = Pool::query()
+                ->with([
+                    'group.users',
+                    'league',
+                    'leagueSeason',
+                    'poolFixtures.fixture.teamStats.team',
+                    'poolFixtures.fixture.homeTeam',
+                    'poolFixtures.fixture.awayTeam',
+                    'poolUsers.user',
+                    'poolUsers.poolUserFixtures',
+                ])
+                ->find($poolId);
+
+            if ($pool === null) {
+                return response()->json([
+                    'message' => 'Pool not found.',
+                ], 404);
+            }
+
+            $isOwner = (int) $pool->owner_id === (int) $user->id;
+            $isApprovedMember = $pool->poolUsers
+                ->contains(fn ($poolUser) => (int) $poolUser->user_id === (int) $user->id && (bool) $poolUser->approved);
+
+            if (!$isOwner && !$isApprovedMember) {
+                return response()->json([
+                    'message' => 'You do not belong to this pool.',
+                ], 403);
+            }
+
+            return response()->json([
+                'pool' => PoolDetailResponse::make($pool)->resolve(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error(__METHOD__ . ' error: ' . $e->getMessage(), [
+                'pool_id' => $poolId,
+                'user_id' => request()->user()?->id,
+                'exception_message' => $e->getMessage(),
+                'exception_trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'message' => 'An error occurred while retrieving the pool.',
+                'error' => 'Pool retrieval failed. Please try again.',
+            ], 500);
+        }
+    }
+
     public function store(StorePoolRequest $request): JsonResponse
     {
         try {
@@ -159,40 +276,7 @@ class PoolController extends Controller
                 PoolUserFixture::query()->where('pool_id', $pool->id)->delete();
 
                 foreach ($userIds as $userId) {
-                    PoolUser::query()->create([
-                        'pool_id' => $pool->id,
-                        'user_id' => $userId,
-                        'approved' => true,
-                    ]);
-
-                    foreach ($pool->poolFixtures as $poolFixture) {
-                        $fixture = $poolFixture->fixture;
-
-                        if ($fixture === null) {
-                            continue;
-                        }
-
-                        PoolUserFixture::query()->create([
-                            'pool_id' => $pool->id,
-                            'user_id' => $userId,
-                            'fixture_id' => $fixture->id,
-                            'league_id' => $fixture->league_id,
-                            'season' => $fixture->season,
-                            'round' => $fixture->round,
-                            'timezone' => $fixture->timezone,
-                            'fixture_date' => $fixture->fixture_date,
-                            'timestamp' => $fixture->timestamp,
-                            'status_long' => $fixture->status_long,
-                            'status_short' => $fixture->status_short,
-                            'home_team_id' => $fixture->home_team_id,
-                            'away_team_id' => $fixture->away_team_id,
-                            'home_goals' => null,
-                            'away_goals' => null,
-                            'finished_at' => $fixture->finished_at,
-                            'entry_order' => null,
-                            'is_locked' => false,
-                        ]);
-                    }
+                    $this->poolService->initializeApprovedUser($pool, $userId);
                 }
             });
 
@@ -276,13 +360,7 @@ class PoolController extends Controller
                 }
 
                 DB::transaction(function () use ($pool, $user): void {
-                    PoolUser::query()->create([
-                        'pool_id' => $pool->id,
-                        'user_id' => $user->id,
-                        'approved' => true,
-                    ]);
-
-                    $this->createPoolUserFixturesForUser($pool->loadMissing('poolFixtures.fixture'), $user->id);
+                    $this->poolService->initializeApprovedUser($pool, $user->id);
                 });
 
                 return response()->json([
@@ -298,7 +376,7 @@ class PoolController extends Controller
                 ]);
 
                 if (!$requiresApproval) {
-                    $this->createPoolUserFixturesForUser($pool->loadMissing('poolFixtures.fixture'), $user->id);
+                    $this->poolService->initializeApprovedUser($pool, $user->id);
                 }
             });
 
@@ -389,10 +467,7 @@ class PoolController extends Controller
             }
 
             DB::transaction(function () use ($poolUser, $pool, $userId): void {
-                $poolUser->approved = true;
-                $poolUser->save();
-
-                $this->createPoolUserFixturesForUser($pool, $userId);
+                $this->poolService->initializeApprovedUser($pool, $userId);
             });
 
             return response()->json([
@@ -414,6 +489,62 @@ class PoolController extends Controller
         }
     }
 
+    public function lock(int $poolId): JsonResponse
+    {
+        try {
+            $user = request()->user();
+
+            if ($user === null) {
+                return response()->json([
+                    'message' => 'Unauthenticated.',
+                ], 401);
+            }
+
+            $pool = Pool::query()->find($poolId);
+
+            if ($pool === null) {
+                return response()->json([
+                    'message' => 'Pool not found.',
+                ], 404);
+            }
+
+            if ((int) $pool->owner_id !== (int) $user->id) {
+                return response()->json([
+                    'message' => 'You cannot lock this pool.',
+                ], 403);
+            }
+
+            $pool = $this->poolService->run($poolId);
+
+            $pool->loadMissing(
+                'poolUsers.user',
+                'poolFixtures.fixture.teamStats.team',
+                'poolFixtures.fixture.homeTeam',
+                'poolFixtures.fixture.awayTeam'
+            );
+
+            return response()->json([
+                'pool' => PoolResponse::make($pool)->resolve(),
+            ]);
+        } catch (ModelNotFoundException) {
+            return response()->json([
+                'message' => 'Pool not found.',
+            ], 404);
+        } catch (\Throwable $e) {
+            Log::error(__METHOD__ . ' error: ' . $e->getMessage(), [
+                'pool_id' => $poolId,
+                'user_id' => request()->user()?->id,
+                'exception_message' => $e->getMessage(),
+                'exception_trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'message' => 'An error occurred while locking the pool.',
+                'error' => 'Pool lock failed. Please try again.',
+            ], 500);
+        }
+    }
+
     private function generateJoinCode(): string
     {
         do {
@@ -423,41 +554,5 @@ class PoolController extends Controller
         } while (Pool::query()->where('code', $code)->exists());
 
         return $code;
-    }
-
-    private function createPoolUserFixturesForUser(Pool $pool, int $userId): void
-    {
-        foreach ($pool->poolFixtures as $poolFixture) {
-            $fixture = $poolFixture->fixture;
-
-            if ($fixture === null) {
-                continue;
-            }
-
-            PoolUserFixture::query()->updateOrCreate(
-                [
-                    'pool_id' => $pool->id,
-                    'user_id' => $userId,
-                    'fixture_id' => $fixture->id,
-                ],
-                [
-                    'league_id' => $fixture->league_id,
-                    'season' => $fixture->season,
-                    'round' => $fixture->round,
-                    'timezone' => $fixture->timezone,
-                    'fixture_date' => $fixture->fixture_date,
-                    'timestamp' => $fixture->timestamp,
-                    'status_long' => $fixture->status_long,
-                    'status_short' => $fixture->status_short,
-                    'home_team_id' => $fixture->home_team_id,
-                    'away_team_id' => $fixture->away_team_id,
-                    'home_goals' => null,
-                    'away_goals' => null,
-                    'finished_at' => $fixture->finished_at,
-                    'entry_order' => null,
-                    'is_locked' => false,
-                ]
-            );
-        }
     }
 }

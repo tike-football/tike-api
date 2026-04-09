@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PoolUser extends Model
 {
@@ -43,5 +44,10 @@ class PoolUser extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function poolUserFixtures(): HasMany
+    {
+        return $this->hasMany(PoolUserFixture::class, 'user_id', 'user_id');
     }
 }
