@@ -41,6 +41,24 @@ class PoolControllerTest extends TestCase
         $response->assertStatus(403);
     }
 
+    public function test_show_requires_scope(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        $pool = Pool::query()->create([
+            'owner_id' => $user->id,
+            'name' => 'Pool',
+            'description' => str_repeat('Descripcion valida. ', 8),
+            'scope' => 'league',
+            'type' => 'league_general',
+            'status' => 'scheduled',
+        ]);
+        Passport::actingAs($user, ['different:scope']);
+
+        $response = $this->getJsonWithApiKey('/api/v1/pool/' . $pool->id);
+
+        $response->assertStatus(403);
+    }
+
     public function test_store_requires_bearer_token(): void
     {
         $response = $this->postJsonWithApiKey('/api/v1/pool', []);
@@ -831,6 +849,135 @@ class PoolControllerTest extends TestCase
                 'season' => 2026,
                 'league_season_id' => $leagueSeason->id,
             ]);
+    }
+
+    public function test_show_returns_pool_detail_for_owner_with_pending_and_approved_users(): void
+    {
+        $owner = User::factory()->create(['role' => 'user']);
+        $friendUser = User::factory()->create([
+            'role' => 'user',
+            'name' => 'Alexandrea',
+            'last_name' => 'Stokes',
+            'avatar_path' => 'system/default01.png',
+        ]);
+        $pendingUser = User::factory()->create([
+            'role' => 'user',
+            'name' => 'Bridgette',
+            'last_name' => 'Prohaska',
+            'avatar_path' => 'system/default01.png',
+        ]);
+        $league = $this->createLeague();
+        $leagueSeason = $this->createLeagueSeason($league);
+        $fixture = $this->createFixture($league, (int) $leagueSeason->year);
+        $group = Group::query()->create([
+            'owner_id' => $owner->id,
+            'name' => 'Pool Group',
+            'description' => 'Group description',
+            'image_path' => 'group.png',
+            'language' => 'es',
+        ]);
+        $group->users()->attach($owner->id, ['is_accepted' => true]);
+        $group->users()->attach($friendUser->id, ['is_accepted' => true]);
+
+        \App\Models\Friend::query()->create([
+            'user_id' => $owner->id,
+            'friend_id' => $friendUser->id,
+        ]);
+        \App\Models\Friend::query()->create([
+            'user_id' => $friendUser->id,
+            'friend_id' => $owner->id,
+        ]);
+
+        $pool = Pool::query()->create([
+            'owner_id' => $owner->id,
+            'league_id' => $league->id,
+            'league_season_id' => $leagueSeason->id,
+            'group_id' => $group->id,
+            'name' => 'Owned Pool',
+            'description' => str_repeat('Descripcion valida. ', 8),
+            'scope' => 'match',
+            'type' => 'selected_score',
+            'status' => 'scheduled',
+        ]);
+
+        \App\Models\PoolFixture::query()->create([
+            'pool_id' => $pool->id,
+            'fixture_id' => $fixture->id,
+            'score_selection_type' => 'selected_score',
+            'possible_scores' => ['s00', 's01'],
+        ]);
+
+        \App\Models\PoolUser::query()->create([
+            'pool_id' => $pool->id,
+            'user_id' => $friendUser->id,
+            'approved' => true,
+        ]);
+        \App\Models\PoolUser::query()->create([
+            'pool_id' => $pool->id,
+            'user_id' => $owner->id,
+            'approved' => true,
+        ]);
+        \App\Models\PoolUser::query()->create([
+            'pool_id' => $pool->id,
+            'user_id' => $pendingUser->id,
+            'approved' => false,
+        ]);
+
+        \App\Models\PoolUserFixture::query()->create([
+            'pool_id' => $pool->id,
+            'user_id' => $friendUser->id,
+            'fixture_id' => $fixture->id,
+            'league_id' => $league->id,
+            'season' => 2026,
+            'round' => 'Regular Season - 1',
+            'timezone' => 'UTC',
+            'fixture_date' => now()->addDay(),
+            'timestamp' => now()->addDay()->timestamp,
+            'status_long' => 'Not Started',
+            'status_short' => 'NS',
+            'home_team_id' => $fixture->home_team_id,
+            'away_team_id' => $fixture->away_team_id,
+            'home_goals' => 1,
+            'away_goals' => 0,
+            'entry_order' => 1,
+            'is_locked' => false,
+        ]);
+
+        Passport::actingAs($owner, ['pool:get']);
+
+        $response = $this->getJsonWithApiKey('/api/v1/pool/' . $pool->id);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('pool.pool.id', $pool->id)
+            ->assertJsonPath('pool.pool.is_owner', true)
+            ->assertJsonPath('pool.pool.total_approved_users', 2)
+            ->assertJsonPath('pool.pool.total_pending_join_requests', 1)
+            ->assertJsonPath('pool.group.id', $group->id)
+            ->assertJsonPath('pool.group.image_path', 'group.png')
+            ->assertJsonPath('pool.group.name', 'Pool Group')
+            ->assertJsonPath('pool.group.description', 'Group description')
+            ->assertJsonPath('pool.group.total_users', 2)
+            ->assertJsonPath('pool.league.league_id', $league->id)
+            ->assertJsonPath('pool.league.name', 'League Test')
+            ->assertJsonPath('pool.league.season', 2026)
+            ->assertJsonPath('pool.league.league_season_id', $leagueSeason->id)
+            ->assertJsonPath('pool.match.id', $fixture->id)
+            ->assertJsonCount(2, 'pool.approved_users')
+            ->assertJsonCount(1, 'pool.pending_users');
+
+        $response->assertJsonFragment([
+            'id' => $friendUser->id,
+            'name' => 'Alexandrea',
+            'last_name' => 'Stokes',
+            'status' => 'friend',
+        ]);
+
+        $response->assertJsonFragment([
+            'fixture_id' => $fixture->id,
+            'home_goals' => 1,
+            'away_goals' => 0,
+            'entry_order' => 1,
+        ]);
     }
 
     private function createLeague(): League

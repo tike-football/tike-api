@@ -7,6 +7,7 @@ use App\Http\Requests\Pool\JoinPoolRequest;
 use App\Http\Requests\Pool\ReviewPoolJoinRequest;
 use App\Http\Requests\Pool\StorePoolRequest;
 use App\Http\Requests\Pool\UpdatePoolRequest;
+use App\Http\Resources\Api\V1\Pool\PoolDetailResponse;
 use App\Http\Resources\Api\V1\Pool\PoolListResponse;
 use App\Http\Resources\Api\V1\Pool\PoolResponse;
 use App\Models\Fixture;
@@ -73,6 +74,64 @@ class PoolController extends Controller
             return response()->json([
                 'message' => 'An error occurred while retrieving pools.',
                 'error' => 'Pools retrieval failed. Please try again.',
+            ], 500);
+        }
+    }
+
+    public function show(int $poolId): JsonResponse
+    {
+        try {
+            $user = request()->user();
+
+            if ($user === null) {
+                return response()->json([
+                    'message' => 'Unauthenticated.',
+                ], 401);
+            }
+
+            $pool = Pool::query()
+                ->with([
+                    'group.users',
+                    'league',
+                    'leagueSeason',
+                    'poolFixtures.fixture.teamStats.team',
+                    'poolFixtures.fixture.homeTeam',
+                    'poolFixtures.fixture.awayTeam',
+                    'poolUsers.user',
+                    'poolUsers.poolUserFixtures',
+                ])
+                ->find($poolId);
+
+            if ($pool === null) {
+                return response()->json([
+                    'message' => 'Pool not found.',
+                ], 404);
+            }
+
+            $isOwner = (int) $pool->owner_id === (int) $user->id;
+            $isApprovedMember = $pool->poolUsers
+                ->contains(fn ($poolUser) => (int) $poolUser->user_id === (int) $user->id && (bool) $poolUser->approved);
+
+            if (!$isOwner && !$isApprovedMember) {
+                return response()->json([
+                    'message' => 'You do not belong to this pool.',
+                ], 403);
+            }
+
+            return response()->json([
+                'pool' => PoolDetailResponse::make($pool)->resolve(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error(__METHOD__ . ' error: ' . $e->getMessage(), [
+                'pool_id' => $poolId,
+                'user_id' => request()->user()?->id,
+                'exception_message' => $e->getMessage(),
+                'exception_trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'message' => 'An error occurred while retrieving the pool.',
+                'error' => 'Pool retrieval failed. Please try again.',
             ], 500);
         }
     }
