@@ -159,6 +159,25 @@ class PoolControllerTest extends TestCase
         $response->assertStatus(403);
     }
 
+    public function test_lock_requires_scope(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        $pool = Pool::query()->create([
+            'owner_id' => $user->id,
+            'name' => 'Pool',
+            'description' => str_repeat('Descripcion valida. ', 8),
+            'scope' => 'league',
+            'type' => 'league_general',
+            'status' => 'scheduled',
+        ]);
+
+        Passport::actingAs($user, ['different:scope']);
+
+        $response = $this->postJsonWithApiKey('/api/v1/pool/' . $pool->id . '/lock');
+
+        $response->assertStatus(403);
+    }
+
     public function test_store_validates_required_fields(): void
     {
         $user = User::factory()->create(['role' => 'user']);
@@ -977,6 +996,56 @@ class PoolControllerTest extends TestCase
             'home_goals' => 1,
             'away_goals' => 0,
             'entry_order' => 1,
+        ]);
+    }
+
+    public function test_lock_returns_forbidden_when_user_is_not_owner(): void
+    {
+        $owner = User::factory()->create(['role' => 'user']);
+        $otherUser = User::factory()->create(['role' => 'user']);
+        $pool = Pool::query()->create([
+            'owner_id' => $owner->id,
+            'name' => 'Pool',
+            'description' => str_repeat('Descripcion valida. ', 8),
+            'scope' => 'league',
+            'type' => 'league_general',
+            'status' => 'scheduled',
+        ]);
+
+        Passport::actingAs($otherUser, ['pool:add']);
+
+        $response = $this->postJsonWithApiKey('/api/v1/pool/' . $pool->id . '/lock');
+
+        $response->assertStatus(403)
+            ->assertJson([
+                'message' => 'You cannot lock this pool.',
+            ]);
+    }
+
+    public function test_lock_updates_pool_status_to_running_for_owner(): void
+    {
+        $owner = User::factory()->create(['role' => 'user']);
+        $pool = Pool::query()->create([
+            'owner_id' => $owner->id,
+            'name' => 'Pool',
+            'description' => str_repeat('Descripcion valida. ', 8),
+            'scope' => 'league',
+            'type' => 'league_general',
+            'status' => 'scheduled',
+            'is_active' => true,
+        ]);
+
+        Passport::actingAs($owner, ['pool:add']);
+
+        $response = $this->postJsonWithApiKey('/api/v1/pool/' . $pool->id . '/lock');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('pool.id', $pool->id)
+            ->assertJsonPath('pool.status', 'running');
+
+        $this->assertDatabaseHas('pools', [
+            'id' => $pool->id,
+            'status' => 'running',
         ]);
     }
 

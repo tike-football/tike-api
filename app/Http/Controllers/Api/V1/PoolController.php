@@ -16,6 +16,7 @@ use App\Models\PoolFixture;
 use App\Models\PoolUser;
 use App\Models\PoolUserFixture;
 use App\Services\PoolService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -484,6 +485,62 @@ class PoolController extends Controller
             return response()->json([
                 'message' => 'An error occurred while reviewing the join request.',
                 'error' => 'Join request review failed. Please try again.',
+            ], 500);
+        }
+    }
+
+    public function lock(int $poolId): JsonResponse
+    {
+        try {
+            $user = request()->user();
+
+            if ($user === null) {
+                return response()->json([
+                    'message' => 'Unauthenticated.',
+                ], 401);
+            }
+
+            $pool = Pool::query()->find($poolId);
+
+            if ($pool === null) {
+                return response()->json([
+                    'message' => 'Pool not found.',
+                ], 404);
+            }
+
+            if ((int) $pool->owner_id !== (int) $user->id) {
+                return response()->json([
+                    'message' => 'You cannot lock this pool.',
+                ], 403);
+            }
+
+            $pool = $this->poolService->run($poolId);
+
+            $pool->loadMissing(
+                'poolUsers.user',
+                'poolFixtures.fixture.teamStats.team',
+                'poolFixtures.fixture.homeTeam',
+                'poolFixtures.fixture.awayTeam'
+            );
+
+            return response()->json([
+                'pool' => PoolResponse::make($pool)->resolve(),
+            ]);
+        } catch (ModelNotFoundException) {
+            return response()->json([
+                'message' => 'Pool not found.',
+            ], 404);
+        } catch (\Throwable $e) {
+            Log::error(__METHOD__ . ' error: ' . $e->getMessage(), [
+                'pool_id' => $poolId,
+                'user_id' => request()->user()?->id,
+                'exception_message' => $e->getMessage(),
+                'exception_trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'message' => 'An error occurred while locking the pool.',
+                'error' => 'Pool lock failed. Please try again.',
             ], 500);
         }
     }

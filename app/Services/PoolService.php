@@ -5,9 +5,33 @@ namespace App\Services;
 use App\Models\Pool;
 use App\Models\PoolUser;
 use App\Models\PoolUserFixture;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class PoolService
 {
+    public function run(int $poolId): Pool
+    {
+        $pool = Pool::query()->find($poolId);
+
+        if ($pool === null) {
+            throw new ModelNotFoundException('Pool not found.');
+        }
+
+        $statuses = (array) config('pools.statuses', []);
+        $runningStatus = (string) ($statuses[2] ?? 'running');
+
+        $pool->status = $runningStatus;
+        $pool->save();
+
+        PoolUserFixture::query()
+            ->where('pool_id', $pool->id)
+            ->update([
+                'is_locked' => true,
+            ]);
+
+        return $pool;
+    }
+
     public function initializeApprovedUser(Pool $pool, int $userId): void
     {
         $poolUser = PoolUser::query()
