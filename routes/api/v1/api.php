@@ -107,6 +107,7 @@ Route::middleware(['api.key', 'auth:api'])->prefix('pool')->group(function (): v
     Route::middleware(['scope:pool:add'])->controller(PoolController::class)->group(function (): void {
         Route::post('/', 'store');
         Route::post('{pool_id}', 'update');
+        Route::post('{pool_id}/review-join-request', 'reviewJoinRequest');
     });
 
     Route::middleware(['scope:pool:join'])->controller(PoolController::class)->group(function (): void {
