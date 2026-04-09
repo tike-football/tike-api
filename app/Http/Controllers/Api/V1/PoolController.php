@@ -7,6 +7,7 @@ use App\Http\Requests\Pool\JoinPoolRequest;
 use App\Http\Requests\Pool\ReviewPoolJoinRequest;
 use App\Http\Requests\Pool\StorePoolRequest;
 use App\Http\Requests\Pool\UpdatePoolRequest;
+use App\Http\Resources\Api\V1\Pool\PoolListResponse;
 use App\Http\Resources\Api\V1\Pool\PoolResponse;
 use App\Models\Fixture;
 use App\Models\Pool;
@@ -24,6 +25,56 @@ class PoolController extends Controller
     public function __construct(
         private readonly PoolService $poolService
     ) {
+    }
+
+    public function index(): JsonResponse
+    {
+        try {
+            $user = request()->user();
+
+            if ($user === null) {
+                return response()->json([
+                    'message' => 'Unauthenticated.',
+                ], 401);
+            }
+
+            $pools = Pool::query()
+                ->with([
+                    'group:id,name',
+                    'league:id,name,country_name',
+                    'leagueSeason:id,league_id,year',
+                    'poolFixtures:id,pool_id,fixture_id',
+                ])
+                ->withCount([
+                    'poolUsers as approved_pool_users_count' => fn ($query) => $query->where('approved', true),
+                    'poolUsers as pending_pool_users_count' => fn ($query) => $query->where('approved', false),
+                ])
+                ->where(function ($query) use ($user): void {
+                    $query->where('owner_id', $user->id)
+                        ->orWhereHas('poolUsers', function ($poolUsersQuery) use ($user): void {
+                            $poolUsersQuery
+                                ->where('user_id', $user->id)
+                                ->where('approved', true);
+                        });
+                })
+                ->orderByDesc('id')
+                ->get();
+
+            return response()->json([
+                'pools' => PoolListResponse::collection($pools)->resolve(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error(__METHOD__ . ' error: ' . $e->getMessage(), [
+                'user_id' => request()->user()?->id,
+                'exception_message' => $e->getMessage(),
+                'exception_trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'message' => 'An error occurred while retrieving pools.',
+                'error' => 'Pools retrieval failed. Please try again.',
+            ], 500);
+        }
     }
 
     public function store(StorePoolRequest $request): JsonResponse

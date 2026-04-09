@@ -104,6 +104,10 @@ Route::middleware(['api.key', 'auth:api'])->prefix('group')->group(function (): 
 });
 
 Route::middleware(['api.key', 'auth:api'])->prefix('pool')->group(function (): void {
+    Route::middleware(['scope:pool:get'])->controller(PoolController::class)->group(function (): void {
+        Route::get('/', 'index');
+    });
+
     Route::middleware(['scope:pool:add'])->controller(PoolController::class)->group(function (): void {
         Route::post('/', 'store');
         Route::post('{pool_id}', 'update');

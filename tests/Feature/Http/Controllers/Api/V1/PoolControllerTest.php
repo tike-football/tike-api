@@ -31,6 +31,16 @@ class PoolControllerTest extends TestCase
             ]);
     }
 
+    public function test_index_requires_scope(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        Passport::actingAs($user, ['different:scope']);
+
+        $response = $this->getJsonWithApiKey('/api/v1/pool');
+
+        $response->assertStatus(403);
+    }
+
     public function test_store_requires_bearer_token(): void
     {
         $response = $this->postJsonWithApiKey('/api/v1/pool', []);
@@ -725,6 +735,102 @@ class PoolControllerTest extends TestCase
             'pool_id' => $pool->id,
             'user_id' => $requestUser->id,
         ]);
+    }
+
+    public function test_index_returns_owned_and_joined_pools_with_summary_information(): void
+    {
+        $owner = User::factory()->create(['role' => 'user']);
+        $member = User::factory()->create(['role' => 'user']);
+        $pending = User::factory()->create(['role' => 'user']);
+        $otherOwner = User::factory()->create(['role' => 'user']);
+        $league = $this->createLeague();
+        $leagueSeason = $this->createLeagueSeason($league);
+        $fixture = $this->createFixture($league, (int) $leagueSeason->year);
+        $group = Group::query()->create([
+            'owner_id' => $owner->id,
+            'name' => 'Pool Group',
+            'language' => 'es',
+        ]);
+
+        $ownedPool = Pool::query()->create([
+            'owner_id' => $owner->id,
+            'league_id' => $league->id,
+            'league_season_id' => $leagueSeason->id,
+            'group_id' => $group->id,
+            'name' => 'Owned Pool',
+            'description' => str_repeat('Descripcion valida. ', 8),
+            'scope' => 'match',
+            'type' => 'selected_score',
+            'status' => 'scheduled',
+        ]);
+
+        \App\Models\PoolFixture::query()->create([
+            'pool_id' => $ownedPool->id,
+            'fixture_id' => $fixture->id,
+            'score_selection_type' => 'selected_score',
+        ]);
+
+        \App\Models\PoolUser::query()->create([
+            'pool_id' => $ownedPool->id,
+            'user_id' => $member->id,
+            'approved' => true,
+        ]);
+
+        \App\Models\PoolUser::query()->create([
+            'pool_id' => $ownedPool->id,
+            'user_id' => $pending->id,
+            'approved' => false,
+        ]);
+
+        $joinedPool = Pool::query()->create([
+            'owner_id' => $otherOwner->id,
+            'name' => 'Joined Pool',
+            'description' => str_repeat('Descripcion valida. ', 8),
+            'scope' => 'league',
+            'type' => 'league_general',
+            'status' => 'scheduled',
+        ]);
+
+        \App\Models\PoolUser::query()->create([
+            'pool_id' => $joinedPool->id,
+            'user_id' => $owner->id,
+            'approved' => true,
+        ]);
+
+        Passport::actingAs($owner, ['pool:get']);
+
+        $response = $this->getJsonWithApiKey('/api/v1/pool');
+
+        $response->assertStatus(200)
+            ->assertJsonCount(2, 'pools')
+            ->assertJsonFragment([
+                'id' => $ownedPool->id,
+                'owner_id' => $owner->id,
+                'name' => 'Owned Pool',
+                'is_owner' => true,
+                'match_id' => $fixture->id,
+                'total_approved_users' => 1,
+                'total_pending_join_requests' => 1,
+            ])
+            ->assertJsonFragment([
+                'id' => $joinedPool->id,
+                'owner_id' => $otherOwner->id,
+                'name' => 'Joined Pool',
+                'is_owner' => false,
+                'total_approved_users' => 1,
+                'total_pending_join_requests' => null,
+            ])
+            ->assertJsonFragment([
+                'id' => $group->id,
+                'name' => 'Pool Group',
+            ])
+            ->assertJsonFragment([
+                'id' => $league->id,
+                'name' => 'League Test',
+                'country' => null,
+                'season' => 2026,
+                'league_season_id' => $leagueSeason->id,
+            ]);
     }
 
     private function createLeague(): League
