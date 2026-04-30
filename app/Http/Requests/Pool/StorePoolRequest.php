@@ -3,7 +3,6 @@
 namespace App\Http\Requests\Pool;
 
 use App\Models\Fixture;
-use App\Models\LeagueSeason;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
@@ -25,7 +24,7 @@ class StorePoolRequest extends FormRequest
 
         return [
             'league_id' => ['nullable', 'integer', 'exists:leagues,id'],
-            'league_season_id' => ['nullable', 'integer', 'exists:league_seasons,id'],
+            'season' => ['nullable', 'integer'],
             'group_id' => ['nullable', 'integer', 'exists:groups,id'],
             'name' => ['required', 'string', 'min:3'],
             'description' => ['required', 'string', 'min:100'],
@@ -42,21 +41,17 @@ class StorePoolRequest extends FormRequest
     {
         $validator->after(function (Validator $validator): void {
             $leagueId = $this->input('league_id');
-            $leagueSeasonId = $this->input('league_season_id');
+            $season = $this->input('season');
             $scope = (string) $this->input('scope', '');
             $fixtureId = $this->input('fixture_id');
             $type = $this->input('type');
 
-            if ($leagueId !== null && $leagueSeasonId === null) {
-                $validator->errors()->add('league_season_id', 'The league_season_id field is required when league_id is present.');
+            if ($leagueId !== null && $season === null) {
+                $validator->errors()->add('season', 'The season field is required when league_id is present.');
             }
 
-            if ($leagueId !== null && $leagueSeasonId !== null) {
-                $season = LeagueSeason::query()->find($leagueSeasonId);
-
-                if ($season !== null && (int) $season->league_id !== (int) $leagueId) {
-                    $validator->errors()->add('league_season_id', 'The selected league_season_id does not belong to the selected league_id.');
-                }
+            if ($leagueId === null && $season !== null) {
+                $validator->errors()->add('season', 'The season field is only allowed when league_id is present.');
             }
 
             if ($scope === 'match' && $fixtureId === null) {

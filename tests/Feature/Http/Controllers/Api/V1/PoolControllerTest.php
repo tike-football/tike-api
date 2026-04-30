@@ -194,7 +194,7 @@ class PoolControllerTest extends TestCase
             ]);
     }
 
-    public function test_store_requires_league_season_when_league_id_is_present(): void
+    public function test_store_requires_season_when_league_id_is_present(): void
     {
         $user = User::factory()->create(['role' => 'user']);
         $league = $this->createLeague();
@@ -209,7 +209,27 @@ class PoolControllerTest extends TestCase
         ]);
 
         $response->assertStatus(422)
-            ->assertJsonValidationErrors(['league_season_id']);
+            ->assertJsonValidationErrors(['season']);
+    }
+
+    public function test_store_returns_validation_error_when_season_does_not_exist_for_league(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        $league = $this->createLeague();
+        $this->createLeagueSeason($league);
+        Passport::actingAs($user, ['pool:add']);
+
+        $response = $this->postJsonWithApiKey('/api/v1/pool', [
+            'league_id' => $league->id,
+            'season' => 2031,
+            'name' => 'Pool de prueba',
+            'description' => str_repeat('Descripcion valida. ', 8),
+            'scope' => 'league',
+            'type' => 'league_general',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonPath('errors.season.0', 'The selected season does not exist for the selected league.');
     }
 
     public function test_store_requires_fixture_id_and_valid_type_for_match_scope(): void
@@ -247,7 +267,7 @@ class PoolControllerTest extends TestCase
 
         $response = $this->postJsonWithApiKey('/api/v1/pool', [
             'league_id' => $league->id,
-            'league_season_id' => $leagueSeason->id,
+            'season' => (int) $leagueSeason->year,
             'name' => 'Pool de partido',
             'description' => str_repeat('Descripcion valida. ', 8),
             'scope' => 'match',
@@ -274,7 +294,7 @@ class PoolControllerTest extends TestCase
 
         $response = $this->postJsonWithApiKey('/api/v1/pool', [
             'league_id' => $league->id,
-            'league_season_id' => $leagueSeason->id,
+            'season' => (int) $leagueSeason->year,
             'name' => 'Pool de partido',
             'description' => str_repeat('Descripcion valida. ', 8),
             'scope' => 'match',
@@ -357,7 +377,7 @@ class PoolControllerTest extends TestCase
 
         $response = $this->postJsonWithApiKey('/api/v1/pool', [
             'league_id' => $league->id,
-            'league_season_id' => $leagueSeason->id,
+            'season' => (int) $leagueSeason->year,
             'group_id' => $group->id,
             'name' => 'Pool de liga',
             'description' => str_repeat('Descripcion valida. ', 8),
