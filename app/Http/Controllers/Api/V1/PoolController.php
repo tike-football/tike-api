@@ -11,6 +11,7 @@ use App\Http\Resources\Api\V1\Pool\PoolDetailResponse;
 use App\Http\Resources\Api\V1\Pool\PoolListResponse;
 use App\Http\Resources\Api\V1\Pool\PoolResponse;
 use App\Models\Fixture;
+use App\Models\LeagueSeason;
 use App\Models\Pool;
 use App\Models\PoolFixture;
 use App\Models\PoolUser;
@@ -149,12 +150,33 @@ class PoolController extends Controller
             }
 
             $validated = $request->validated();
+            $leagueSeasonId = null;
 
-            $pool = DB::transaction(function () use ($user, $validated): Pool {
+            if (isset($validated['league_id'], $validated['season'])) {
+                $leagueSeason = LeagueSeason::query()
+                    ->where('league_id', (int) $validated['league_id'])
+                    ->where('year', (int) $validated['season'])
+                    ->first();
+
+                if ($leagueSeason === null) {
+                    return response()->json([
+                        'message' => 'The given data was invalid.',
+                        'errors' => [
+                            'season' => [
+                                'The selected season does not exist for the selected league.',
+                            ],
+                        ],
+                    ], 422);
+                }
+
+                $leagueSeasonId = (int) $leagueSeason->id;
+            }
+
+            $pool = DB::transaction(function () use ($user, $validated, $leagueSeasonId): Pool {
                 $data = [
                     'owner_id' => $user->id,
                     'league_id' => $validated['league_id'] ?? null,
-                    'league_season_id' => $validated['league_season_id'] ?? null,
+                    'league_season_id' => $leagueSeasonId,
                     'group_id' => $validated['group_id'] ?? null,
                     'name' => (string) $validated['name'],
                     'description' => (string) $validated['description'],
