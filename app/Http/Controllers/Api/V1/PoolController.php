@@ -80,6 +80,73 @@ class PoolController extends Controller
         }
     }
 
+    public function search(string $term): JsonResponse
+    {
+        try {
+            $user = request()->user();
+
+            if ($user === null) {
+                return response()->json([
+                    'message' => 'Unauthenticated.',
+                ], 401);
+            }
+
+            $term = trim($term);
+
+            if (mb_strlen($term) < 3) {
+                return response()->json([
+                    'message' => 'The term must be at least 3 characters.',
+                    'errors' => [
+                        'term' => [
+                            'The term must be at least 3 characters.',
+                        ],
+                    ],
+                ], 422);
+            }
+
+            $pools = Pool::query()
+                ->with([
+                    'group:id,name',
+                    'league:id,name,country_name',
+                    'leagueSeason:id,league_id,year',
+                    'poolFixtures:id,pool_id,fixture_id',
+                ])
+                ->withCount([
+                    'poolUsers as approved_pool_users_count' => fn ($query) => $query->where('approved', true),
+                    'poolUsers as pending_pool_users_count' => fn ($query) => $query->where('approved', false),
+                ])
+                ->where('is_active', true)
+                ->where('status', 'scheduled')
+                ->where('accepts_join_requests', true)
+                ->where(function ($query) use ($term): void {
+                    $query->where('name', 'like', '%' . $term . '%')
+                        ->orWhere('description', 'like', '%' . $term . '%')
+                        ->orWhereHas('owner', function ($ownerQuery) use ($term): void {
+                            $ownerQuery->where('name', 'like', '%' . $term . '%');
+                        });
+                })
+                ->orderByDesc('id')
+                ->limit(10)
+                ->get();
+
+            return response()->json([
+                'pools' => PoolListResponse::collection($pools)->resolve(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error(__METHOD__ . ' error: ' . $e->getMessage(), [
+                'term' => $term,
+                'user_id' => request()->user()?->id,
+                'exception_message' => $e->getMessage(),
+                'exception_trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'message' => 'An error occurred while searching pools.',
+                'error' => 'Pool search failed. Please try again.',
+            ], 500);
+        }
+    }
+
     public function show(int $poolId): JsonResponse
     {
         try {

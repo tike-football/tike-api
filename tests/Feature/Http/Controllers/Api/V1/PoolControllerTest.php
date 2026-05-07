@@ -59,6 +59,16 @@ class PoolControllerTest extends TestCase
         $response->assertStatus(403);
     }
 
+    public function test_search_requires_scope(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        Passport::actingAs($user, ['different:scope']);
+
+        $response = $this->getJsonWithApiKey('/api/v1/pool/search/test');
+
+        $response->assertStatus(403);
+    }
+
     public function test_store_requires_bearer_token(): void
     {
         $response = $this->postJsonWithApiKey('/api/v1/pool', []);
@@ -67,6 +77,18 @@ class PoolControllerTest extends TestCase
             ->assertJson([
                 'message' => 'Unauthenticated.',
             ]);
+    }
+
+    public function test_search_requires_minimum_term_length(): void
+    {
+        $user = User::factory()->create(['role' => 'user']);
+        Passport::actingAs($user, ['pool:get']);
+
+        $response = $this->getJsonWithApiKey('/api/v1/pool/search/ab');
+
+        $response->assertStatus(422)
+            ->assertJsonPath('message', 'The term must be at least 3 characters.')
+            ->assertJsonPath('errors.term.0', 'The term must be at least 3 characters.');
     }
 
     public function test_store_requires_scope(): void
@@ -888,6 +910,155 @@ class PoolControllerTest extends TestCase
                 'season' => 2026,
                 'league_season_id' => $leagueSeason->id,
             ]);
+    }
+
+    public function test_search_returns_first_ten_matching_pools_by_name_description_or_owner_name(): void
+    {
+        $authUser = User::factory()->create(['role' => 'user']);
+        $ownerByName = User::factory()->create([
+            'role' => 'user',
+            'name' => 'Carlos Finder',
+        ]);
+        $otherOwner = User::factory()->create([
+            'role' => 'user',
+            'name' => 'Maria Other',
+        ]);
+        $league = $this->createLeague();
+        $leagueSeason = $this->createLeagueSeason($league);
+
+        $excludedOldPool = Pool::query()->create([
+            'owner_id' => $otherOwner->id,
+            'league_id' => $league->id,
+            'league_season_id' => $leagueSeason->id,
+            'name' => 'Finder Old Pool',
+            'description' => str_repeat('Descripcion valida. ', 8),
+            'scope' => 'league',
+            'type' => 'league_general',
+            'status' => 'scheduled',
+            'is_active' => true,
+            'accepts_join_requests' => true,
+        ]);
+
+        $poolsByName = collect();
+
+        foreach (range(1, 8) as $index) {
+            $poolsByName->push(Pool::query()->create([
+                'owner_id' => $otherOwner->id,
+                'league_id' => $league->id,
+                'league_season_id' => $leagueSeason->id,
+                'name' => 'Finder Pool ' . $index,
+                'description' => str_repeat('Descripcion valida. ', 8),
+                'scope' => 'league',
+                'type' => 'league_general',
+                'status' => 'scheduled',
+                'is_active' => true,
+                'accepts_join_requests' => true,
+            ]));
+        }
+
+        $poolByDescription = Pool::query()->create([
+            'owner_id' => $otherOwner->id,
+            'league_id' => $league->id,
+            'league_season_id' => $leagueSeason->id,
+            'name' => 'Omega Pool',
+            'description' => 'Finder term inside description. ' . str_repeat('Descripcion valida. ', 6),
+            'scope' => 'league',
+            'type' => 'league_general',
+            'status' => 'scheduled',
+            'is_active' => true,
+            'accepts_join_requests' => true,
+        ]);
+
+        $poolByOwnerName = Pool::query()->create([
+            'owner_id' => $ownerByName->id,
+            'league_id' => $league->id,
+            'league_season_id' => $leagueSeason->id,
+            'name' => 'Alpha Pool',
+            'description' => str_repeat('Descripcion valida. ', 8),
+            'scope' => 'league',
+            'type' => 'league_general',
+            'status' => 'scheduled',
+            'is_active' => true,
+            'accepts_join_requests' => true,
+        ]);
+
+        Pool::query()->create([
+            'owner_id' => $otherOwner->id,
+            'league_id' => $league->id,
+            'league_season_id' => $leagueSeason->id,
+            'name' => 'Irrelevant Pool',
+            'description' => str_repeat('Descripcion valida. ', 8),
+            'scope' => 'league',
+            'type' => 'league_general',
+            'status' => 'scheduled',
+            'is_active' => true,
+            'accepts_join_requests' => true,
+        ]);
+
+        $inactivePool = Pool::query()->create([
+            'owner_id' => $otherOwner->id,
+            'league_id' => $league->id,
+            'league_season_id' => $leagueSeason->id,
+            'name' => 'Finder Inactive Pool',
+            'description' => str_repeat('Descripcion valida. ', 8),
+            'scope' => 'league',
+            'type' => 'league_general',
+            'status' => 'scheduled',
+            'is_active' => false,
+            'accepts_join_requests' => true,
+        ]);
+
+        $runningPool = Pool::query()->create([
+            'owner_id' => $otherOwner->id,
+            'league_id' => $league->id,
+            'league_season_id' => $leagueSeason->id,
+            'name' => 'Finder Running Pool',
+            'description' => str_repeat('Descripcion valida. ', 8),
+            'scope' => 'league',
+            'type' => 'league_general',
+            'status' => 'running',
+            'is_active' => true,
+            'accepts_join_requests' => true,
+        ]);
+
+        $closedJoinPool = Pool::query()->create([
+            'owner_id' => $otherOwner->id,
+            'league_id' => $league->id,
+            'league_season_id' => $leagueSeason->id,
+            'name' => 'Finder Closed Join Pool',
+            'description' => str_repeat('Descripcion valida. ', 8),
+            'scope' => 'league',
+            'type' => 'league_general',
+            'status' => 'scheduled',
+            'is_active' => true,
+            'accepts_join_requests' => false,
+        ]);
+
+        Passport::actingAs($authUser, ['pool:get']);
+
+        $response = $this->getJsonWithApiKey('/api/v1/pool/search/Finder');
+
+        $response->assertStatus(200)
+            ->assertJsonCount(10, 'pools');
+
+        $returnedIds = collect($response->json('pools'))->pluck('id')->all();
+
+        $this->assertContains($poolByOwnerName->id, $returnedIds);
+        $this->assertContains($poolByDescription->id, $returnedIds);
+        $this->assertNotContains($excludedOldPool->id, $returnedIds);
+        $this->assertNotContains($inactivePool->id, $returnedIds);
+        $this->assertNotContains($runningPool->id, $returnedIds);
+        $this->assertNotContains($closedJoinPool->id, $returnedIds);
+
+        $response->assertJsonFragment([
+            'id' => $poolByOwnerName->id,
+            'owner_id' => $ownerByName->id,
+            'name' => 'Alpha Pool',
+            'scope' => 'league',
+            'type' => 'league_general',
+            'is_owner' => false,
+            'total_pending_join_requests' => null,
+        ]);
     }
 
     public function test_show_returns_pool_detail_for_owner_with_pending_and_approved_users(): void
